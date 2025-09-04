@@ -3,11 +3,9 @@ import { router } from 'expo-router';
 import { useState } from 'react';
 import { useAuth } from '@/contexts/auth/AuthContext';
 import { Button, TextInput, Text, useTheme } from 'react-native-paper';
-import { View } from 'react-native';
 import { ThemedView } from '@/components/ThemedView';
 
 export default function Login() {
-
     const { login } = useAuth()
 
     const [email, setEmail] = useState('')
@@ -18,7 +16,6 @@ export default function Login() {
     return (
         <ThemedView style={{ flex: 1, justifyContent: 'center', padding: 16, backgroundColor: theme.colors.background }}>
             <Text variant={'headlineMedium'} style={{ marginBottom: 16 }}>Login</Text>
-
             <TextInput
                 placeholder="Digite seu e-mail"
                 label={'E-mail'}
