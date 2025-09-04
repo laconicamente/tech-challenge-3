@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { useAuth } from '@/contexts/auth/AuthContext';
 import { Button, TextInput, Text, useTheme } from 'react-native-paper';
 import { View } from 'react-native';
+import { ThemedView } from '@/components/ThemedView';
 
 export default function Login() {
 
@@ -15,7 +16,7 @@ export default function Login() {
 
 
     return (
-        <View style={{ flex: 1, justifyContent: 'center', padding: 16, backgroundColor: theme.colors.background }}>
+        <ThemedView style={{ flex: 1, justifyContent: 'center', padding: 16, backgroundColor: theme.colors.background }}>
             <Text variant={'headlineMedium'} style={{ marginBottom: 16 }}>Login</Text>
 
             <TextInput
@@ -46,6 +47,6 @@ export default function Login() {
 
             }}> Login</Button>
             <Link href="/signup" style={{ marginTop: 16 }}>Não tem uma conta? Crie uma agora!</Link>
-        </View>
+        </ThemedView>
     );
 }
