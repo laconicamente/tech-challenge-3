@@ -78,5 +78,5 @@ const lightPalette = {
     "logo.filter": "brightness(1)",
   };
   
-  export const colorsPalette = { light: lightPalette, dark: darkPalette };
+  export const ColorsPalette = { light: lightPalette, dark: darkPalette };
   

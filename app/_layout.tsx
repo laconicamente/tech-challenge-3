@@ -25,6 +25,7 @@ export default function RootLayout() {
       <PaperProvider theme={colorScheme === 'dark' ? PaperDarkTheme : PaperLightTheme}>
         <Stack>
           <Stack.Screen name="(auth)/index" options={{ headerShown: false }} />
+          <Stack.Screen name="(protected)" />
           <Stack.Screen name="+not-found" />
         </Stack>
         <StatusBar style="auto" />

@@ -1,4 +1,4 @@
-import { colorsPalette } from './Pallete';
+import { ColorsPalette } from './Pallete';
 
 /**
  * Below are the colors that are used in the app. The colors are defined in the light and dark mode.
@@ -6,30 +6,30 @@ import { colorsPalette } from './Pallete';
  */
 export const Colors = {
   light: {
-    ...colorsPalette.light,
-    primary: colorsPalette.light["lime.500"],
-    accent: colorsPalette.light["lime.700"],
-    background: colorsPalette.light.background,
-    surface: colorsPalette.light["white.main"],
-    text: colorsPalette.light["grey.900"],
-    error: colorsPalette.light["red.200"],
-    disabled: colorsPalette.light["grey.400"],
-    placeholder: colorsPalette.light["grey.400"],
-    onSurface: colorsPalette.light["grey.900"],
-    notification: colorsPalette.light["lime.500"],
+    ...ColorsPalette.light,
+    primary: ColorsPalette.light["lime.500"],
+    accent: ColorsPalette.light["lime.700"],
+    background: ColorsPalette.light.background,
+    surface: ColorsPalette.light["white.main"],
+    text: ColorsPalette.light["grey.900"],
+    error: ColorsPalette.light["red.200"],
+    disabled: ColorsPalette.light["grey.400"],
+    placeholder: ColorsPalette.light["grey.400"],
+    onSurface: ColorsPalette.light["grey.900"],
+    notification: ColorsPalette.light["lime.500"],
   },
   dark: {
-    ...colorsPalette.dark,
-    primary: colorsPalette.dark["lime.500"],
-    accent: colorsPalette.dark["lime.700"],
-    background: colorsPalette.dark.background,
-    surface: colorsPalette.dark["black.main"],
-    text: colorsPalette.dark["lime.accent"],
-    error: colorsPalette.dark["red.200"],
-    disabled: colorsPalette.dark["grey.400"],
-    placeholder: colorsPalette.dark["grey.400"],
-    onSurface: colorsPalette.dark["lime.accent"],
-    notification: colorsPalette.dark["lime.500"],
+    ...ColorsPalette.dark,
+    primary: ColorsPalette.dark["lime.500"],
+    accent: ColorsPalette.dark["lime.700"],
+    background: ColorsPalette.dark.background,
+    surface: ColorsPalette.dark["black.main"],
+    text: ColorsPalette.dark["lime.accent"],
+    error: ColorsPalette.dark["red.200"],
+    disabled: ColorsPalette.dark["grey.400"],
+    placeholder: ColorsPalette.dark["grey.400"],
+    onSurface: ColorsPalette.dark["lime.accent"],
+    notification: ColorsPalette.dark["lime.500"],
   },
 };
 
