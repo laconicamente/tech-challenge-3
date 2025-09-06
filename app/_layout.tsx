@@ -6,10 +6,14 @@ import 'react-native-reanimated';
 
 import { useColorScheme } from '@/hooks/useColorScheme';
 import { AuthProvider } from '@/contexts/auth/AuthContext';
-import { PaperProvider } from 'react-native-paper';
+import { PaperProvider, useTheme } from 'react-native-paper';
 import { PaperDarkTheme, PaperLightTheme } from '@/constants/Colors';
+import Logo from '../assets/images/logo.svg';
+import { Feather } from '@expo/vector-icons';
+import { View, Image, TouchableOpacity, Alert } from 'react-native';
 
 export default function RootLayout() {
+  const theme = useTheme();
   const colorScheme = useColorScheme();
   const [loaded] = useFonts({
     SpaceMono: require('../assets/fonts/SpaceMono-Regular.ttf'),
@@ -20,12 +24,52 @@ export default function RootLayout() {
     return null;
   }
 
+  
+  const AppHeader = () => {
+    const handleLogout = () => {      
+      Alert.alert("Sair", "Você tem certeza que quer sair da aplicação?", [
+        { text: "Cancelar" },
+        { text: "Sair", onPress: () => {
+          console.log('Usuário deslogado!');
+        }}
+      ]);
+    };
+
+    return (
+      <View style={{
+        flexDirection: 'row',
+        alignItems: 'center',
+        justifyContent: 'space-between',
+        paddingHorizontal: 16,
+        paddingVertical: 12,
+        backgroundColor: theme.colors.surface, 
+        borderBottomWidth: 1,
+        borderBottomColor: '#d0d0d078',
+      }}>
+        <View>
+          <Image 
+            source={Logo} 
+            style={{ width: 130, height: 30, resizeMode: 'contain' }} 
+          />
+        </View>
+          <TouchableOpacity onPress={handleLogout}>
+          <Feather name="log-out" size={24} color={theme.colors.shadow} />
+        </TouchableOpacity>
+      </View>
+    );
+  };
+  
   return (
     <AuthProvider>
       <PaperProvider theme={colorScheme === 'dark' ? PaperDarkTheme : PaperLightTheme}>
         <Stack>
           <Stack.Screen name="(auth)/index" options={{ headerShown: false }} />
-          <Stack.Screen name="(protected)" />
+          <Stack.Screen name="(protected)" options={{
+          headerTitle: '',
+          headerShown: true,
+          header: () => <AppHeader />, 
+        }}
+        />
           <Stack.Screen name="+not-found" />
         </Stack>
         <StatusBar style="auto" />
