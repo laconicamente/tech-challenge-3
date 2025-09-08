@@ -1,6 +1,4 @@
-import { View, TouchableOpacity, StyleSheet, Dimensions, Text } from "react-native";
-
-const { width } = Dimensions.get('window');
+import { View, TouchableOpacity, StyleSheet, Text } from "react-native";
 
 interface BytebankTabSelectorProps {
     tabs: Array<{ name: string, label: string }>,
@@ -31,7 +29,7 @@ const styles = StyleSheet.create({
         backgroundColor: '#f0f0f0',
         borderRadius: 50,
         padding: 5,
-        width: width * 0.88,
+        width: '100%',
         marginBottom: 30,
     },
     tabButton: {

@@ -15,10 +15,7 @@ export default function ProtectedLayout() {
         <Tabs
             tabBar={() => <BytebankTabBar />}
             screenOptions={{
-                // tabBarActiveTintColor: ColorsPalette[colorScheme ?? 'light']['lime.200'],
-                // tabBarBackground: TabBarBackground,
                 headerShown: false,
-                // tabBarButton: HapticTab,
                 tabBarStyle: Platform.select({
                     ios: { position: 'absolute' },
                     default: {},
@@ -31,9 +28,9 @@ export default function ProtectedLayout() {
                 }}
             />
             <Tabs.Screen
-                name="statistics"
+                name="transactions"
                 options={{
-                    title: 'Estatísticas',
+                    title: 'Transações',
                 }}
             />
             <Tabs.Screen

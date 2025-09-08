@@ -21,9 +21,9 @@ const BytebankTabBar = () => {
 
     const tabs: { name: `/${string}`; label: string; icon: React.ComponentProps<typeof Feather>['name'] }[] = [
         { name: '/dashboard', label: 'Início', icon: 'home' },
-        { name: '/statistics', label: 'Estatísticas', icon: 'bar-chart-2' },
+        { name: '/transactions', label: 'Transações', icon: 'dollar-sign'},
         { name: '/add', label: 'Criar transação', icon: 'plus' },
-        { name: '/cards', label: 'Cartões', icon: 'refresh-ccw' },
+        { name: '/cards', label: 'Cartões', icon: 'credit-card' },
         { name: '/profile', label: 'Perfil', icon: 'user' },
     ];
     const activeTab = '/' + (segments[1] ?? 'dashboard');

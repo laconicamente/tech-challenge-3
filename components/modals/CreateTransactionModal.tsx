@@ -7,6 +7,9 @@ import { BytebankInput } from '../ui/Input';
 import { BytebankTabSelector } from '../ui/TabSelector';
 
 const height = Dimensions.get('window').height;
+// Define a porcentagem da altura do modal
+const MODAL_HEIGHT_PERCENTAGE = 0.9;
+const MODAL_START_POSITION = height * (1 - MODAL_HEIGHT_PERCENTAGE);
 
 interface CreateTransactionModalProps {
     visible: boolean;
@@ -30,7 +33,7 @@ const CreateTransactionModal: React.FC<CreateTransactionModalProps> = ({ visible
         if (visible) {
             pan.setValue({ x: 0, y: 0 });
             Animated.timing(slideAnim, {
-                toValue: Platform.OS === 'web' ? 0 : height * 0.25,
+                toValue: Platform.OS === 'web' ? 0 : MODAL_START_POSITION,
                 duration: 300,
                 useNativeDriver: Platform.OS !== 'web',
             }).start();
@@ -169,7 +172,7 @@ const styles = StyleSheet.create({
         padding: 20,
         paddingBottom: 90,
         width: '100%',
-        maxHeight: height * 0.7,
+        minHeight: height * MODAL_HEIGHT_PERCENTAGE,
     },
     dragHandle: {
         width: 40,
