@@ -31,7 +31,7 @@ export default function Profile() {
         />
       <Button  onPress={() => { 
         logout()
-        router.replace('/(auth)/login') 
+        router.replace('/(auth)/account-access') 
       }}> Sair </Button>
     </View>
   );

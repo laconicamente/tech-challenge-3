@@ -1,6 +1,5 @@
-import { DarkTheme, DefaultTheme, ThemeProvider } from '@react-navigation/native';
 import { useFonts } from 'expo-font';
-import { Stack } from 'expo-router';
+import { router, Stack } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import 'react-native-reanimated';
 
@@ -28,10 +27,11 @@ export default function RootLayout() {
   
   const AppHeader = () => {
     const handleLogout = () => {      
-      Alert.alert("Sair", "Você tem certeza que quer sair da aplicação?", [
+      Alert.alert("Sair", "Você tem certeza que deseja sair da aplicação?", [
         { text: "Cancelar" },
         { text: "Sair", onPress: () => {
           console.log('Usuário deslogado!');
+          router.replace('/account-access')
         }}
       ]);
     };
@@ -65,7 +65,8 @@ export default function RootLayout() {
     <AuthProvider>
       <PaperProvider theme={colorScheme === 'dark' ? PaperDarkTheme : PaperLightTheme}>
         <Stack>
-          <Stack.Screen name="(auth)" options={{ headerShown: false }} />
+          <Stack.Screen name="index" options={{ headerShown: false }} />
+          <Stack.Screen name="(auth)/account-access" options={{ headerShown: false }} />
           <Stack.Screen name="(protected)" options={{
           headerTitle: '',
           headerShown: true,
