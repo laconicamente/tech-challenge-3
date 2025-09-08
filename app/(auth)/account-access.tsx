@@ -18,8 +18,8 @@ import { useAuth } from '@/contexts/auth/AuthContext';
 import { router } from 'expo-router';
 import { BytebankButton } from '@/components/ui/Button';
 import { BytebankInput } from '@/components/ui/Input';
+import { BytebankTabSelector } from '@/components/ui/TabSelector';
 
-const { width } = Dimensions.get('window');
 
 const AccountAccessScreen = () => {
     const { login, signUp } = useAuth();
@@ -80,21 +80,7 @@ const AccountAccessScreen = () => {
                     />
                     <Text style={styles.title}>Experimente mais liberdade no controle da sua vida financeira.</Text>
 
-                    <View style={styles.tabSelector}>
-                        <TouchableOpacity
-                            style={[styles.tabButton, activeTab === 'login' && styles.tabActive]}
-                            onPress={() => handleTabChange('login')}
-                        >
-                            <Text style={[styles.tabText, activeTab === 'login' && styles.tabTextActive]}>Login</Text>
-                        </TouchableOpacity>
-                        <TouchableOpacity
-                            style={[styles.tabButton, activeTab === 'register' && styles.tabActive]}
-                            onPress={() => handleTabChange('register')}
-                        >
-                            <Text style={[styles.tabText, activeTab === 'register' && styles.tabTextActive]}>Crie uma conta</Text>
-                        </TouchableOpacity>
-                    </View>
-
+                    <BytebankTabSelector tabs={[{label: 'Login', name: 'login'}, {label: 'Crie uma conta', name: 'register'}]} activeTab={activeTab} onTabChange={handleTabChange} />
                     {activeTab === 'login' ? (
                         <View style={styles.formContainer}>
                             <BytebankInput
@@ -148,9 +134,6 @@ const AccountAccessScreen = () => {
                                 mode="outlined"
                                 secureTextEntry={!showRegisterPassword}
                                 placeholder="********"
-                                style={styles.input}
-                                outlineStyle={styles.inputOutline}
-                                theme={{ colors: { primary: theme.colors.primary, onSurfaceVariant: 'gray', onSurface: 'gray' } }}
                                 right={
                                     <TextInput.Icon
                                         icon={() => <Feather name={showRegisterPassword ? "eye-off" : "eye"} size={20} color="gray" />}
@@ -185,62 +168,8 @@ const styles = StyleSheet.create({
         textAlign: 'center',
         marginBottom: 40,
     },
-    tabSelector: {
-        flexDirection: 'row',
-        backgroundColor: '#f0f0f0',
-        borderRadius: 50,
-        padding: 5,
-        width: width * 0.85,
-        marginBottom: 30,
-    },
-    tabButton: {
-        flex: 1,
-        paddingVertical: 12,
-        borderRadius: 50,
-        justifyContent: 'center',
-        alignItems: 'center',
-    },
-    tabActive: {
-        backgroundColor: 'white',
-        shadowColor: '#000',
-        shadowOffset: { width: 0, height: 2 },
-        shadowOpacity: 0.1,
-        shadowRadius: 5,
-        elevation: 3,
-    },
-    tabText: {
-        fontSize: 16,
-        color: '#888',
-    },
-    tabTextActive: {
-        color: '#000',
-    },
     formContainer: {
         width: '100%',
-    },
-    inputLabel: {
-        fontSize: 14,
-        color: '#333',
-        marginBottom: 5,
-        marginLeft: 10,
-        fontWeight: '500',
-    },
-    input: {
-        height: 50,
-        backgroundColor: '#f0f0f0',
-        borderRadius: 10,
-        marginBottom: 20,
-    },
-    inputOutline: {
-        borderRadius: 10,
-        borderWidth: 0,
-    },
-    rowContainer: {
-        flexDirection: 'row',
-        justifyContent: 'space-between',
-        alignItems: 'center',
-        width: '100%',
-        marginBottom: 40,
     },
 });
 
