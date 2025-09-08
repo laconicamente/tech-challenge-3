@@ -17,6 +17,7 @@ import { Feather } from '@expo/vector-icons';
 import { useAuth } from '@/contexts/auth/AuthContext';
 import { router } from 'expo-router';
 import { BytebankButton } from '@/components/ui/Button';
+import { BytebankInput } from '@/components/ui/Input';
 
 const { width } = Dimensions.get('window');
 
@@ -33,7 +34,6 @@ const AccountAccessScreen = () => {
     const [registerEmail, setRegisterEmail] = useState('');
     const [registerPassword, setRegisterPassword] = useState('');
     const [showRegisterPassword, setShowRegisterPassword] = useState(false);
-
 
     const handleLogin = () => {
         console.log('Tentativa de login com:', email, password);
@@ -53,7 +53,7 @@ const AccountAccessScreen = () => {
 
     const handleTabChange = (name: 'login' | 'register') => {
         setActiveTab(name);
-        
+
         if (name === 'register') {
             setName('');
             setRegisterEmail('');
@@ -97,29 +97,20 @@ const AccountAccessScreen = () => {
 
                     {activeTab === 'login' ? (
                         <View style={styles.formContainer}>
-                            <Text style={styles.inputLabel}>Digite o seu e-mail</Text>
-                            <TextInput
+                            <BytebankInput
+                                label={'Digite o seu e-mail'}
                                 value={email}
                                 onChangeText={setEmail}
-                                keyboardType={'email-address'}
-                                mode="outlined"
-                                placeholder="email@example.com"
-                                style={styles.input}
-                                outlineStyle={styles.inputOutline}
-                                theme={{ colors: { primary: theme.colors.primary, onSurfaceVariant: 'gray', onSurface: 'gray' } }}
-                            />
+                                type={'email-address'}
+                                placeholder="email@example.com" />
 
-                            <Text style={styles.inputLabel}>Digite a sua senha</Text>
-                            <TextInput
+                            <BytebankInput
+                                label={'Digite a sua senha'}
                                 value={password}
                                 onChangeText={setPassword}
-                                keyboardType={'visible-password'}
-                                mode="outlined"
+                                type={'visible-password'}
                                 secureTextEntry={!showPassword}
                                 placeholder="********"
-                                style={styles.input}
-                                outlineStyle={styles.inputOutline}
-                                theme={{ colors: { primary: theme.colors.primary, onSurfaceVariant: 'gray', onSurface: 'gray' } }}
                                 right={
                                     <TextInput.Icon
                                         icon={() => <Feather name={showPassword ? "eye-off" : "eye"} size={20} color="gray" />}
@@ -133,31 +124,24 @@ const AccountAccessScreen = () => {
                         </View>
                     ) : (
                         <View style={styles.formContainer}>
-                            <Text style={styles.inputLabel}>Nome</Text>
-                            <TextInput
+                            <BytebankInput
                                 value={name}
                                 onChangeText={setName}
-                                mode="outlined"
                                 placeholder="Seu nome"
-                                style={styles.input}
-                                outlineStyle={styles.inputOutline}
-                                theme={{ colors: { primary: theme.colors.primary, onSurfaceVariant: 'gray', onSurface: 'gray' } }}
-                            />
+                                label={'Nome'} />
 
-                            <Text style={styles.inputLabel}>E-mail</Text>
-                            <TextInput
+
+                            <BytebankInput
+                                label={'Digite o e-mail'}
                                 value={registerEmail}
                                 onChangeText={setRegisterEmail}
                                 keyboardType={'email-address'}
                                 mode="outlined"
                                 placeholder="email@example.com"
-                                style={styles.input}
-                                outlineStyle={styles.inputOutline}
-                                theme={{ colors: { primary: theme.colors.primary, onSurfaceVariant: 'gray', onSurface: 'gray' } }}
                             />
 
-                            <Text style={styles.inputLabel}>Senha</Text>
-                            <TextInput
+                            <BytebankInput
+                                label={'Digite a senha'}
                                 value={registerPassword}
                                 onChangeText={setRegisterPassword}
                                 keyboardType={'visible-password'}

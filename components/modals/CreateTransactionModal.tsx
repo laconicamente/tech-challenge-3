@@ -30,13 +30,13 @@ const CreateTransactionModal: React.FC<CreateTransactionModalProps> = ({ visible
             Animated.timing(slideAnim, {
                 toValue:  Platform.OS === 'web' ? 0 : height * 0.35, // Modal para o fundo, não topo
                 duration: 300,
-                useNativeDriver: true,
+                useNativeDriver: Platform.OS !== 'web',
             }).start();
         } else {
             Animated.timing(slideAnim, {
                 toValue: height,
                 duration: 300,
-                useNativeDriver: true,
+                useNativeDriver: Platform.OS !== 'web',
             }).start();
         }
     }, [visible, slideAnim]);
@@ -60,13 +60,13 @@ const CreateTransactionModal: React.FC<CreateTransactionModalProps> = ({ visible
                     Animated.timing(pan, {
                         toValue: { x: 0, y: height },
                         duration: 200,
-                        useNativeDriver: true,
+                        useNativeDriver: Platform.OS !== 'web',
                     }).start(() => onDismiss());
                 } else {
                     // Volta o modal para a posição original
                     Animated.spring(pan, {
                         toValue: { x: 0, y: 0 },
-                        useNativeDriver: true,
+                        useNativeDriver: Platform.OS !== 'web',
                     }).start();
                 }
             },
