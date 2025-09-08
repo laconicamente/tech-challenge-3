@@ -11,6 +11,7 @@ import { PaperDarkTheme, PaperLightTheme } from '@/constants/Colors';
 import Logo from '../assets/images/logo.svg';
 import { Feather } from '@expo/vector-icons';
 import { View, Image, TouchableOpacity, Alert } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 
 export default function RootLayout() {
   const theme = useTheme();
@@ -36,26 +37,27 @@ export default function RootLayout() {
     };
 
     return (
+      <SafeAreaView
+      edges={['top']}
+      style={{
+        backgroundColor: theme.colors.surface,
+        borderBottomWidth: 1,
+        borderBottomColor: '#d0d0d078',
+      }}
+    >
       <View style={{
         flexDirection: 'row',
         alignItems: 'center',
         justifyContent: 'space-between',
         paddingHorizontal: 16,
         paddingVertical: 12,
-        backgroundColor: theme.colors.surface, 
-        borderBottomWidth: 1,
-        borderBottomColor: '#d0d0d078',
       }}>
-        <View>
-          <Image 
-            source={Logo} 
-            style={{ width: 130, height: 30, resizeMode: 'contain' }} 
-          />
-        </View>
-          <TouchableOpacity onPress={handleLogout}>
+        <Logo width={130} height={30} />
+        <TouchableOpacity onPress={handleLogout}>
           <Feather name="log-out" size={24} color={theme.colors.shadow} />
         </TouchableOpacity>
       </View>
+    </SafeAreaView>
     );
   };
   
@@ -63,7 +65,7 @@ export default function RootLayout() {
     <AuthProvider>
       <PaperProvider theme={colorScheme === 'dark' ? PaperDarkTheme : PaperLightTheme}>
         <Stack>
-          <Stack.Screen name="(auth)/index" options={{ headerShown: false }} />
+          <Stack.Screen name="(auth)" options={{ headerShown: false }} />
           <Stack.Screen name="(protected)" options={{
           headerTitle: '',
           headerShown: true,

@@ -38,7 +38,7 @@ export default function Login() {
             <Button mode="contained" labelStyle={{ color: theme.colors.surface }} onPress={() => {
 
                 const isAuthenticated = login(email, password)
-                if (isAuthenticated) {
+                if (!isAuthenticated) {
                     router.replace('/(protected)/profile')
                 }
 
