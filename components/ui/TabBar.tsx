@@ -4,8 +4,10 @@ import { Href, useRouter, useSegments } from 'expo-router';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useState } from 'react';
 import CreateTransactionModal from '../modals/CreateTransactionModal';
+import { useTheme } from 'react-native-paper';
 
-const CustomTabBar = () => {
+const BytebankTabBar = () => {
+    const theme = useTheme();
     const router = useRouter();
     const segments = useSegments();
     const [isModalVisible, setIsModalVisible] = useState(false);
@@ -39,10 +41,10 @@ const CustomTabBar = () => {
                             onPress={() => showModal()}
                         >
                             <LinearGradient
-                                colors={['#8BC34A', '#689F38']}
+                                colors={[theme.colors.primary, theme.colors.primary]}
                                 style={styles.gradient}
                             >
-                                <Feather name="plus" size={30} color="white" />
+                                <Feather name="plus" size={30} color="black" />
                             </LinearGradient>
                         </TouchableOpacity>
                     );
@@ -54,8 +56,8 @@ const CustomTabBar = () => {
                         style={styles.tabButton}
                         onPress={() => router.replace(tab.name as Href)}
                     >
-                        <Feather name={tab.icon} size={24} color={isFocused ? '#8BC34A' : 'gray'} />
-                        <Text style={{ color: isFocused ? '#8BC34A' : 'gray', fontSize: 12 }}>
+                        <Feather name={tab.icon} size={24} color={isFocused ? theme.colors.primary : 'gray'} />
+                        <Text style={{ color: isFocused ? theme.colors.primary : 'gray', fontSize: 12 }}>
                             {tab.label}
                         </Text>
                     </TouchableOpacity>
@@ -84,7 +86,7 @@ const styles = StyleSheet.create({
         shadowOpacity: 0.1,
         shadowRadius: 5,
         justifyContent: 'space-around',
-        height: 70,
+        height: 80,
     },
     tabButton: {
         flex: 1,
@@ -116,4 +118,4 @@ const styles = StyleSheet.create({
     },
 });
 
-export default CustomTabBar;
+export default BytebankTabBar;

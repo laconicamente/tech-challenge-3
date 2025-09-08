@@ -3,8 +3,6 @@ import {
     View,
     Text,
     StyleSheet,
-    Dimensions,
-    TouchableOpacity,
     TouchableWithoutFeedback,
     Keyboard,
     KeyboardAvoidingView,
@@ -12,7 +10,7 @@ import {
     Image,
     ScrollView,
 } from 'react-native';
-import { TextInput, useTheme } from 'react-native-paper';
+import { TextInput } from 'react-native-paper';
 import { Feather } from '@expo/vector-icons';
 import { useAuth } from '@/contexts/auth/AuthContext';
 import { router } from 'expo-router';
@@ -23,7 +21,6 @@ import { BytebankTabSelector } from '@/components/ui/TabSelector';
 
 const AccountAccessScreen = () => {
     const { login, signUp } = useAuth();
-    const theme = useTheme();
     const [activeTab, setActiveTab] = useState('login');
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
@@ -39,7 +36,7 @@ const AccountAccessScreen = () => {
         console.log('Tentativa de login com:', email, password);
         const isAuthenticated = login(email, password);
         if (!isAuthenticated) {
-            router.replace('/(protected)/profile');
+            router.replace('/(protected)/dashboard');
         }
     };
 
@@ -51,7 +48,7 @@ const AccountAccessScreen = () => {
         setRegisterPassword('');
     };
 
-    const handleTabChange = (name: 'login' | 'register') => {
+    const handleTabChange = (name: string) => {
         setActiveTab(name);
 
         if (name === 'register') {

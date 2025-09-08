@@ -1,11 +1,13 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { View, StyleSheet, TouchableOpacity, Text, Animated, Dimensions, PanResponder, Platform } from 'react-native';
+import { View, StyleSheet, Text, Animated, Dimensions, PanResponder, Platform, TouchableWithoutFeedback, KeyboardAvoidingView, Keyboard, ScrollView } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { Modal, Portal, TextInput, Button, Card, Divider } from 'react-native-paper';
+import { Modal, Portal, Card, Divider } from 'react-native-paper';
+import { BytebankButton } from '../ui/Button';
+import { BytebankInput } from '../ui/Input';
+import { BytebankTabSelector } from '../ui/TabSelector';
 
-// Obtém a altura da tela
 const height = Dimensions.get('window').height;
-  
+
 interface CreateTransactionModalProps {
     visible: boolean;
     onDismiss: () => void;
@@ -13,7 +15,8 @@ interface CreateTransactionModalProps {
 }
 
 const CreateTransactionModal: React.FC<CreateTransactionModalProps> = ({ visible, onDismiss, onFinished }) => {
-    const [tipoTransacao, setTipoTransacao] = useState('ENTRADA');
+    const [transactionType, setTransactionType] = useState('income');
+
     const [descricao, setDescricao] = useState('');
     const [valor, setValor] = useState('');
     const [categoria, setCategoria] = useState('');
@@ -23,12 +26,11 @@ const CreateTransactionModal: React.FC<CreateTransactionModalProps> = ({ visible
     // Valor animado para o gesto de deslizar
     const pan = useRef(new Animated.ValueXY()).current;
 
-    // Usa useEffect para iniciar a animação quando a prop 'visible' muda
     useEffect(() => {
         if (visible) {
             pan.setValue({ x: 0, y: 0 });
             Animated.timing(slideAnim, {
-                toValue:  Platform.OS === 'web' ? 0 : height * 0.35, // Modal para o fundo, não topo
+                toValue: Platform.OS === 'web' ? 0 : height * 0.25,
                 duration: 300,
                 useNativeDriver: Platform.OS !== 'web',
             }).start();
@@ -73,8 +75,12 @@ const CreateTransactionModal: React.FC<CreateTransactionModalProps> = ({ visible
         })
     ).current;
 
-    const handleConcluir = () => {
-        console.log({ tipoTransacao, descricao, valor, categoria });
+    const handleTabChange = (name: string) => {
+        setTransactionType(name);
+    };
+
+    const handleCreateTransaction = () => {
+        console.log({ transactionType, descricao, valor, categoria });
         onFinished();
         onDismiss();
     };
@@ -93,77 +99,50 @@ const CreateTransactionModal: React.FC<CreateTransactionModalProps> = ({ visible
                     ]}
                     {...panResponder.panHandlers}
                 >
-                      <SafeAreaView edges={['bottom']}>
-                    <Card style={styles.card}>
-                        <View style={styles.dragHandle} />
-                        <View style={styles.header}>
-                            <Text style={styles.title}>Nova transação</Text>
-                        </View>
-                        <Divider />
-
-                        <View style={styles.buttonGroup}>
-                            <Button
-                                mode={tipoTransacao === 'ENTRADA' ? 'contained' : 'outlined'}
-                                onPress={() => setTipoTransacao('ENTRADA')}
-                                style={styles.button}
-                                labelStyle={{ color: tipoTransacao === 'ENTRADA' ? 'white' : 'black' }}
-                                buttonColor={tipoTransacao === 'ENTRADA' ? '#8BC34A' : 'transparent'}
+                    <KeyboardAvoidingView
+                        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+                    >
+                        <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
+                            <ScrollView
+                                keyboardShouldPersistTaps="handled"
                             >
-                                ENTRADA
-                            </Button>
-                            <Button
-                                mode={tipoTransacao === 'SAÍDA' ? 'contained' : 'outlined'}
-                                onPress={() => setTipoTransacao('SAÍDA')}
-                                style={styles.button}
-                                labelStyle={{ color: tipoTransacao === 'SAÍDA' ? 'white' : 'black' }}
-                                buttonColor={tipoTransacao === 'SAÍDA' ? '#8BC34A' : 'transparent'}
-                            >
-                                SAÍDA
-                            </Button>
-                        </View>
+                                <SafeAreaView edges={['bottom']}>
+                                    <Card style={styles.card}>
+                                        <View style={styles.dragHandle} />
+                                        <View style={styles.header}>
+                                            <Text style={styles.title}>Nova transação</Text>
+                                        </View>
+                                        <Divider />
 
-                        <TextInput
-                            label="Descrição"
-                            value={descricao}
-                            onChangeText={setDescricao}
-                            mode="outlined"
-                            style={styles.input}
-                            placeholder="Descreva sua transação"
-                            theme={{ colors: { primary: '#8BC34A' } }}
-                        />
+                                        <BytebankTabSelector tabs={[{ label: 'Entrada', name: 'income' }, { label: 'Saída', name: 'expense' }]} activeTab={transactionType} onTabChange={handleTabChange} />
+                                        <BytebankInput
+                                            label={'Descrição'}
+                                            value={descricao}
+                                            onChangeText={setDescricao}
+                                            placeholder="Descreva sua transação"
+                                        />
 
-                        <TextInput
-                            label="Valor"
-                            value={valor}
-                            onChangeText={setValor}
-                            mode="outlined"
-                            keyboardType="numeric"
-                            style={styles.input}
-                            placeholder="R$ 0,00"
-                            theme={{ colors: { primary: '#8BC34A' } }}
-                        />
+                                        <BytebankInput
+                                            label={'Valor'}
+                                            value={valor}
+                                            onChangeText={setValor}
+                                            placeholder="R$ 0,00"
+                                        />
 
-                        <TextInput
-                            label="Categoria"
-                            value={categoria}
-                            onChangeText={setCategoria}
-                            mode="outlined"
-                            style={styles.input}
-                            placeholder="Selecione uma categoria"
-                            theme={{ colors: { primary: '#8BC34A' } }}
-                        />
-
-                        <Button
-                            mode="contained"
-                            onPress={handleConcluir}
-                            style={styles.concluirButton}
-                            buttonColor="#333"
-                            labelStyle={{ color: 'white' }}
-                        >
-                            Concluir
-                        </Button>
-                    </Card>
-                    </SafeAreaView>
+                                        <BytebankInput
+                                            label={'Selecione uma categoria'}
+                                            value={categoria}
+                                            onChangeText={setCategoria}
+                                            placeholder="Ex: Alimentação"
+                                        />
+                                        <BytebankButton color="primary" variant="contained" onPress={handleCreateTransaction}>
+                                            Concluir
+                                        </BytebankButton>
+                                    </Card>
+                                </SafeAreaView>
+                            </ScrollView>
+                        </TouchableWithoutFeedback>
+                    </KeyboardAvoidingView>
                 </Animated.View>
             </Modal>
         </Portal>
@@ -190,7 +169,7 @@ const styles = StyleSheet.create({
         padding: 20,
         paddingBottom: 90,
         width: '100%',
-        maxHeight: height * 0.7, 
+        maxHeight: height * 0.7,
     },
     dragHandle: {
         width: 40,
@@ -204,30 +183,11 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         justifyContent: 'space-between',
         alignItems: 'center',
-        marginBottom: 10,
+        marginBottom: 15,
     },
     title: {
-        fontSize: 20,
+        fontSize: 22,
         fontWeight: 'bold',
-    },
-    buttonGroup: {
-        flexDirection: 'row',
-        justifyContent: 'space-between',
-        marginVertical: 20,
-    },
-    button: {
-        flex: 1,
-        marginHorizontal: 5,
-        borderRadius: 5,
-    },
-    input: {
-        marginBottom: 15,
-        backgroundColor: 'transparent',
-    },
-    concluirButton: {
-        marginTop: 20,
-        borderRadius: 5,
-        paddingVertical: 5,
     },
 });
 

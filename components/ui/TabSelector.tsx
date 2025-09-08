@@ -31,7 +31,7 @@ const styles = StyleSheet.create({
         backgroundColor: '#f0f0f0',
         borderRadius: 50,
         padding: 5,
-        width: width * 0.85,
+        width: width * 0.88,
         marginBottom: 30,
     },
     tabButton: {
