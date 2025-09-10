@@ -1,5 +1,5 @@
 import { useFonts } from 'expo-font';
-import { router, Stack } from 'expo-router';
+import { router, SplashScreen, Stack } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import 'react-native-reanimated';
 
@@ -9,8 +9,11 @@ import { PaperProvider, useTheme } from 'react-native-paper';
 import { PaperDarkTheme, PaperLightTheme } from '@/constants/Colors';
 import Logo from '../assets/images/logo.svg';
 import { Feather } from '@expo/vector-icons';
-import { View, Image, TouchableOpacity, Alert } from 'react-native';
+import { View, TouchableOpacity, Alert } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { useEffect } from 'react';
+
+SplashScreen.preventAutoHideAsync();
 
 export default function RootLayout() {
   const theme = useTheme();
@@ -18,6 +21,14 @@ export default function RootLayout() {
   const [loaded] = useFonts({
     SpaceMono: require('../assets/fonts/SpaceMono-Regular.ttf'),
   });
+
+  useEffect(() => {
+    if (loaded) {
+      SplashScreen.hideAsync();
+      // Redireciona para a página de login
+      // router.replace('/login'); // Rota baseada na estrutura de arquivos
+    }
+  }, [loaded]);
 
   if (!loaded) {
     // Async font loading only occurs in development.

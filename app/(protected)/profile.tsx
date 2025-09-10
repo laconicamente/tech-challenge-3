@@ -1,4 +1,4 @@
-import CreateTransactionModal from '@/components/modals/CreateTransactionModal';
+import CreateTransactionModal from '@/shared/modals/CreateTransactionModal';
 import { useAuth } from '@/contexts/auth/AuthContext';
 import { router } from 'expo-router';
 import { useState } from 'react';

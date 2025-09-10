@@ -1,4 +1,4 @@
-import { StyleSheet } from "react-native";
+import { Animated, StyleProp, StyleSheet, TextStyle, ViewStyle } from "react-native";
 import { Button, ButtonProps, useTheme } from "react-native-paper";
 
 
@@ -19,6 +19,8 @@ export interface BytebankButtonProps extends ButtonProps {
 
     variant?: 'contained' | 'text' | 'outlined';
     onPress?: () => void;
+    styles?: Animated.WithAnimatedValue<StyleProp<ViewStyle>>;
+    labelStyles?:  StyleProp<TextStyle>;
 }
 
 export function BytebankButton({
@@ -26,7 +28,9 @@ export function BytebankButton({
     variant = 'contained',
     borderRadius,
     onPress,
-    children
+    children,
+    styles = {},
+    labelStyles = {}
 }: BytebankButtonProps) {
     const theme = useTheme();
 
@@ -35,18 +39,18 @@ export function BytebankButton({
             mode={variant}
             buttonColor={theme.colors[color]}
             onPress={onPress}
-            style={[styles.button, borderRadius ? { borderRadius: Number(borderRadius) } : {}]}
-            labelStyle={styles.buttonText}
+            style={{ ...styles, ...buttonStyles.button, ...(borderRadius ? { borderRadius: Number(borderRadius) } : {}) }}
+            labelStyle={{ ...buttonStyles.buttonText, ...labelStyles }}
         >
             {children}
         </Button>
     );
 }
 
-const styles = StyleSheet.create({
+const buttonStyles = StyleSheet.create({
     button: {
         width: '100%',
-        borderRadius: 10,
+        borderRadius: 30,
         padding: 10,
     },
     buttonText: {

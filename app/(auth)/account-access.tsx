@@ -14,9 +14,9 @@ import { TextInput } from 'react-native-paper';
 import { Feather } from '@expo/vector-icons';
 import { useAuth } from '@/contexts/auth/AuthContext';
 import { router } from 'expo-router';
-import { BytebankButton } from '@/components/ui/Button';
-import { BytebankInput } from '@/components/ui/Input';
-import { BytebankTabSelector } from '@/components/ui/TabSelector';
+import { BytebankButton } from '@/shared/ui/Button';
+import { BytebankInput } from '@/shared/ui/Input';
+import { BytebankTabSelector } from '@/shared/ui/TabSelector';
 
 
 const AccountAccessScreen = () => {
