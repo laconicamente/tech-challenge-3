@@ -5,6 +5,7 @@ import { LinearGradient } from 'expo-linear-gradient';
 import { useState } from 'react';
 import CreateTransactionModal from '../modals/CreateTransactionModal';
 import { useTheme } from 'react-native-paper';
+import { ColorsPalette } from '@/constants/Pallete';
 
 const BytebankTabBar = () => {
     const theme = useTheme();
@@ -32,7 +33,6 @@ const BytebankTabBar = () => {
         <View style={styles.tabContainer}>
             {tabs.map((tab, index) => {
                 const isFocused = tab.name === activeTab;
-                console.log(activeTab)
                 if (tab.icon === 'plus') {
                     return (
                         <TouchableOpacity
@@ -56,8 +56,8 @@ const BytebankTabBar = () => {
                         style={styles.tabButton}
                         onPress={() => router.replace(tab.name as Href)}
                     >
-                        <Feather name={tab.icon} size={24} color={isFocused ? theme.colors.primary : 'gray'} />
-                        <Text style={{ color: isFocused ? theme.colors.primary : 'gray', fontSize: 12 }}>
+                        <Feather name={tab.icon} size={24} color={isFocused ? ColorsPalette.light['lime.700'] : 'gray'} />
+                        <Text style={{ color: isFocused ? ColorsPalette.light['lime.700'] : 'gray', fontSize: 12 }}>
                             {tab.label}
                         </Text>
                     </TouchableOpacity>

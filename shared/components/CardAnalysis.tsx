@@ -31,28 +31,30 @@ const CardAnalytics = () => {
               </View>
             )}
             innerCircleColor="#1E1E1E"
-            
-            // **** PROPRIEDADES DE ANIMAÇÃO ADICIONADAS AQUI ****
             isAnimated 
-            animationDuration={1200} // Duração da animação em milissegundos (ex: 1.2 segundos)
-            animationEasing="ease-in-out" // Tipo de easing da animação (opcional)
-            // animationType="fadeIn" // Outros tipos incluem 'spring', 'linear', 'bounce' (opcional)
+            animationDuration={1200}
           />
         </View>
 
         <View style={styles.statsContainer}>
-          <StatItem dotColor="#b6da42" label="Quanto entrou" value="R$ 40.911" /> {/* Ordem corrigida */}
-          <StatItem dotColor="#e46e6e" label="Quanto gastou" value="R$ 12.273" /> {/* Ordem corrigida */}
+          <StatItem dotColor="#b6da42" label="Quanto entrou" value="R$ 40.911" /> 
+          <StatItem dotColor="#e46e6e" label="Quanto gastou" value="R$ 12.273" />
         </View>
       </View>
         <View style={styles.descriptionContainer}>
-            <Text style={styles.description}>A diferença entre os seus ganhos e seus gastos é de R$ 28.638,00.</Text> {/* Ajustada a descrição */}
+            <Text style={styles.description}>A diferença entre os seus ganhos e seus gastos é de R$ 28.638,00.</Text>
         </View>
     </Card>
   );
 };
 
-const StatItem = ({ dotColor, label, value }) => (
+interface StatItemProps {
+  dotColor: string;
+  label: string;
+  value: string;
+}
+
+const StatItem: React.FC<StatItemProps> = ({ dotColor, label, value }) => (
   <View style={styles.statItem}>
     <View style={[styles.statDot, { backgroundColor: dotColor }]} />
     <View>
@@ -79,7 +81,7 @@ const styles = StyleSheet.create({
     marginTop: 10,
   },
   description: {
-    fontSize: 16, // Um pouco menor para melhor leitura
+    fontSize: 16, 
     color: '#FFF',
   },
   header: {

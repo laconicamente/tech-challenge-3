@@ -39,8 +39,15 @@ export function BytebankButton({
             mode={variant}
             buttonColor={theme.colors[color]}
             onPress={onPress}
-            style={{ ...styles, ...buttonStyles.button, ...(borderRadius ? { borderRadius: Number(borderRadius) } : {}) }}
-            labelStyle={{ ...buttonStyles.buttonText, ...labelStyles }}
+            style={{ 
+                ...buttonStyles.button, 
+                ...(styles && typeof styles === 'object' ? styles : {}), 
+                ...(borderRadius ? { borderRadius: Number(borderRadius) } : {}) 
+            }}
+            labelStyle={{ 
+                ...buttonStyles.buttonText, 
+                ...(labelStyles && typeof labelStyles === 'object' ? labelStyles : {}) 
+            }}
         >
             {children}
         </Button>
@@ -49,7 +56,6 @@ export function BytebankButton({
 
 const buttonStyles = StyleSheet.create({
     button: {
-        width: '100%',
         borderRadius: 30,
         padding: 10,
     },
@@ -57,5 +63,6 @@ const buttonStyles = StyleSheet.create({
         color: 'black',
         fontWeight: 'bold',
         fontSize: 18,
+        display: 'flex',
     },
 });

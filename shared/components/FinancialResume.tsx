@@ -2,10 +2,7 @@ import React, { useState } from 'react';
 import { View, Text, StyleSheet, Dimensions, TouchableOpacity } from 'react-native';
 import { BarChart } from 'react-native-gifted-charts'; // Não precisamos mais do LineChart
 import { Card } from 'react-native-paper';
-import { Feather } from '@expo/vector-icons';
 
-
-const { width } = Dimensions.get('window');
 
 // --- Configurações Fixas do Gráfico ---
 const BAR_WIDTH = 30;
@@ -22,8 +19,8 @@ const calculatedChartWidth =
 const daysOfWeek = ['Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sáb', 'Dom'];
 
 // Gerar dados aleatórios para 7 dias
-const generateWeeklyData = (baseValue, variance, barColor, type) => {
-  const data = [];
+const generateWeeklyData = (baseValue: number, variance: number, barColor: string, type: string) => {
+  const data: { value: number; label: string; frontColor: string; text: string; dataPointIndex: number }[] = [];
   daysOfWeek.forEach((day, index) => {
     const value = baseValue + Math.random() * variance - (variance / 2);
     data.push({
@@ -37,7 +34,6 @@ const generateWeeklyData = (baseValue, variance, barColor, type) => {
   return data;
 };
 
-// --- Dados Fixos para Entradas e Saídas Semanais ---
 const entradasBarData = generateWeeklyData(2500, 1500, '#4A90E2', 'Entrada');
 const saidasBarData = generateWeeklyData(1800, 1200, '#5ED4B3', 'Saída');
 
@@ -103,18 +99,13 @@ const FinancialResume = () => {
         yAxisLabelSuffix=""
         yAxisLabelTexts={['0', '500', '1000', '1500', '2000', '2500', '3000']}
         yAxisOffset={0}
-    
         isAnimated
         animationDuration={800}
-        
         renderTooltip={(item) => (
           <View style={styles.tooltip}>
             <Text style={{ color: 'white', fontSize: 12 }}>R$ {item.value}</Text>
           </View>
         )}
-        
-        // Remove as props de lineData e lineConfig, pois não há linha
-        
         rulesColor="#555"
         rulesType="dashed"
         dashWidth={10}
@@ -122,9 +113,6 @@ const FinancialResume = () => {
         showYAxisIndices
         verticalLinesColor="#555"
         showXAxisIndices
-        // hideRules // Oculta as regras para ter apenas o visual da imagem
-        
-        // Remove xAxisLabelInterval, pois os 7 rótulos já cabem
       />
 
       <View style={styles.legendContainer}>
@@ -190,18 +178,18 @@ const styles = StyleSheet.create({
   },
   xAxisLabel: {
     color: '#fff',
-    fontSize: 12, // Tamanho maior para 7 dias
-    transform: [{ translateY: 10 }], // Empurra o label um pouco para baixo
+    fontSize: 12,
+    transform: [{ translateY: 10 }],
   },
   yAxisLabel: {
     color: '#fff',
     fontSize: 12,
   },
   tooltip: {
-    position: 'absolute', // Permite posicionamento livre
+    position: 'absolute',
     backgroundColor: 'rgba(0,0,0,0.7)',
     padding: 8,
-    minWidth: 80, // Garante que o tooltip não fique muito pequeno
+    minWidth: 80,
     alignItems: 'center',
     justifyContent: 'center',
     borderRadius: 20,
@@ -230,7 +218,7 @@ const styles = StyleSheet.create({
     height: 8,
     borderRadius: 4,
     backgroundColor: 'white',
-    marginBottom: 5, // Espaço entre o ponto e a barra
+    marginBottom: 5,
   },
 });
 
