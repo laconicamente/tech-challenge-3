@@ -1,10 +1,9 @@
 import React from 'react';
-import { View, StyleSheet, SafeAreaView, TouchableOpacity } from 'react-native';
+import { View, StyleSheet, SafeAreaView, TouchableOpacity, Text } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import { useNavigation } from '@react-navigation/native';
 import { router } from 'expo-router';
 
-const TransactionHeader = () => {
+const TransactionHeader = ({ title = '' }) => {
 
   return (
     <SafeAreaView style={styles.headerContainer}>
@@ -12,6 +11,7 @@ const TransactionHeader = () => {
         <TouchableOpacity onPress={() => router.replace('/(protected)/dashboard')} style={styles.iconButton}>
           <Ionicons name="arrow-back" size={24} color="#000" />
         </TouchableOpacity>
+        <Text style={styles.headerTitle}>{title}</Text>
         <TouchableOpacity style={styles.iconButton}>
           <Ionicons name="search" size={24} color="#000" />
         </TouchableOpacity>
