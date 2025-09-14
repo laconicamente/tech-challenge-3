@@ -36,13 +36,12 @@ export const AppHeader = ({ title = '' }: { title?: string }) => {
                 paddingHorizontal: 16,
                 paddingVertical: 16,
             }}>
-                {/* <Logo width={130} height={30} /> */}
                 <TouchableOpacity>
                     <View style={{display: 'flex', alignItems: 'center', justifyContent: 'center', backgroundColor: ColorsPalette.light['lime.200'], borderRadius: 25, width: 50, height: 50}}>
                         <MaterialIcons name="user" size={25} color={ColorsPalette.light['lime.800']} />
                     </View>
                 </TouchableOpacity>
-                <Text style={{ fontSize: 20, fontWeight: 'bold', color: '#000' }}>{title}</Text>
+                <Text style={{ fontSize: 18, fontWeight: 'bold', color: ColorsPalette.light['lime.50'] }}>{title}</Text>
                 <TouchableOpacity onPress={handleLogout}>
                     <Feather name="log-out" size={24} color={ColorsPalette.light['lime.50']} />
                 </TouchableOpacity>

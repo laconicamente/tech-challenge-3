@@ -86,7 +86,7 @@ export default function TransactionList() {
         <Text style={styles.subHeaderTitle}>Transações</Text>
         <View style={styles.filtroContainer}>
           <Text style={styles.filtroText}>Filtro</Text>
-          <Ionicons name="filter" size={16} color="#000" />
+          <Ionicons name="filter" size={16} color=ColorsPalette.light["lime.900"] />
         </View>
       </View>
 

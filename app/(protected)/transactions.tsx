@@ -17,6 +17,7 @@ import Animated, {
 } from 'react-native-reanimated';
 import { BytebankButton } from '@/shared/ui/Button';
 import { TransactionItem } from '@/shared/components/TransactionItem';
+import { ColorsPalette } from '@/constants/Pallete';
 
 // Dados de exemplo para as transações
 const transacoes = [
@@ -108,7 +109,7 @@ export default function TransactionsList() {
   const opacity = useSharedValue(1);
   const height = useSharedValue(115);
   const contentTopRadius = useSharedValue(32);
-  const contentMarginTop = useSharedValue(20);
+  const contentMarginTop = useSharedValue(0);
 
   const animatedBalanceResumeStyle = useAnimatedStyle(() => {
     return {
@@ -145,17 +146,17 @@ export default function TransactionsList() {
       opacity.value = shouldShowHeader ? 1 : 0;
       height.value = shouldShowHeader ? 115 : 0;
       contentTopRadius.value = shouldShowHeader ? 32 : 0;
-      contentMarginTop.value = shouldShowHeader ? 20 : 0;
+      contentMarginTop.value = shouldShowHeader ? 0 : 0;
     }
   };
 
   const ListHeader = () => (
     <View style={styles.subHeader}>
       <Text style={styles.subHeaderTitle}>Movimentações</Text>
-      <View style={styles.filter}>
+      <View>
         <BytebankButton color={'primary'} styles={styles.filterButton}>
         <Text style={styles.filterText}>Filtro</Text>
-        <Ionicons name="filter" size={20} color="#000" />
+        <Ionicons name="filter" size={20} color={ColorsPalette.light["lime.900"]} />
         </BytebankButton>
       </View>
     </View>
@@ -217,20 +218,18 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     color: '#333',
   },
-  filter: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    paddingVertical: 6,
-    justifyContent: 'center',
-  },
   filterText: {
     fontSize: 16,
     marginRight: 8,
-    color: '#555',
+    color: ColorsPalette.light["lime.900"],
   },
   filterButton: {
     backgroundColor: '#f1f8d5', 
-    padding: 5 
+    display: 'flex',
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    padding: 0,
   },
   listContainer: {
     paddingHorizontal: 0,

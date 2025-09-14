@@ -117,7 +117,7 @@ const styles = StyleSheet.create({
     },
     formSection: {
         paddingHorizontal: 20,
-        gap: 15,
+        gap: 0,
     },
     actionsSection: {
         padding: 20,

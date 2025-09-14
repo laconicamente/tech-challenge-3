@@ -4,6 +4,7 @@ import TransactionHeader from '@/shared/components/TransactionHeader';
 import { Stack } from 'expo-router';
 import React, { useState, useCallback } from 'react';
 import { View, Text, StyleSheet, FlatList, Dimensions, TouchableOpacity, SafeAreaView } from 'react-native';
+import { ColorsPalette } from '@/constants/Pallete';
 
 const { width } = Dimensions.get('window');
 
@@ -11,30 +12,27 @@ const cardsData = [
   {
     id: '1',
     number: '3098',
-    holder: 'Simon StClaire',
-    valid: '12/26',
-    balance: '$142,560.00',
-    type: 'VISA',
-    cardColor: '#D0DD92',
-    transactions: [
-      { id: 't1', amount: '$ 2,130.00', merchant: ['Whole Foods', 'Burger King'] },
-      { id: 't2', amount: '$ 180.50', text: 'Cashback earned', merchant: ['Netflix', 'HBO Max'] },
-    ],
-    actions: { canBlock: true, canSetPrimary: true, canDelete: true },
+    name: 'Simon StClaire',
+    expireDate: '12/26',
+    type: 'Platinum',
+    cvv: '321',
   },
   {
     id: '2',
     number: '4567',
-    holder: 'Maria Gomes',
-    valid: '05/25',
+    name: 'Maria Gomes',
+    expireDate: '05/25',
     balance: '$50,000.00',
-    type: 'MasterCard',
-    cardColor: '#A8D8B9',
-    transactions: [
-      { id: 't4', amount: '$ 500.00', merchant: ['Amazon'] },
-      { id: 't5', amount: '50', text: 'Cashback earned', merchant: ['Spotify'] },
-    ],
-    actions: { canBlock: false, canSetPrimary: true, canDelete: true },
+    type: 'Black',
+    cvv: '123',
+  },
+  {
+    id: '3',
+    number: '3098',
+    name: 'Simon StClaire',
+    expireDate: '12/26',
+    type: 'Gold',
+    cvv: '321',
   },
 ];
 
@@ -77,7 +75,6 @@ const Cards = () => {
         style={styles.cardList}
       />
       
-      {/* Indicadores de página */}
       <View style={styles.pagination}>
         {cardsData.map((_, index) => (
           <View
@@ -89,8 +86,6 @@ const Cards = () => {
           />
         ))}
       </View>
-
-      {/* Detalhes e ações do cartão ativo */}
       <BankCardDetails card={cardsData[activeCardIndex]} />
     </SafeAreaView>
   );
@@ -99,7 +94,7 @@ const Cards = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#1E1E1E',
+    backgroundColor: '#FFF',
   },
   header: {
     flexDirection: 'row',
@@ -118,7 +113,9 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
   },
   cardList: {
-    height: 0,
+    display: 'flex',
+    height: 260,
+    marginTop: 15,
   },
   cardWrapper: {
     width: width,
@@ -128,7 +125,7 @@ const styles = StyleSheet.create({
   pagination: {
     flexDirection: 'row',
     justifyContent: 'center',
-    marginBottom: 20,
+    marginVertical: 10,
   },
   dot: {
     width: 8,
@@ -138,7 +135,7 @@ const styles = StyleSheet.create({
     marginHorizontal: 4,
   },
   activeDot: {
-    backgroundColor: '#fff',
+    backgroundColor: ColorsPalette.light['lime.200'],
   },
 });
 

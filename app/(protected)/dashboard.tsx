@@ -56,7 +56,7 @@ export default function Dashboard() {
         <ScrollView
           keyboardShouldPersistTaps="handled"
           onScroll={handleScroll}
-          scrollEventThrottle={16}
+          scrollEventThrottle={0}
         >
           <View style={styles.content}>
             <CardBalance />
