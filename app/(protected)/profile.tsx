@@ -34,7 +34,7 @@ const Profile = () => {
                 <View style={styles.profileSection}>
                     <TouchableOpacity>
                         <View style={styles.profileImage}>
-                            <MaterialIcons name="photo-camera" size={50} color={ColorsPalette.light['lime.200']} />
+                            <MaterialIcons name="camera-enhance" size={50} color={ColorsPalette.light['lime.200']} />
                         </View>
                     </TouchableOpacity>
                     <Text style={styles.userName}>{name}</Text>

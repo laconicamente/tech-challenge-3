@@ -8,7 +8,7 @@ const lightPalette = {
     "lime.600": "#c9df39",
     "lime.700": "#A2B247",
     "lime.800": "#40460d",
-    "lime.900": "#242811",
+    "lime.900": "#1a1c0c",
     "lime.dark": "#151808",
     "lime.main": "#8a9f00",
     "lime.contrast": "#121407f2",

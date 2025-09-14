@@ -1,37 +1,73 @@
-import { View, Text, ScrollView, StyleSheet, SafeAreaView } from 'react-native';
 import { CardBalance } from '@/shared/components/CardBalance';
 import FinancialResume from '@/shared/components/FinancialResume';
 import CardAnalytics from '@/shared/components/CardAnalysis';
-import React from 'react';
+import React, { useState } from 'react';
 import { Stack } from 'expo-router';
 import { AppHeader } from '@/shared/components/AppHeader';
 import CategoryList from '@/shared/components/CategoryList';
+import { ColorsPalette } from '@/constants/Pallete';
+import { View, Text, ScrollView, StyleSheet, SafeAreaView } from 'react-native';
+import Animated, { useSharedValue, useAnimatedStyle, withTiming } from 'react-native-reanimated';
 
 export default function Dashboard() {
+  const [showHeader, setShowHeader] = useState(true);
+  const opacity = useSharedValue(1);
+  const height = useSharedValue(115);
+  const contentTopRadius = useSharedValue(32);
+  const contentMarginTop = useSharedValue(0);
+
+  const animatedGreetingHeaderStyle = useAnimatedStyle(() => ({
+    opacity: withTiming(opacity.value, { duration: 300 }),
+    height: withTiming(height.value, { duration: 300 }),
+    borderBottomLeftRadius: contentTopRadius.value,
+    borderBottomRightRadius: contentTopRadius.value,
+    overflow: 'hidden',
+  }));
+
+  const animatedContentStyle = useAnimatedStyle(() => ({
+    marginTop: contentMarginTop.value,
+  }));
+
+  const handleScroll = (e) => {
+    const y = e.nativeEvent.contentOffset.y;
+    const shouldShowHeader = y < 40;
+
+    if (shouldShowHeader !== showHeader) {
+      setShowHeader(shouldShowHeader);
+      height.value = shouldShowHeader ? 115 : 0;
+      contentTopRadius.value = shouldShowHeader ? 32 : 0;
+      contentMarginTop.value = shouldShowHeader ? 0 : 0;
+    }
+  };
 
   return (
-    <SafeAreaView style={styles.viewContainer}>
+    <SafeAreaView style={styles.container}>
       <Stack.Screen
         options={{
           header: () => <AppHeader />,
           headerShown: true,
         }}
       />
-      <ScrollView
-        keyboardShouldPersistTaps="handled"
-      >
-
-        <View style={{ flex: 1, justifyContent: 'flex-start', padding: 16 }}>
-          <Text style={{ fontSize: 30, fontWeight: '500' }}>{'Olá, Joana!'}</Text>
-          <Text style={{ fontSize: 16, marginBottom: 20 }} >Gerencie suas finanças de forma eficiente.</Text>
-          <CardBalance />
-          <FinancialResume />
-          <CardAnalytics />
-          <View style={{ minHeight: 220 }}>
-            <CategoryList />
+      <Animated.View style={[styles.greetingHeader, animatedGreetingHeaderStyle]}>
+        <Text style={styles.greetingTitle}>{'Olá, Joana!'}</Text>
+        <Text style={styles.greetingSubtitle}>Gerencie suas finanças de forma eficiente.</Text>
+      </Animated.View>
+      <Animated.View style={[styles.content, animatedContentStyle]}>
+        <ScrollView
+          keyboardShouldPersistTaps="handled"
+          onScroll={handleScroll}
+          scrollEventThrottle={16}
+        >
+          <View style={styles.content}>
+            <CardBalance />
+            <FinancialResume />
+            <CardAnalytics />
+            <View style={{ minHeight: 220 }}>
+              <CategoryList />
+            </View>
           </View>
-        </View>
-      </ScrollView>
+        </ScrollView>
+      </Animated.View>
     </SafeAreaView>
   );
 }
@@ -39,13 +75,33 @@ export default function Dashboard() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    marginTop: 20
+    backgroundColor: '#FFF',
   },
-  viewContainer: {
-    flex: 1,
-  },
-  flatListContent: {
+  greetingHeader: {
+    backgroundColor: ColorsPalette.light['lime.900'],
+    paddingHorizontal: 30,
+    zIndex: 2,
+    borderBottomLeftRadius: 32,
+    borderBottomRightRadius: 32,
+    height: 115,
     display: 'flex',
-    gap: 15
+    justifyContent: 'center',
+  },
+  greetingTitle: {
+    fontSize: 30,
+    fontWeight: '500',
+    color: '#FFF',
+  },
+  greetingSubtitle: {
+    fontSize: 16,
+    color: ColorsPalette.light['lime.50'],
+  },
+  content: {
+    backgroundColor: '#FFF',
+    flex: 1,
+    marginTop: 20,
+    paddingHorizontal: 10,
+    minHeight: 600,
+    zIndex: 1,
   },
 });
