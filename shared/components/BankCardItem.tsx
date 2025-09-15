@@ -1,7 +1,7 @@
 import { ColorsPalette } from '@/constants/Pallete';
 import { LinearGradient } from 'expo-linear-gradient';
 import React from 'react';
-import { View, Text, StyleSheet, Dimensions, Image } from 'react-native';
+import { View, Text, StyleSheet, Dimensions, Image, ColorValue } from 'react-native';
 import { BankCardProps } from '../classes/bank-card';
 import { maskCardNumber } from '../hooks/maskCardNumber';
 
@@ -23,13 +23,13 @@ const BankCardItem = ({ card }: { card: Partial<BankCardProps> }) => {
   }
   return (
     <LinearGradient
-      colors={color ? [color as string, '#fff'] : cardColors[type]?.backgroundColor || cardColors['Platinum'].backgroundColor}
+      colors={color ? [color as ColorValue, '#fff' as ColorValue] : (cardColors[type]?.backgroundColor || cardColors['Platinum'].backgroundColor) as [ColorValue, ColorValue]}
       start={{ x: 0, y: 0 }}
       end={{ x: 1, y: 1 }}
       style={styles.cardContainer}
     >
       <Image
-        source={require('../../assets/images/pixels.png')} // troque para .png ou .jpg, SVG não é suportado nativamente
+        source={require('../../assets/images/pixels.png')}
         style={styles.cardBackgroundImage}
         resizeMode="contain"
       />

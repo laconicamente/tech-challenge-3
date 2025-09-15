@@ -3,20 +3,12 @@ import { Button, ButtonProps, useTheme } from "react-native-paper";
 
 
 export interface BytebankButtonProps extends ButtonProps {
-    /**
-     * A cor do botão
-     */
     color:
     | 'primary'
     | 'secondary'
     | 'tertiary'
     | 'error'
-    /**
-     * O estilo do botão
-     */
-
     borderRadius?: string;
-
     variant?: 'contained' | 'text' | 'outlined';
     onPress?: () => void;
     styles?: Animated.WithAnimatedValue<StyleProp<ViewStyle>>;
@@ -57,7 +49,7 @@ export function BytebankButton({
 const buttonStyles = StyleSheet.create({
     button: {
         borderRadius: 30,
-        padding: 10,
+        padding: 10
     },
     buttonText: {
         color: 'black',

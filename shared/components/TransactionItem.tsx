@@ -1,14 +1,6 @@
 import { Ionicons } from "@expo/vector-icons";
 import { View, StyleSheet, Text } from "react-native";
-
-export interface TransactionItemProps {
-    id: string,
-    title: string;
-    description: string;
-    value: string | number;
-    createdAt: string;
-    type: 'income' | 'expense';
-}
+import { TransactionItemProps } from "../classes/transaction";
 
 export const TransactionItem = ({transaction}: {transaction: TransactionItemProps}) => (
     <View style={styles.itemContainer}>

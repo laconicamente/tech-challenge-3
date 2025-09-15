@@ -22,12 +22,9 @@ const Profile = () => {
 
     return (
         <SafeAreaView style={styles.container}>
-            <Stack.Screen
-                options={{
-                    header: () => <AppHeader title="Perfil" />,
-                    headerShown: true,
-                }}
-            />
+            <View style={styles.header}>
+                <Text style={{ fontSize: 18, fontWeight: 'bold', color: '#333', textAlign: 'center' }}>Perfil</Text>
+            </View>
             <ScrollView
                 keyboardShouldPersistTaps="handled"
             >
@@ -86,10 +83,8 @@ const styles = StyleSheet.create({
         backgroundColor: '#FFF',
     },
     header: {
-        padding: 20,
+        paddingTop: 20,
         alignItems: 'center',
-        borderBottomWidth: 1,
-        borderBottomColor: '#e0e0e0',
     },
     headerTitle: {
         fontSize: 24,

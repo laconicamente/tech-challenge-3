@@ -88,16 +88,14 @@ const FinancialResume = () => {
         spacing={SPACING}
         barWidth={BAR_WIDTH}
         barBorderRadius={8}
-        
         xAxisColor="#555"
-        yAxisColor="#555"
+        yAxisColor="#999"
         xAxisLabelTextStyle={styles.xAxisLabel}
         yAxisLabelTextStyle={styles.yAxisLabel}
-        
         noOfSections={7}
         maxValue={3000}
         yAxisLabelSuffix=""
-        yAxisLabelTexts={['0', '500', '1000', '1500', '2000', '2500', '3000']}
+        yAxisLabelTexts={[]}
         yAxisOffset={0}
         isAnimated
         animationDuration={800}
