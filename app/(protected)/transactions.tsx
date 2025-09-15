@@ -8,16 +8,18 @@ import {
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { Stack } from 'expo-router';
-import TransactionHeader from '@/shared/components/TransactionHeader';
-import { BalanceResume } from '@/shared/components/BalanceResume';
+import TransactionHeader from '@/shared/components/Transaction/TransactionHeader';
+import { BalanceResume } from '@/shared/components/Balance/BalanceResume';
 import Animated, {
   useSharedValue,
   useAnimatedStyle,
   withTiming,
 } from 'react-native-reanimated';
 import { BytebankButton } from '@/shared/ui/Button';
-import { TransactionItem, TransactionItemProps } from '@/shared/components/TransactionItem';
+import { TransactionItem } from '@/shared/components/Transaction/TransactionItem';
 import { ColorsPalette } from '@/constants/Pallete';
+import { TransactionItemProps } from '@/shared/classes/transaction';
+import { TransactionSkeleton } from '@/shared/components/Transaction/TransactionSkeleton';
 
 // Dados de exemplo para as transações
 const INITIAL_TRANSACTIONS: TransactionItemProps[] = [
@@ -207,10 +209,10 @@ export default function TransactionsList() {
           ListHeaderComponent={<ListHeader />}
           showsVerticalScrollIndicator={false}
           onScroll={handleScroll}
-          scrollEventThrottle={16}
+          scrollEventThrottle={0}
           onEndReached={fetchMoreTransactions}
-          onEndReachedThreshold={0.2}
-          ListFooterComponent={loading ? <Text style={{ textAlign: 'center', margin: 16 }}>Carregando...</Text> : null}
+          onEndReachedThreshold={0.6}
+          ListFooterComponent={loading ? <TransactionSkeleton /> : null}
         />
       </Animated.View>
     </SafeAreaView>

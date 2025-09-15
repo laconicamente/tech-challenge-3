@@ -1,11 +1,10 @@
-import { View, Text, useColorScheme, Platform } from 'react-native';
-import { Slot, Tabs } from 'expo-router';
+import { Platform } from 'react-native';
+import { Tabs } from 'expo-router';
 import { useAuth } from '@/contexts/auth/AuthContext';
 import BytebankTabBar from '@/shared/ui/TabBar';
 
 export default function ProtectedLayout() {
     const { isAuthenticated } = useAuth();
-    const colorScheme = useColorScheme();
 
     //   if (!isAuthenticated) {
     //     return null;

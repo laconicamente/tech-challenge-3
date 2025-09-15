@@ -1,4 +1,4 @@
-import { BytebankButton } from "../ui/Button";
+import { BytebankButton } from "../../ui/Button";
 import { Feather } from "@expo/vector-icons";
 import { router } from "expo-router";
 import { useState } from "react";

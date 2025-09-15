@@ -2,8 +2,8 @@ import { ColorsPalette } from '@/constants/Pallete';
 import { LinearGradient } from 'expo-linear-gradient';
 import React from 'react';
 import { View, Text, StyleSheet, Dimensions, Image, ColorValue } from 'react-native';
-import { BankCardProps } from '../classes/bank-card';
-import { maskCardNumber } from '../hooks/maskCardNumber';
+import { BankCardProps } from '../../classes/bank-card';
+import { maskCardNumber } from '../../hooks/maskCardNumber';
 
 const BankCardItem = ({ card }: { card: Partial<BankCardProps> }) => {
   const { number, type = 'Platinum', color } = card as { number?: string; type?: keyof typeof cardColors; color?: string };
@@ -29,7 +29,7 @@ const BankCardItem = ({ card }: { card: Partial<BankCardProps> }) => {
       style={styles.cardContainer}
     >
       <Image
-        source={require('../../assets/images/pixels.png')}
+        source={require('../../../assets/images/pixels.png')}
         style={styles.cardBackgroundImage}
         resizeMode="contain"
       />

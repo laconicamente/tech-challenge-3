@@ -1,9 +1,9 @@
-import BankCardItem from '@/shared/components/BankCardItem';
-import BankCardDetails from '@/shared/components/BankCardDetails';
-import TransactionHeader from '@/shared/components/TransactionHeader';
+import BankCardItem from '@/shared/components/BankCard/BankCardItem';
+import BankCardDetails from '@/shared/components/BankCard/BankCardDetails';
+import TransactionHeader from '@/shared/components/Transaction/TransactionHeader';
 import { Stack } from 'expo-router';
 import React, { useState, useCallback } from 'react';
-import { View, Text, StyleSheet, FlatList, Dimensions, TouchableOpacity, SafeAreaView } from 'react-native';
+import { View, Text, StyleSheet, FlatList, Dimensions, SafeAreaView } from 'react-native';
 import { ColorsPalette } from '@/constants/Pallete';
 
 const { width } = Dimensions.get('window');

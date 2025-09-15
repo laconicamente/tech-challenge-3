@@ -1,10 +1,10 @@
-import { CardBalance } from '@/shared/components/CardBalance';
-import FinancialResume from '@/shared/components/FinancialResume';
-import CardAnalytics from '@/shared/components/CardAnalysis';
+import { CardBalance } from '@/shared/components/Balance/CardBalance';
+import FinancialResume from '@/shared/components/Widget/FinancialResume';
+import CardAnalytics from '@/shared/components/Widget/CardAnalysis';
 import React, { useState } from 'react';
 import { Stack } from 'expo-router';
 import { AppHeader } from '@/shared/components/AppHeader';
-import CategoryList from '@/shared/components/CategoryList';
+import CategoryList from '@/shared/components/Category/CategoryList';
 import { ColorsPalette } from '@/constants/Pallete';
 import { View, Text, ScrollView, StyleSheet, SafeAreaView } from 'react-native';
 import Animated, { useSharedValue, useAnimatedStyle, withTiming } from 'react-native-reanimated';
