@@ -7,7 +7,7 @@ export interface CategoryItemProps {
   color?: string;
 }
 
-const CategoryItem = ({ data, style = {}, ref }: { data: CategoryItemProps; style?: object; ref?: React.Ref<any> }) => {
+const CategoryItem = ({ data, style = {}, ref }: {createdAt: CategoryItemProps; style?: object; ref?: React.Ref<any> }) => {
   return (
     <View ref={ref} style={[styles.card, { backgroundColor: data.color }, style]}>
       <Text style={styles.value}>{data.value}</Text>

@@ -52,7 +52,7 @@ export default function Dashboard() {
         <Text style={styles.greetingTitle}>{'Olá, Joana!'}</Text>
         <Text style={styles.greetingSubtitle}>Gerencie suas finanças de forma eficiente.</Text>
       </Animated.View>
-      <Animated.View style={[styles.content, animatedContentStyle]}>
+      <Animated.View style={[animatedContentStyle]}>
         <ScrollView
           keyboardShouldPersistTaps="handled"
           onScroll={handleScroll}
@@ -100,8 +100,8 @@ const styles = StyleSheet.create({
     backgroundColor: '#FFF',
     flex: 1,
     marginTop: 20,
-    paddingHorizontal: 10,
     minHeight: 600,
+    paddingHorizontal: 20,
     zIndex: 1,
   },
 });

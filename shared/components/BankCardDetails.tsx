@@ -2,6 +2,7 @@ import React from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, ScrollView } from 'react-native';
 import { BankCardProps } from '../classes/bank-card';
 import { maskCardNumber } from '../hooks/maskCardNumber';
+import { ColorsPalette } from '@/constants/Pallete';
 
 const BankCardDetails = ({ card }: { card: Partial<BankCardProps> }) => {
     if (!card) return null;
@@ -52,7 +53,6 @@ const styles = StyleSheet.create({
     },
     cardDetails: {
         paddingVertical: 10,
-        marginBottom: 10,
     },
     cardLabel: {
         fontSize: 15,
@@ -68,7 +68,7 @@ const styles = StyleSheet.create({
         gap: 15,
     },
     actionButton: {
-        backgroundColor: '#333',
+        backgroundColor: ColorsPalette.light['lime.900'],
         padding: 15,
         borderRadius: 10,
         alignItems: 'center',
@@ -79,7 +79,7 @@ const styles = StyleSheet.create({
         fontWeight: 'bold',
     },
     deleteButtonText: {
-        color: '#333',
+        color: ColorsPalette.light['lime.900'],
         textAlign: 'center',
         marginTop: 10,
         fontSize: 16,

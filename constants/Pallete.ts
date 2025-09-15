@@ -35,7 +35,6 @@ const lightPalette = {
     "white.main": "#ffffff",
     "red.200": "#ff5c5c",
     "red.700": "#B00020",
-    "logo.filter": "brightness(0.4)",
   };
   
   const darkPalette = {
@@ -75,7 +74,6 @@ const lightPalette = {
     "white.main": "#ffffff",
     "red.200": "#ff8181",
     "red.700": "#B00020",
-    "logo.filter": "brightness(1)",
   };
   
   export const ColorsPalette = { light: lightPalette, dark: darkPalette };

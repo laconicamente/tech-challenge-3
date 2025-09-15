@@ -16,90 +16,90 @@ import Animated, {
   withTiming,
 } from 'react-native-reanimated';
 import { BytebankButton } from '@/shared/ui/Button';
-import { TransactionItem } from '@/shared/components/TransactionItem';
+import { TransactionItem, TransactionItemProps } from '@/shared/components/TransactionItem';
 import { ColorsPalette } from '@/constants/Pallete';
 
 // Dados de exemplo para as transações
-const transacoes = [
+const INITIAL_TRANSACTIONS: TransactionItemProps[] = [
   {
     id: '1',
-    titulo: 'Pagamento recebido',
-    descricao: 'Transferência de Maria P.',
-    valor: '+ R$ 50,00',
-    data: '10 de Setembro',
-    tipo: 'entrada',
+   title: 'Pagamento recebido',
+    description: 'Transferência de Maria P.',
+    value: '+ R$ 50,00',
+   createdAt: '10 de Setembro',
+    type: 'income',
   },
   {
     id: '2',
-    titulo: 'Spotify',
-    descricao: 'Pagamento de assinatura',
-    valor: '- R$ 21,90',
-    data: '08 de Setembro',
-    tipo: 'saida',
+   title: 'Spotify',
+    description: 'Pagamento de assinatura',
+    value: '- R$ 21,90',
+   createdAt: '08 de Setembro',
+    type: 'expense',
   },
   {
     id: '3',
-    titulo: 'Supermercado',
-    descricao: 'Compra no Carrefour',
-    valor: '- R$ 150,50',
-    data: '07 de Setembro',
-    tipo: 'saida',
+   title: 'Supermercado',
+    description: 'Compra no Carrefour',
+    value: '- R$ 150,50',
+   createdAt: '07 de Setembro',
+    type: 'expense',
   },
   {
     id: '4',
-    titulo: 'Pix recebido',
-    descricao: 'Transferência de João S.',
-    valor: '+ R$ 200,00',
-    data: '05 de Setembro',
-    tipo: 'entrada',
+   title: 'Pix recebido',
+    description: 'Transferência de João S.',
+    value: '+ R$ 200,00',
+   createdAt: '05 de Setembro',
+    type: 'income',
   },
   {
     id: '5',
-    titulo: 'Uber',
-    descricao: 'Corrida para casa',
-    valor: '- R$ 35,00',
-    data: '04 de Setembro',
-    tipo: 'saida',
+   title: 'Uber',
+    description: 'Corrida para casa',
+    value: '- R$ 35,00',
+   createdAt: '04 de Setembro',
+    type: 'expense',
   },
   {
     id: '6',
-    titulo: 'Pagamento recebido',
-    descricao: 'Transferência de Maria P.',
-    valor: '+ R$ 50,00',
-    data: '10 de Setembro',
-    tipo: 'entrada',
+   title: 'Pagamento recebido',
+    description: 'Transferência de Maria P.',
+    value: '+ R$ 50,00',
+   createdAt: '10 de Setembro',
+    type: 'income',
   },
   {
     id: '7',
-    titulo: 'Spotify',
-    descricao: 'Pagamento de assinatura',
-    valor: '- R$ 21,90',
-    data: '08 de Setembro',
-    tipo: 'saida',
+   title: 'Spotify',
+    description: 'Pagamento de assinatura',
+    value: '- R$ 21,90',
+   createdAt: '08 de Setembro',
+    type: 'expense',
   },
   {
     id: '8',
-    titulo: 'Supermercado',
-    descricao: 'Compra no Carrefour',
-    valor: '- R$ 150,50',
-    data: '07 de Setembro',
-    tipo: 'saida',
+   title: 'Supermercado',
+    description: 'Compra no Carrefour',
+    value: '- R$ 150,50',
+   createdAt: '07 de Setembro',
+    type: 'expense',
   },
   {
     id: '9',
-    titulo: 'Pix recebido',
-    descricao: 'Transferência de João S.',
-    valor: '+ R$ 200,00',
-    data: '05 de Setembro',
-    tipo: 'entrada',
+   title: 'Pix recebido',
+    description: 'Transferência de João S.',
+    value: '+ R$ 200,00',
+   createdAt: '05 de Setembro',
+    type: 'income',
   },
   {
     id: '10',
-    titulo: 'Uber',
-    descricao: 'Corrida para casa',
-    valor: '- R$ 35,00',
-    data: '04 de Setembro',
-    tipo: 'saida',
+   title: 'Uber',
+    description: 'Corrida para casa',
+    value: '- R$ 35,00',
+   createdAt: '04 de Setembro',
+    type: 'expense',
   },
 ];
 
@@ -110,6 +110,8 @@ export default function TransactionsList() {
   const height = useSharedValue(115);
   const contentTopRadius = useSharedValue(32);
   const contentMarginTop = useSharedValue(0);
+  const [transactions, setTransactions] = useState(INITIAL_TRANSACTIONS);
+  const [loading, setLoading] = useState(false);
 
   const animatedBalanceResumeStyle = useAnimatedStyle(() => {
     return {
@@ -127,18 +129,14 @@ export default function TransactionsList() {
     };
   });
 
-  const renderItem = ({ item }) => (
+  const renderItem = ({ item }: {item : TransactionItemProps}) => (
     <TransactionItem
-      titulo={item.titulo}
-      descricao={item.descricao}
-      valor={item.valor}
-      data={item.data}
-      tipo={item.tipo}
+     transaction={item}
     />
   );
 
-  const handleScroll = (event) => {
-    const y = event.nativeEvent.contentOffset.y;
+  const handleScroll = (e) => {
+    const y = e.nativeEvent.contentOffset.y;
     const shouldShowHeader = y < 40;
 
     if (shouldShowHeader !== showHeader) {
@@ -150,13 +148,40 @@ export default function TransactionsList() {
     }
   };
 
+  const fetchMoreTransactions = async () => {
+    if (loading) return;
+    setLoading(true);
+  
+    // Simule uma requisição (troque por sua API)
+    setTimeout(() => {
+      const newTransactions: TransactionItemProps[] = [
+        // ...novos dados, mesmo formato do seu array
+        {
+          id: String(transactions.length + 1),
+          title: 'Nova transação',
+          description: 'Descrição extra',
+          value: '+ R$ 10,00',
+          createdAt: 'Hoje',
+          type: 'income',
+        },
+        // Adicione mais se quiser
+      ];
+      setTransactions([...transactions, ...newTransactions]);
+      setLoading(false);
+    }, 1500);
+  }
+
   const ListHeader = () => (
     <View style={styles.subHeader}>
       <Text style={styles.subHeaderTitle}>Movimentações</Text>
       <View>
         <BytebankButton color={'primary'} styles={styles.filterButton}>
-        <Text style={styles.filterText}>Filtro</Text>
-        <Ionicons name="filter" size={20} color={ColorsPalette.light["lime.900"]} />
+          <View>
+            <Text style={styles.filterText}>Filtros</Text>
+          </View>
+          <View>
+            <Ionicons name="filter" size={20} color={ColorsPalette.light["lime.900"]} />
+          </View>
         </BytebankButton>
       </View>
     </View>
@@ -175,7 +200,7 @@ export default function TransactionsList() {
       </Animated.View>
       <Animated.View style={[styles.contentWrapper, animatedContentStyle]}>
         <FlatList
-          data={transacoes}
+          data={transactions}
           renderItem={renderItem}
           keyExtractor={(item) => item.id}
           contentContainerStyle={styles.listContainer}
@@ -183,6 +208,9 @@ export default function TransactionsList() {
           showsVerticalScrollIndicator={false}
           onScroll={handleScroll}
           scrollEventThrottle={16}
+          onEndReached={fetchMoreTransactions}
+          onEndReachedThreshold={0.2}
+          ListFooterComponent={loading ? <Text style={{ textAlign: 'center', margin: 16 }}>Carregando...</Text> : null}
         />
       </Animated.View>
     </SafeAreaView>
@@ -220,15 +248,16 @@ const styles = StyleSheet.create({
   },
   filterText: {
     fontSize: 16,
-    marginRight: 8,
     color: ColorsPalette.light["lime.900"],
+    marginRight: 6
   },
   filterButton: {
-    backgroundColor: '#f1f8d5', 
+    backgroundColor: '#f1f8d5',
     display: 'flex',
     flexDirection: 'row',
     alignItems: 'center',
-    justifyContent: 'center',
+    justifyContent: 'space-between',
+    gap: 10,
     padding: 0,
   },
   listContainer: {
