@@ -1,6 +1,6 @@
 import { Platform } from 'react-native';
 import { Tabs } from 'expo-router';
-import { useAuth } from '@/contexts/auth/AuthContext';
+import { useAuth } from '@/shared/auth/AuthContext';
 import BytebankTabBar from '@/shared/ui/TabBar';
 
 export default function ProtectedLayout() {

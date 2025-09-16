@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { View, Text, StyleSheet, Dimensions, TouchableOpacity } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
 import { BarChart } from 'react-native-gifted-charts'; // Não precisamos mais do LineChart
 import { Card } from 'react-native-paper';
 

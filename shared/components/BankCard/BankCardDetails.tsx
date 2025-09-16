@@ -1,8 +1,8 @@
 import React from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, ScrollView } from 'react-native';
-import { BankCardProps } from '../../classes/bank-card';
+import { BankCardProps } from '../../classes/models/bank-card';
 import { maskCardNumber } from '../../hooks/maskCardNumber';
-import { ColorsPalette } from '@/constants/Pallete';
+import { ColorsPalette } from '@/shared/classes/constants/Pallete';
 
 const BankCardDetails = ({ card }: { card: Partial<BankCardProps> }) => {
     if (!card) return null;

@@ -1,3 +1,4 @@
+// AccountAccessScreen.tsx
 import React, { useState } from 'react';
 import {
     View,
@@ -9,15 +10,16 @@ import {
     Platform,
     Image,
     ScrollView,
+    ActivityIndicator,
+    Alert
 } from 'react-native';
 import { TextInput } from 'react-native-paper';
 import { Feather } from '@expo/vector-icons';
-import { useAuth } from '@/contexts/auth/AuthContext';
+import { useAuth } from '@/shared/auth/AuthContext';
 import { router } from 'expo-router';
 import { BytebankButton } from '@/shared/ui/Button';
 import { BytebankInput } from '@/shared/ui/Input';
 import { BytebankTabSelector } from '@/shared/ui/TabSelector';
-
 
 const AccountAccessScreen = () => {
     const { login, signUp } = useAuth();
@@ -25,23 +27,29 @@ const AccountAccessScreen = () => {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [showPassword, setShowPassword] = useState(false);
+    const [isLoading, setIsLoading] = useState(false);
 
-    // Cadastro
     const [name, setName] = useState('');
     const [registerEmail, setRegisterEmail] = useState('');
     const [registerPassword, setRegisterPassword] = useState('');
     const [showRegisterPassword, setShowRegisterPassword] = useState(false);
 
-    const handleLogin = () => {
-        console.log('Tentativa de login com:', email, password);
-        const isAuthenticated = login(email, password);
-        if (!isAuthenticated) {
+    const handleLogin = async () => {
+        setIsLoading(true);
+        const success = await login(email, password);
+        setIsLoading(false);
+
+        if (!success) {
             router.replace('/(protected)/dashboard');
+        } else {
+            Alert.alert("Erro de Login", "Verifique seu e-mail e senha e tente novamente.");
         }
     };
 
-    const handleRegister = () => {
-        signUp(name, registerEmail, registerPassword);
+    const handleRegister = async () => {
+        setIsLoading(true);
+        await signUp(name, registerEmail, registerPassword);
+        setIsLoading(false);
         setActiveTab('login');
         setName('');
         setRegisterEmail('');
@@ -50,15 +58,11 @@ const AccountAccessScreen = () => {
 
     const handleTabChange = (name: string) => {
         setActiveTab(name);
-
-        if (name === 'register') {
-            setName('');
-            setRegisterEmail('');
-            setRegisterPassword('');
-        } else if (name === 'login') {
-            setEmail('');
-            setPassword('');
-        }
+        setEmail('');
+        setPassword('');
+        setName('');
+        setRegisterEmail('');
+        setRegisterPassword('');
     };
 
     return (
@@ -101,8 +105,12 @@ const AccountAccessScreen = () => {
                                     />
                                 }
                             />
-                            <BytebankButton color="primary" variant="contained" onPress={handleLogin}>
-                                Entrar
+                            <BytebankButton
+                                color="primary"
+                                variant="contained"
+                                onPress={handleLogin}
+                                disabled={isLoading}>
+                                {isLoading ? <ActivityIndicator color="#fff" /> : "Entrar"}
                             </BytebankButton>
                         </View>
                     ) : (
@@ -138,8 +146,12 @@ const AccountAccessScreen = () => {
                                     />
                                 }
                             />
-                            <BytebankButton color="primary" variant="contained" onPress={handleRegister}>
-                                Criar conta
+                            <BytebankButton
+                                color="primary"
+                                variant="contained"
+                                onPress={handleRegister}
+                                disabled={isLoading}>
+                                {isLoading ? <ActivityIndicator color="#fff" /> : "Criar conta"}
                             </BytebankButton>
                         </View>
                     )}

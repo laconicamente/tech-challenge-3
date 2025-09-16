@@ -4,7 +4,7 @@ import TransactionHeader from '@/shared/components/Transaction/TransactionHeader
 import { Stack } from 'expo-router';
 import React, { useState, useCallback } from 'react';
 import { View, Text, StyleSheet, FlatList, Dimensions, SafeAreaView } from 'react-native';
-import { ColorsPalette } from '@/constants/Pallete';
+import { ColorsPalette } from '@/shared/classes/constants/Pallete';
 
 const { width } = Dimensions.get('window');
 
@@ -36,7 +36,7 @@ const cardsData = [
   },
 ];
 
-const Cards = () => {
+const CardsScreen = () => {
   const [activeCardIndex, setActiveCardIndex] = useState(0);
 
   const onViewableItemsChanged = useCallback(({ viewableItems }) => {
@@ -139,4 +139,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default Cards;
+export default CardsScreen;

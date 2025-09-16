@@ -5,7 +5,7 @@ import { LinearGradient } from 'expo-linear-gradient';
 import { useState } from 'react';
 import CreateTransactionModal from '../modals/CreateTransactionModal';
 import { useTheme } from 'react-native-paper';
-import { ColorsPalette } from '@/constants/Pallete';
+import { ColorsPalette } from '@/shared/classes/constants/Pallete';
 
 const BytebankTabBar = () => {
     const theme = useTheme();

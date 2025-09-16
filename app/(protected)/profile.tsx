@@ -1,4 +1,4 @@
-import { ColorsPalette } from '@/constants/Pallete';
+import { ColorsPalette } from '@/shared/classes/constants/Pallete';
 import { AppHeader } from '@/shared/components/AppHeader';
 import { BytebankButton } from '@/shared/ui/Button';
 import { BytebankInput } from '@/shared/ui/Input';
@@ -7,7 +7,7 @@ import React, { useState } from 'react';
 import { View, Text, StyleSheet, SafeAreaView, Image, TouchableOpacity, ScrollView } from 'react-native';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 
-const Profile = () => {
+const ProfileScreen = () => {
     // Dados iniciais do usuário para o estado
     const [name, setName] = useState('João da Silva');
     const [email, setEmail] = useState('joao.silva@bytebank.com');
@@ -120,4 +120,4 @@ const styles = StyleSheet.create({
     },
 });
 
-export default Profile;
+export default ProfileScreen;

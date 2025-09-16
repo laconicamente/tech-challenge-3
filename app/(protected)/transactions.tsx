@@ -17,8 +17,8 @@ import Animated, {
 } from 'react-native-reanimated';
 import { BytebankButton } from '@/shared/ui/Button';
 import { TransactionItem } from '@/shared/components/Transaction/TransactionItem';
-import { ColorsPalette } from '@/constants/Pallete';
-import { TransactionItemProps } from '@/shared/classes/transaction';
+import { ColorsPalette } from '@/shared/classes/constants/Pallete';
+import { TransactionItemProps } from '@/shared/classes/models/transaction';
 import { TransactionSkeleton } from '@/shared/components/Transaction/TransactionSkeleton';
 
 // Dados de exemplo para as transações
@@ -106,7 +106,7 @@ const INITIAL_TRANSACTIONS: TransactionItemProps[] = [
 ];
 
 
-export default function TransactionsList() {
+export default function TransactionsScreen() {
   const [showHeader, setShowHeader] = useState(true);
   const opacity = useSharedValue(1);
   const height = useSharedValue(115);
@@ -193,8 +193,9 @@ export default function TransactionsList() {
     <SafeAreaView style={styles.container}>
       <Stack.Screen
         options={{
-          header: () => <TransactionHeader />,
+          header: () => <TransactionHeader showSearch={true} />,
           headerShown: true,
+          presentation: 'transparentModal'
         }}
       />
       <Animated.View style={[styles.balanceResumeHeader, animatedBalanceResumeStyle]}>

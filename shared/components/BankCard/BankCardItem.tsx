@@ -1,8 +1,8 @@
-import { ColorsPalette } from '@/constants/Pallete';
+import { ColorsPalette } from '@/shared/classes/constants/Pallete';
 import { LinearGradient } from 'expo-linear-gradient';
 import React from 'react';
 import { View, Text, StyleSheet, Dimensions, Image, ColorValue } from 'react-native';
-import { BankCardProps } from '../../classes/bank-card';
+import { BankCardProps } from '../../classes/models/bank-card';
 import { maskCardNumber } from '../../hooks/maskCardNumber';
 
 const BankCardItem = ({ card }: { card: Partial<BankCardProps> }) => {

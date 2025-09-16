@@ -5,7 +5,7 @@ import { Alert, TouchableOpacity, View, Text } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useTheme } from "react-native-paper";
 import Logo from '../../assets/images/logo.svg';
-import { ColorsPalette } from "@/constants/Pallete";
+import { ColorsPalette } from "@/shared/classes/constants/Pallete";
 import MaterialIcons from "react-native-vector-icons/AntDesign";
 
 export const AppHeader = ({ title = '' }: { title?: string }) => {

@@ -5,11 +5,11 @@ import React, { useState } from 'react';
 import { Stack } from 'expo-router';
 import { AppHeader } from '@/shared/components/AppHeader';
 import CategoryList from '@/shared/components/Category/CategoryList';
-import { ColorsPalette } from '@/constants/Pallete';
+import { ColorsPalette } from '@/shared/classes/constants/Pallete';
 import { View, Text, ScrollView, StyleSheet, SafeAreaView } from 'react-native';
 import Animated, { useSharedValue, useAnimatedStyle, withTiming } from 'react-native-reanimated';
 
-export default function Dashboard() {
+export default function DashboardScreen() {
   const [showHeader, setShowHeader] = useState(true);
   const opacity = useSharedValue(1);
   const height = useSharedValue(115);

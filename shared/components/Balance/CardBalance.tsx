@@ -1,5 +1,5 @@
 import { BytebankCard } from "../../ui/Card";
-import { ColorsPalette } from "@/constants/Pallete";
+import { ColorsPalette } from "@/shared/classes/constants/Pallete";
 import { LinearGradient } from "expo-linear-gradient";
 import { BalanceResume } from "./BalanceResume";
 

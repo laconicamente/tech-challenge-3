@@ -1,4 +1,4 @@
-import { ColorsPalette } from "@/constants/Pallete";
+import { ColorsPalette } from "@/shared/classes/constants/Pallete";
 import { JSX } from "react";
 import { Card } from "react-native-paper";
 

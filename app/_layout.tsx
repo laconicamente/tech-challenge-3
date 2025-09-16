@@ -3,11 +3,12 @@ import { SplashScreen, Stack } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import 'react-native-reanimated';
 
-import { useColorScheme } from '@/hooks/useColorScheme';
-import { AuthProvider } from '@/contexts/auth/AuthContext';
+import { useColorScheme } from '@/shared/hooks/useColorScheme';
+import { AuthProvider } from '@/shared/auth/AuthContext';
 import { PaperProvider, useTheme } from 'react-native-paper';
-import { PaperDarkTheme, PaperLightTheme } from '@/constants/Colors';
+import { PaperDarkTheme, PaperLightTheme } from '@/shared/classes/constants/Colors';
 import { useEffect } from 'react';
+import TransactionHeader from '@/shared/components/Transaction/TransactionHeader';
 
 SplashScreen.preventAutoHideAsync();
 
@@ -29,15 +30,15 @@ export default function RootLayout() {
     // Async font loading only occurs in development.
     return null;
   }
-  
+
   return (
     <AuthProvider>
       <PaperProvider theme={colorScheme === 'dark' ? PaperDarkTheme : PaperLightTheme}>
         <Stack>
           <Stack.Screen name="index" options={{ headerShown: false }} />
           <Stack.Screen name="(auth)/account-access" options={{ headerShown: false }} />
-          <Stack.Screen name="(protected)" options={{ headerShown: false }}
-        />
+          <Stack.Screen name="(protected)" options={{ headerShown: false }} />
+
           <Stack.Screen name="+not-found" />
         </Stack>
         <StatusBar style="auto" />
