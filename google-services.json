@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "597904779384",
+    "project_id": "bytebank-5dba7",
+    "storage_bucket": "bytebank-5dba7.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:597904779384:android:5cd62e727105501844258d",
+        "android_client_info": {
+          "package_name": "bytebank.laconicamente.com"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyB6wl7jFxDbmToCslzC8MG_kHNjlFAIeow"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

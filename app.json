@@ -10,11 +10,11 @@
     "newArchEnabled": true,
     "ios": {
       "googleServicesFile": "./GoogleService-Info.plist",
-      "bundleIdentifier": "com.mycorp.myapp"
+      "bundleIdentifier": "bytebank.laconicamente.com"
     },
     "android": {
       "googleServicesFile": "./google-services.json",
-      "package": "laconicamente.bytebank",
+      "package": "bytebank.laconicamente.com",
       "adaptiveIcon": {
         "foregroundImage": "./assets/images/adaptive-icon.png",
         "backgroundColor": "#ffffff"
