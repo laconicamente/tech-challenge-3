@@ -1,8 +1,7 @@
 
-// shared/auth/AuthContext.tsx
 import React, { createContext, useState, useContext, useEffect, ReactNode } from 'react';
-import { onAuthStateChanged, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, User } from 'firebase/auth';
-import { auth } from '@/firebaseConfig'; // Importe a instância do auth
+import { onAuthStateChanged, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, User, updateProfile } from 'firebase/auth';
+import { auth } from '@/firebaseConfig';
 
 interface AuthContextType {
     user: User | null;
@@ -21,7 +20,6 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     const [isAuthenticated, setIsAuthenticated] = useState(false);
 
     useEffect(() => {
-        // Observa mudanças no estado de autenticação
         const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
             setUser(currentUser);
             setIsLoading(false);
@@ -33,18 +31,20 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     const login = async (email: string, password: string): Promise<boolean> => {
         try {
             await signInWithEmailAndPassword(auth, email, password);
-            return true; // Login bem-sucedido
+            return true;
         } catch (error) {
             console.error("Erro de login:", error);
-            return false; // Login falhou
+            return false;
         }
     };
 
     const signUp = async (name: string, email: string, password: string): Promise<void> => {
         try {
             await createUserWithEmailAndPassword(auth, email, password);
-            // Opcional: Atualizar o perfil do usuário com o nome
-            // await updateProfile(auth.currentUser, { displayName: name });
+
+            if (auth.currentUser) {
+                await updateProfile(auth.currentUser, { displayName: name });
+            }
         } catch (error) {
             console.error("Erro de cadastro:", error);
             throw error;
@@ -74,7 +74,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 export const useAuth = () => {
     const context = useContext(AuthContext);
     if (context === undefined) {
-        throw new Error('useAuth deve ser usado dentro de um AuthProvider');
+        throw new Error('O hook useAuth() deve ser usado dentro de um AuthProvider.');
     }
     return context;
 };

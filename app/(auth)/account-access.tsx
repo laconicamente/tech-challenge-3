@@ -57,11 +57,8 @@ const AccountAccessScreen = () => {
             setName('');
             setRegisterEmail('');
             setRegisterPassword('');
-        } catch (error) {
-            if (error instanceof Error) {
-                console.log(error.message)
-                Alert.alert("Ocorreu um erro", "Verifique os dados e tente novamente.");
-            }
+        } catch (_) {
+            Alert.alert("Ocorreu um erro", "Verifique os dados e tente novamente.");
         } finally {
             setIsLoading(false);
         }
