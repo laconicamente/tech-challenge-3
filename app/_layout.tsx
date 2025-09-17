@@ -3,7 +3,7 @@ import { SplashScreen, Stack } from 'expo-router';
 import 'react-native-reanimated';
 
 import { useColorScheme } from '@/shared/hooks/useColorScheme';
-import { AuthProvider } from '@/shared/auth/AuthContext';
+import { AuthProvider } from '@/shared/contexts/auth/AuthContext';
 import { PaperProvider, useTheme } from 'react-native-paper';
 import { PaperDarkTheme, PaperLightTheme } from '@/shared/classes/constants/Colors';
 import { useEffect } from 'react';

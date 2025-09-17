@@ -51,6 +51,9 @@
     ],
     "experiments": {
       "typedRoutes": true
+    },
+    "expo": {
+      "jsEngine": "hermes"
     }
   }
 }

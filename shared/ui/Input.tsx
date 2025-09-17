@@ -1,7 +1,9 @@
 import React, { useId } from "react";
-import { View, StyleSheet, Text } from "react-native";
+import { View, StyleSheet, Text, KeyboardTypeOptions } from "react-native";
 import { TextInput, TextInputProps, useTheme } from "react-native-paper";
+import MaskInput, { createNumberMask, MaskInputProps, Masks } from 'react-native-mask-input';
 
+export type InputMask = "currency" | "date";
 
 export type BytebankInputProps = {
     label: string;
@@ -11,7 +13,6 @@ export type BytebankInputProps = {
     error?: boolean;
     helperText?: string;
     autoComplete?: string;
-    mask?: "currency";
     color?:
     | "primary"
     | "secondary"
@@ -19,8 +20,14 @@ export type BytebankInputProps = {
     | "error"
     | "warning"
     variant?: "contained" | "text" | "outlined";
-
+    maskType?: InputMask;
+    onChangeText: (masked: string, unmasked: string) => void;
 } & TextInputProps;
+
+const currencyMask = Masks.BRL_CURRENCY;
+
+const dateMask = Masks.DATE_DDMMYYYY;
+
 
 export function BytebankInput({
     value,
@@ -30,7 +37,7 @@ export function BytebankInput({
     error = false,
     helperText = "",
     autoComplete,
-    mask,
+    maskType,
     color,
     onChangeText,
     ...props
@@ -39,6 +46,40 @@ export function BytebankInput({
     const reactId = useId();
     const inputId = `input-${reactId}`;
     const helperId = helperText ? `${inputId}-helper` : undefined;
+
+    const baseInputStyle = {
+        ...styles.input,
+        backgroundColor: '#f0f0f0',
+        borderRadius: 10,
+        marginBottom: 20,
+    };
+    const maskInputStyle = {
+        ...baseInputStyle,
+        height: 50,
+        fontSize: 16,
+        paddingHorizontal: 15,
+    };
+
+    if (maskType) {
+        let mask = maskType === 'currency' ? currencyMask : dateMask;
+        let keyboardType: KeyboardTypeOptions = (maskType === 'currency') ? 'numeric' : 'default';
+
+        return (
+            <View className="bytebank-input">
+                <Text style={styles.inputLabel}>{label}</Text>
+                <MaskInput
+                    value={value}
+                    onChangeText={onChangeText}
+                    mask={mask}
+                    placeholder={placeholder}
+                    keyboardType={keyboardType}
+                    style={maskInputStyle}
+                />
+            </View>
+        );
+    }
+
+
 
     return (
         <View className="bytebank-input">

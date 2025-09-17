@@ -14,7 +14,7 @@ import {
 } from 'react-native';
 import { TextInput } from 'react-native-paper';
 import { Feather } from '@expo/vector-icons';
-import { useAuth } from '@/shared/auth/AuthContext';
+import { useAuth } from '@/shared/contexts/auth/AuthContext';
 import { router } from 'expo-router';
 import { BytebankButton } from '@/shared/ui/Button';
 import { BytebankInput } from '@/shared/ui/Input';
