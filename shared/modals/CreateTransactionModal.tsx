@@ -27,6 +27,7 @@ import { FileUploadButton } from "../ui/FileUploadButton";
 import { useForm, Controller, FormProvider } from "react-hook-form";
 import { BytebankInputController } from "../ui/Input/InputController";
 import { BytebankSelectController } from "../ui/Select/SelectController";
+import { useFeedbackAnimation } from "../hooks/useFeedbackAnimation";
 
 const height = Dimensions.get("window").height;
 
@@ -41,6 +42,7 @@ const CreateTransactionModal: React.FC<CreateTransactionModalProps> = ({
     onDismiss,
     onFinished,
 }) => {
+    const { showFeedback, FeedbackAnimation } = useFeedbackAnimation();
     const { user } = useAuth();
     const methods = useForm({
         mode: "onChange",
@@ -53,7 +55,7 @@ const CreateTransactionModal: React.FC<CreateTransactionModalProps> = ({
             fileUrl: null,
         },
     });
-    const { setValue, watch, reset, control, handleSubmit, formState: { errors } } = methods;
+    const { setValue, reset, control, handleSubmit, formState: { errors } } = methods;
 
 
     const [transactionType, setTransactionType] = useState("income");
@@ -103,7 +105,7 @@ const CreateTransactionModal: React.FC<CreateTransactionModalProps> = ({
                 newTransaction
             );
             console.log("Transação adicionada com ID: ", docRef.id);
-            Alert.alert("Sucesso", "Transação criada com sucesso!");
+            showFeedback("success");
             onFinished();
             onDismiss();
         } catch (error) {
@@ -218,6 +220,7 @@ const CreateTransactionModal: React.FC<CreateTransactionModalProps> = ({
                     </KeyboardAvoidingView>
                 </Animated.View>
             </Modal>
+            <FeedbackAnimation />
         </Portal>
     );
 };
