@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { StyleSheet, Text, TouchableOpacity, ActivityIndicator, Alert } from 'react-native';
-import {pick, keepLocalCopy} from '@react-native-documents/picker';
+import * as DocumentPicker from 'expo-document-picker';
 import { getStorage, ref, uploadBytesResumable, getDownloadURL } from 'firebase/storage';
 import { useAuth } from '@/shared/contexts/auth/AuthContext';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
@@ -22,25 +22,25 @@ export const FileUploadButton: React.FC<FileUploadButtonProps> = ({label, onFini
     }
 
     try {
-      const file = await pick({type: ['image/*', 'application/pdf']});
-      const [localCopy] = await keepLocalCopy({
-        files: [
-          {
-            uri: file[0].uri,
-            fileName: file[0].name ?? 'fallbackName',
-          },
-        ],
-        destination: 'documentDirectory',
-      });
+      const file = await DocumentPicker.getDocumentAsync({type: ['image/*', 'application/pdf'], copyToCacheDirectory: true});
+      if (file.canceled) {
+        return;
+      }
 
-      const filename = localCopy.sourceUri.substring(localCopy.sourceUri.lastIndexOf('/') + 1);
+      const selectedFile = file.assets?.[0];
+      if (!selectedFile || !selectedFile.uri) {
+        Alert.alert("Erro", "Não foi possível obter o arquivo selecionado.");
+        return;
+      }
+      const uri = selectedFile.uri;
+      const filename = uri.split('/').pop() || 'unknown';
       const uploadPath = `files/${user.uid}/${filename}`;
       
       setIsUploading(true);
 
       const storage = getStorage();
       const reference = ref(storage, uploadPath);
-      const response = await fetch(localCopy.sourceUri);
+      const response = await fetch(uri);
       const blob = await response.blob();
       const task = uploadBytesResumable(reference, blob);
 
@@ -74,7 +74,7 @@ export const FileUploadButton: React.FC<FileUploadButtonProps> = ({label, onFini
       disabled={isUploading}
     >
       {isUploading ? (
-        <ActivityIndicator color="#fff" />
+        <ActivityIndicator color={ColorsPalette.light['lime.700']} />
       ) : (
         <>
           <MaterialIcons name="cloud-upload" size={24} color={ColorsPalette.light['lime.700']} style={styles.icon} />

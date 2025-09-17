@@ -1,7 +1,7 @@
 import React, { useId } from "react";
 import { View, StyleSheet, Text, KeyboardTypeOptions } from "react-native";
 import { TextInput, TextInputProps, useTheme } from "react-native-paper";
-import MaskInput, { createNumberMask, MaskInputProps, Masks } from 'react-native-mask-input';
+import MaskInput, { Masks } from 'react-native-mask-input';
 
 export type InputMask = "currency" | "date";
 
@@ -21,7 +21,7 @@ export type BytebankInputProps = {
     | "warning"
     variant?: "contained" | "text" | "outlined";
     maskType?: InputMask;
-    onChangeText: (masked: string, unmasked: string) => void;
+    onChangeText?: (masked: string, unmasked: string) => void;
 } & TextInputProps;
 
 const currencyMask = Masks.BRL_CURRENCY;
@@ -62,7 +62,7 @@ export function BytebankInput({
 
     if (maskType) {
         let mask = maskType === 'currency' ? currencyMask : dateMask;
-        let keyboardType: KeyboardTypeOptions = (maskType === 'currency') ? 'numeric' : 'default';
+        let keyboardType: KeyboardTypeOptions = (maskType === 'currency' || maskType === 'date') ? 'numeric' : 'default';
 
         return (
             <View className="bytebank-input">

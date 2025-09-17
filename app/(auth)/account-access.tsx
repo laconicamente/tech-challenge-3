@@ -17,7 +17,7 @@ import { Feather } from '@expo/vector-icons';
 import { useAuth } from '@/shared/contexts/auth/AuthContext';
 import { router } from 'expo-router';
 import { BytebankButton } from '@/shared/ui/Button';
-import { BytebankInput } from '@/shared/ui/Input';
+import { BytebankInput } from '@/shared/ui/Input/Input';
 import { BytebankTabSelector } from '@/shared/ui/TabSelector';
 
 const AccountAccessScreen = () => {

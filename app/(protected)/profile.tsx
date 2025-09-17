@@ -1,7 +1,7 @@
 import { ColorsPalette } from '@/shared/classes/constants/Pallete';
 import { AppHeader } from '@/shared/components/AppHeader';
 import { BytebankButton } from '@/shared/ui/Button';
-import { BytebankInput } from '@/shared/ui/Input';
+import { BytebankInput } from '@/shared/ui/Input/Input';
 import { Stack } from 'expo-router';
 import React, { useState } from 'react';
 import { View, Text, StyleSheet, SafeAreaView, Image, TouchableOpacity, ScrollView } from 'react-native';
