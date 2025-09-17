@@ -1,5 +1,4 @@
-// AccountAccessScreen.tsx
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import {
     View,
     Text,
@@ -22,17 +21,22 @@ import { BytebankInput } from '@/shared/ui/Input';
 import { BytebankTabSelector } from '@/shared/ui/TabSelector';
 
 const AccountAccessScreen = () => {
-    const { login, signUp } = useAuth();
+    const { login, signUp, user, isLoading: authLoading } = useAuth();
     const [activeTab, setActiveTab] = useState('login');
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [showPassword, setShowPassword] = useState(false);
-    const [isLoading, setIsLoading] = useState(false);
-
     const [name, setName] = useState('');
     const [registerEmail, setRegisterEmail] = useState('');
     const [registerPassword, setRegisterPassword] = useState('');
     const [showRegisterPassword, setShowRegisterPassword] = useState(false);
+    const [isLoading, setIsLoading] = useState(false);
+
+    useEffect(() => {
+        if (user && !authLoading) {
+            router.replace('/(protected)/dashboard');
+        }
+    }, [user, authLoading]);
 
     const handleLogin = async () => {
         setIsLoading(true);
@@ -40,21 +44,29 @@ const AccountAccessScreen = () => {
         setIsLoading(false);
 
         if (!success) {
-            router.replace('/(protected)/dashboard');
-        } else {
             Alert.alert("Erro de Login", "Verifique seu e-mail e senha e tente novamente.");
         }
     };
 
     const handleRegister = async () => {
         setIsLoading(true);
-        await signUp(name, registerEmail, registerPassword);
-        setIsLoading(false);
-        setActiveTab('login');
-        setName('');
-        setRegisterEmail('');
-        setRegisterPassword('');
+        try {
+            await signUp(name, registerEmail, registerPassword);
+            setActiveTab('login');
+            Alert.alert("Sucesso", "Conta criada com sucesso! Faça login para continuar.");
+            setName('');
+            setRegisterEmail('');
+            setRegisterPassword('');
+        } catch (error) {
+            if (error instanceof Error) {
+                console.log(error.message)
+                Alert.alert("Ocorreu um erro", "Verifique os dados e tente novamente.");
+            }
+        } finally {
+            setIsLoading(false);
+        }
     };
+
 
     const handleTabChange = (name: string) => {
         setActiveTab(name);
@@ -81,7 +93,7 @@ const AccountAccessScreen = () => {
                     />
                     <Text style={styles.title}>Experimente mais liberdade no controle da sua vida financeira.</Text>
 
-                    <BytebankTabSelector tabs={[{label: 'Login', name: 'login'}, {label: 'Crie uma conta', name: 'register'}]} activeTab={activeTab} onTabChange={handleTabChange} />
+                    <BytebankTabSelector tabs={[{ label: 'Login', name: 'login' }, { label: 'Crie uma conta', name: 'register' }]} activeTab={activeTab} onTabChange={handleTabChange} />
                     {activeTab === 'login' ? (
                         <View style={styles.formContainer}>
                             <BytebankInput

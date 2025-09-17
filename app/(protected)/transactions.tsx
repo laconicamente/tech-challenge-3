@@ -5,6 +5,7 @@ import {
   View,
   FlatList,
   SafeAreaView,
+  StatusBar,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { Stack } from 'expo-router';

@@ -1,67 +1,80 @@
-import { createContext, ReactNode, useContext, useState } from "react"
 
-interface User {
-    name: string
-    email: string
-    password: string
+// shared/auth/AuthContext.tsx
+import React, { createContext, useState, useContext, useEffect, ReactNode } from 'react';
+import { onAuthStateChanged, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, User } from 'firebase/auth';
+import { auth } from '@/firebaseConfig'; // Importe a instância do auth
+
+interface AuthContextType {
+    user: User | null;
+    isLoading: boolean;
+    login: (email: string, password: string) => Promise<boolean>;
+    signUp: (name: string, email: string, password: string) => Promise<void>;
+    logout: () => Promise<void>;
+    isAuthenticated: boolean;
 }
 
-interface IAuthContext {
-    user: User | null
-    users: User[]
-    login: (email: string, password: string) => boolean
-    signUp: (name: string, email: string, password: string) => void
-    logout: () => void
-    isAuthenticated: boolean
-}
-
-const AuthContext = createContext<IAuthContext | undefined>(undefined)
+const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export const AuthProvider = ({ children }: { children: ReactNode }) => {
-    const [user, setUser] = useState<User | null>(null)
-    const [users, setUsers] = useState<User[]>([])
-    const [isAuthenticated, setIsAuthenticated] = useState(false)
+    const [user, setUser] = useState<User | null>(null);
+    const [isLoading, setIsLoading] = useState(true);
+    const [isAuthenticated, setIsAuthenticated] = useState(false);
 
-    const login = (email: string, password: string) => {
-        console.log(users)
-        const foundUser = users.find(u => u.email === email && u.password === password)
-        if (foundUser) {
-            setUser(user)
-            setIsAuthenticated(true)
-            console.log('AuthProvider :: login - usuário logado com sucesso')
-            return true
-        } 
-        console.log('AuthProvider :: login - usuário não encontrado')
-        return false
-    }
+    useEffect(() => {
+        // Observa mudanças no estado de autenticação
+        const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
+            setUser(currentUser);
+            setIsLoading(false);
+            setIsAuthenticated(!!currentUser);
+        });
+        return () => unsubscribe();
+    }, []);
 
-    const signUp = (name: string, email: string, password: string) => {
-        setUsers([...users, { name, email, password }])
-        console.log('AuthProvider :: signUp - usuário cadastrado com sucesso')
-    }
+    const login = async (email: string, password: string): Promise<boolean> => {
+        try {
+            await signInWithEmailAndPassword(auth, email, password);
+            return true; // Login bem-sucedido
+        } catch (error) {
+            console.error("Erro de login:", error);
+            return false; // Login falhou
+        }
+    };
 
-    const logout = () => {
-        console.log('AuthProvider :: logout - usuário deslogado com sucesso')
-        setUser(null)
-        setIsAuthenticated(false)
-    }
+    const signUp = async (name: string, email: string, password: string): Promise<void> => {
+        try {
+            await createUserWithEmailAndPassword(auth, email, password);
+            // Opcional: Atualizar o perfil do usuário com o nome
+            // await updateProfile(auth.currentUser, { displayName: name });
+        } catch (error) {
+            console.error("Erro de cadastro:", error);
+            throw error;
+        }
+    };
 
-    return <AuthContext.Provider value={{
+    const logout = async (): Promise<void> => {
+        await signOut(auth);
+    };
+
+    const value = {
         user,
-        users,
+        isLoading,
         login,
         signUp,
         logout,
-        isAuthenticated
-    }}> 
-        {children}
-    </AuthContext.Provider>
-}
+        isAuthenticated,
+    };
+
+    return (
+        <AuthContext.Provider value={value}>
+            {children}
+        </AuthContext.Provider>
+    );
+};
 
 export const useAuth = () => {
-    const context = useContext(AuthContext)
-    if (!context) {
-        throw new Error('contexto não encontado, useAuth deve estar dentro de AuthProvider')
+    const context = useContext(AuthContext);
+    if (context === undefined) {
+        throw new Error('useAuth deve ser usado dentro de um AuthProvider');
     }
-    return context
-}
+    return context;
+};

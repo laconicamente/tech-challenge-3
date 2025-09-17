@@ -46,6 +46,7 @@ export default function DashboardScreen() {
         options={{
           header: () => <AppHeader />,
           headerShown: true,
+          statusBarStyle: 'light',
         }}
       />
       <Animated.View style={[styles.greetingHeader, animatedGreetingHeaderStyle]}>
