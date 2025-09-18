@@ -1,23 +1,27 @@
-import React, { useEffect, useRef } from 'react';
-import { View, StyleSheet, Dimensions } from 'react-native';
+import React, { useEffect, useRef, useState } from 'react';
+import { View, StyleSheet, Dimensions, Text } from 'react-native';
 import LottieView from 'lottie-react-native';
 
 const { width, height } = Dimensions.get('window');
 
+export type FeedbackAnimationType = 'success' | 'error';
 export interface FeedbackAnimationProps {
-    name: 'success' | 'error';
+    name: FeedbackAnimationType;
     onFinished?: () => void;
 }
 const animationSources: Record<string, any> = {
     success: require('@/assets/animations/success.json'),
     error: require('@/assets/animations/error.json'),
-}
+};
+
 export const FeedbackAnimation = ({ name, onFinished }: FeedbackAnimationProps) => {
     const animationRef = useRef<LottieView>(null);
 
     useEffect(() => {
-        animationRef.current?.play();
-    }, []);
+        if (animationRef.current) {
+            animationRef.current.play();
+        }
+    }, [name]);
 
     return (
         <View style={styles.container}>
@@ -40,7 +44,7 @@ const styles = StyleSheet.create({
         justifyContent: 'center',
         alignItems: 'center',
         backgroundColor: 'rgba(255, 255, 255, 0.97)',
-        zIndex: 10, 
+        zIndex: 10,
     },
     animation: {
         width: width * 0.8,

@@ -11,9 +11,10 @@ interface FileUploadButtonProps {
   onFinished: (url: string) => void;
 }
 
-export const FileUploadButton: React.FC<FileUploadButtonProps> = ({label, onFinished }) => {
+export const FileUploadButton: React.FC<FileUploadButtonProps> = ({ label, onFinished }) => {
   const { user } = useAuth();
   const [isUploading, setIsUploading] = useState(false);
+  const [isFinished, setIsFinished] = useState(false);
 
   const handleDocumentPick = async () => {
     if (!user) {
@@ -22,7 +23,7 @@ export const FileUploadButton: React.FC<FileUploadButtonProps> = ({label, onFini
     }
 
     try {
-      const file = await DocumentPicker.getDocumentAsync({type: ['image/*', 'application/pdf'], copyToCacheDirectory: true});
+      const file = await DocumentPicker.getDocumentAsync({ type: ['image/*', 'application/pdf'], copyToCacheDirectory: true });
       if (file.canceled) {
         return;
       }
@@ -35,7 +36,7 @@ export const FileUploadButton: React.FC<FileUploadButtonProps> = ({label, onFini
       const uri = selectedFile.uri;
       const filename = uri.split('/').pop() || 'unknown';
       const uploadPath = `files/${user.uid}/${filename}`;
-      
+
       setIsUploading(true);
 
       const storage = getStorage();
@@ -44,18 +45,14 @@ export const FileUploadButton: React.FC<FileUploadButtonProps> = ({label, onFini
       const blob = await response.blob();
       const task = uploadBytesResumable(reference, blob);
 
-      task.on('state_changed', (snapshot) => {
-        const progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
-        console.log(`Progresso: ${progress.toFixed(2)}%`);
-      });
+      task.on('state_changed', (_) => onProgress(true));
 
       await task;
       const downloadURL = await getDownloadURL(reference);
-      
-      setIsUploading(false);
-      Alert.alert("Sucesso", "Arquivo enviado com sucesso!");
-      onFinished(downloadURL);
 
+      setIsUploading(false);
+      onFinished(downloadURL);
+      setIsFinished(true);
     } catch (err: any) {
       setIsUploading(false);
       console.log(err)
@@ -69,7 +66,7 @@ export const FileUploadButton: React.FC<FileUploadButtonProps> = ({label, onFini
 
   return (
     <TouchableOpacity
-      style={styles.button}
+      style={[styles.button, { backgroundColor: isFinished ? ColorsPalette.light['grey.50'] : ColorsPalette.light['lime.100'], borderColor: isFinished ? ColorsPalette.light['grey.200'] : ColorsPalette.light['lime.300'] }]}
       onPress={handleDocumentPick}
       disabled={isUploading}
     >
@@ -92,10 +89,8 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: ColorsPalette.light['lime.100'],
     borderStyle: 'dashed',
     borderWidth: 2,
-    borderColor: ColorsPalette.light['lime.300'],
     paddingVertical: 12,
     borderRadius: 8,
     marginTop: 10,

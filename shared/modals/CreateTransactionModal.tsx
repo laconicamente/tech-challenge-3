@@ -1,4 +1,4 @@
-import React, { useState, useRef } from "react";
+import React, { useState, useRef, useMemo } from "react";
 import {
     View,
     StyleSheet,
@@ -14,7 +14,7 @@ import {
     ActivityIndicator,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { Modal, Portal, Card, Divider } from "react-native-paper";
+import { Modal, Portal, Card, Divider, ProgressBar } from "react-native-paper";
 import { BytebankButton } from "../ui/Button";
 import { BytebankTabSelector } from "../ui/TabSelector";
 import { collection, addDoc } from "firebase/firestore";
@@ -55,9 +55,8 @@ const CreateTransactionModal: React.FC<CreateTransactionModalProps> = ({
             fileUrl: null,
         },
     });
+    const [uploadProgress, showUploadProgress] = useState(false);
     const { setValue, reset, control, handleSubmit, formState: { errors } } = methods;
-
-
     const [transactionType, setTransactionType] = useState("income");
 
     const [isLoading, setIsLoading] = useState(false);
@@ -110,17 +109,17 @@ const CreateTransactionModal: React.FC<CreateTransactionModalProps> = ({
             onDismiss();
         } catch (error) {
             console.error("Erro ao adicionar transação: ", error);
-            Alert.alert(
-                "Ocorreu um erro",
-                "Não foi possível salvar a transação. Tente novamente por favor."
-            );
+            showFeedback("error");
         } finally {
             setIsLoading(false);
         }
     };
 
+    const handleUploadProgress = (progress: boolean) => showUploadProgress(progress);
+
     return (
         <Portal>
+            <ProgressBar indeterminate visible={uploadProgress} />
             <Modal
                 visible={visible}
                 onDismiss={onDismiss}
@@ -193,7 +192,7 @@ const CreateTransactionModal: React.FC<CreateTransactionModalProps> = ({
                                                         name="fileUrl"
                                                         control={control}
                                                         render={({ field }) => (
-                                                            <FileUploadButton label='Adicionar comprovante' onFinished={(v) => { field.onChange(v); console.log('Upload finalizado', v); }} />
+                                                            <FileUploadButton label={field.value ? 'Comprovante adicionado' : 'Adicionar comprovante'} onProgress={handleUploadProgress} onFinished={(v) => { field.onChange(v); handleUploadProgress(false); showFeedback('success'); }} />
                                                         )}
                                                     />
                                                 </View>
