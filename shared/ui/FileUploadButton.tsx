@@ -1,17 +1,18 @@
-import React, { useState } from 'react';
-import { StyleSheet, Text, TouchableOpacity, ActivityIndicator, Alert } from 'react-native';
-import * as DocumentPicker from 'expo-document-picker';
-import { getStorage, ref, uploadBytesResumable, getDownloadURL } from 'firebase/storage';
 import { useAuth } from '@/shared/contexts/auth/AuthContext';
+import * as DocumentPicker from 'expo-document-picker';
+import { getDownloadURL, getStorage, ref, uploadBytesResumable } from 'firebase/storage';
+import React, { useState } from 'react';
+import { ActivityIndicator, Alert, StyleSheet, Text, TouchableOpacity } from 'react-native';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 import { ColorsPalette } from '../classes/constants/Pallete';
 
 interface FileUploadButtonProps {
   label: string,
   onFinished: (url: string) => void;
+  onProgress: (uploading: boolean) => void;
 }
 
-export const FileUploadButton: React.FC<FileUploadButtonProps> = ({ label, onFinished }) => {
+export const FileUploadButton: React.FC<FileUploadButtonProps> = ({ label, onFinished, onProgress }) => {
   const { user } = useAuth();
   const [isUploading, setIsUploading] = useState(false);
   const [isFinished, setIsFinished] = useState(false);
@@ -45,7 +46,9 @@ export const FileUploadButton: React.FC<FileUploadButtonProps> = ({ label, onFin
       const blob = await response.blob();
       const task = uploadBytesResumable(reference, blob);
 
-      task.on('state_changed', (_) => onProgress(true));
+      task.on('state_changed', (snapshot) => {
+        onProgress(true);
+      });
 
       await task;
       const downloadURL = await getDownloadURL(reference);

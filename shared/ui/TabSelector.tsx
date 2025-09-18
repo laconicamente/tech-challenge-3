@@ -1,4 +1,4 @@
-import { View, TouchableOpacity, StyleSheet, Text } from "react-native";
+import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
 
 interface BytebankTabSelectorProps {
     tabs: Array<{ name: string, label: string }>,

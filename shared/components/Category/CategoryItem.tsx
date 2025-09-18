@@ -1,13 +1,13 @@
 import React from 'react';
-import { View, Text, StyleSheet } from 'react-native';
+import { StyleSheet, Text, View } from 'react-native';
 
-export interface CategoryItemProps {
+interface CategoryProps {
   value: number;
   name: string;
   color?: string;
 }
 
-const CategoryItem = ({ data, style = {}, ref }: {createdAt: CategoryItemProps; style?: object; ref?: React.Ref<any> }) => {
+const CategoryItem = ({ data, style = {}, ref }: { data: CategoryProps; style?: object; ref?: React.Ref<any> }) => {
   return (
     <View ref={ref} style={[styles.card, { backgroundColor: data.color }, style]}>
       <Text style={styles.value}>{data.value}</Text>

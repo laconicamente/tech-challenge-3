@@ -1,33 +1,36 @@
-import React, { useState, useRef, useMemo } from "react";
-import {
-    View,
-    StyleSheet,
-    Text,
-    Animated,
-    Dimensions,
-    Platform,
-    TouchableWithoutFeedback,
-    KeyboardAvoidingView,
-    Keyboard,
-    ScrollView,
-    Alert,
-    ActivityIndicator,
-} from "react-native";
-import { SafeAreaView } from "react-native-safe-area-context";
-import { Modal, Portal, Card, Divider, ProgressBar } from "react-native-paper";
-import { BytebankButton } from "../ui/Button";
-import { BytebankTabSelector } from "../ui/TabSelector";
-import { collection, addDoc } from "firebase/firestore";
 import { firestore } from "@/firebaseConfig";
 import { useAuth } from "@/shared/contexts/auth/AuthContext";
 import { router } from "expo-router";
-import { useBottomSheetHandler } from "../hooks/useBottomSheetHandler";
+import { addDoc, collection } from "firebase/firestore";
+import React, { useRef, useState } from "react";
+import { Controller, FormProvider, useForm } from "react-hook-form";
+import {
+    ActivityIndicator,
+    Alert,
+    Animated,
+    Dimensions,
+    Keyboard,
+    KeyboardAvoidingView,
+    Platform,
+    ScrollView,
+    StyleSheet,
+    Text,
+    TouchableWithoutFeedback,
+    View,
+} from "react-native";
+import { Card, Divider, Modal, Portal, ProgressBar } from "react-native-paper";
+import { SafeAreaView } from "react-native-safe-area-context";
+import { TransactionItemProps, TransactionType } from "../classes/models/transaction";
 import { useBottomSheetAnimation } from "../hooks/useBottomSheetAnimation";
+import { useBottomSheetHandler } from "../hooks/useBottomSheetHandler";
+import { useCategories } from "../hooks/useCategories";
+import { useFeedbackAnimation } from "../hooks/useFeedbackAnimation";
+import { useMethods } from "../hooks/useMethods";
+import { BytebankButton } from "../ui/Button";
 import { FileUploadButton } from "../ui/FileUploadButton";
-import { useForm, Controller, FormProvider } from "react-hook-form";
 import { BytebankInputController } from "../ui/Input/InputController";
 import { BytebankSelectController } from "../ui/Select/SelectController";
-import { useFeedbackAnimation } from "../hooks/useFeedbackAnimation";
+import { BytebankTabSelector } from "../ui/TabSelector";
 
 const height = Dimensions.get("window").height;
 
@@ -43,24 +46,26 @@ const CreateTransactionModal: React.FC<CreateTransactionModalProps> = ({
     onFinished,
 }) => {
     const { showFeedback, FeedbackAnimation } = useFeedbackAnimation();
+    const [transactionType, setTransactionType] = useState<TransactionType>("income");
     const { user } = useAuth();
-    const methods = useForm({
+    const { categories } = useCategories(transactionType);
+    const { methods } = useMethods(transactionType);
+    const [uploadProgress, showUploadProgress] = useState(false);
+    const [isLoading, setIsLoading] = useState(false);
+    const [isInteracting, setIsInteracting] = useState(false);
+
+    const formMethods = useForm({
         mode: "onChange",
         defaultValues: {
             methodId: "",
             categoryId: "",
             createdAt: "",
             value: "",
-            type: "income",
+            type: transactionType,
             fileUrl: null,
         },
     });
-    const [uploadProgress, showUploadProgress] = useState(false);
-    const { setValue, reset, control, handleSubmit, formState: { errors } } = methods;
-    const [transactionType, setTransactionType] = useState("income");
-
-    const [isLoading, setIsLoading] = useState(false);
-    const [isInteracting, setIsInteracting] = useState(false);
+    const { setValue, reset, control, handleSubmit, formState: { errors } } = formMethods;
 
     const pan = useRef(new Animated.ValueXY()).current;
     const gestureHandler = useBottomSheetHandler(pan, onDismiss);
@@ -75,20 +80,25 @@ const CreateTransactionModal: React.FC<CreateTransactionModalProps> = ({
         { label: "Dinheiro em espécie", value: "dinheiro" },
     ];
 
-    const handleTabChange = (name: string) => {
-        setTransactionType(name);
-        setValue("type", name);
+    const resetSettings = (type: TransactionType = 'income') => {
         reset({
             methodId: "",
             categoryId: "",
             createdAt: "",
             value: "",
-            type: name,
+            type,
             fileUrl: null
         })
     }
 
-    const onSubmit = async (data: any) => {
+    const handleTabChange = (type: string) => {
+        const transactionType = type as TransactionType;
+        setTransactionType(transactionType);
+        setValue("type", transactionType);
+        resetSettings(transactionType);
+    }
+
+    const onSubmit = async (data: TransactionItemProps) => {
         console.log(data);
         if (!user) {
             Alert.alert("Ocorreu um erro", "Usuário não autenticado.");
@@ -112,6 +122,7 @@ const CreateTransactionModal: React.FC<CreateTransactionModalProps> = ({
             showFeedback("error");
         } finally {
             setIsLoading(false);
+            resetSettings(transactionType);
         }
     };
 
@@ -137,7 +148,7 @@ const CreateTransactionModal: React.FC<CreateTransactionModalProps> = ({
                     >
                         <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
                             <SafeAreaView edges={["bottom"]}>
-                                <FormProvider {...methods}>
+                                <FormProvider {...formMethods}>
                                     <Card style={styles.card}>
                                         <View style={styles.dragHandle} />
                                         <View style={styles.header}>
@@ -154,14 +165,15 @@ const CreateTransactionModal: React.FC<CreateTransactionModalProps> = ({
                                                     activeTab={transactionType}
                                                     onTabChange={handleTabChange}
                                                 />
-
-                                                <BytebankSelectController
-                                                    name={"methodId"}
-                                                    label="Selecione o tipo da transação"
-                                                    items={transactionCategories}
-                                                    placeholder="Selecione o tipo da transação"
-                                                    onOpen={() => setIsInteracting(true)}
-                                                    onClose={() => setIsInteracting(false)} />
+                                                {methods && methods.length > 0 ?
+                                                    (<BytebankSelectController
+                                                        name={"methodId"}
+                                                        label="Selecione o tipo da transação"
+                                                        items={methods.map(c => ({ label: c.name, value: c.id }))}
+                                                        placeholder="Selecione o tipo da transação"
+                                                        onOpen={() => setIsInteracting(true)}
+                                                        onClose={() => setIsInteracting(false)} />
+                                                    ) : (null)}
                                                 <BytebankInputController
                                                     type='text'
                                                     name="createdAt"
@@ -179,14 +191,16 @@ const CreateTransactionModal: React.FC<CreateTransactionModalProps> = ({
                                                     rules={{ required: "Valor obrigatório" }}
                                                     keyboardType="numeric"
                                                 />
-                                                <BytebankSelectController
-                                                    name={"categoryId"}
-                                                    label="Selecione uma categoria"
-                                                    items={transactionCategories}
-                                                    placeholder="Selecione uma categoria"
-                                                    onOpen={() => setIsInteracting(true)}
-                                                    onClose={() => setIsInteracting(false)}
-                                                />
+                                                {categories && categories.length > 0 && (
+                                                    <BytebankSelectController
+                                                        name="categoryId"
+                                                        label="Selecione uma categoria"
+                                                        items={categories.map(c => ({ label: c.name, value: c.id }))}
+                                                        placeholder="Selecione uma categoria"
+                                                        onOpen={() => setIsInteracting(true)}
+                                                        onClose={() => setIsInteracting(false)}
+                                                    />
+                                                )}
                                                 <View style={{ marginBottom: 10 }}>
                                                     <Controller
                                                         name="fileUrl"
@@ -249,7 +263,6 @@ const styles = StyleSheet.create({
         display: "flex",
         alignContent: "space-between",
         flexDirection: "column",
-        height: "100%",
     },
     dragHandle: {
         width: 40,
