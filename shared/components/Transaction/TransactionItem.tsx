@@ -1,5 +1,6 @@
+import { formatCurrency } from "@/shared/hooks/formatCurrency";
 import { Ionicons } from "@expo/vector-icons";
-import { View, StyleSheet, Text } from "react-native";
+import { StyleSheet, Text, View } from "react-native";
 import { TransactionItemProps } from "../../classes/models/transaction";
 
 export const TransactionItem = ({transaction}: {transaction: TransactionItemProps}) => (
@@ -12,12 +13,12 @@ export const TransactionItem = ({transaction}: {transaction: TransactionItemProp
             />
         </View>
         <View style={styles.itemDetalhes}>
-            <Text style={styles.itemtitle}>{transaction.title}</Text>
-            <Text style={styles.itemDescription}>{transaction.description}</Text>
+            <Text style={styles.itemtitle}>{transaction.categoryName}</Text>
+            <Text style={styles.itemDescription}>{transaction.methodName}</Text>
         </View>
         <View style={styles.itemValueContainer}>
             <Text style={[styles.itemValue]}>
-                {transaction.value}
+                {formatCurrency(Number(transaction.value))}
             </Text>
             <Text style={styles.itemData}>{transaction.createdAt}</Text>
         </View>

@@ -1,5 +1,5 @@
 import { firestore } from '@/firebaseConfig';
-import { collection, DocumentData, getDocs, QueryDocumentSnapshot } from 'firebase/firestore';
+import { collection, doc, DocumentData, getDoc, getDocs, QueryDocumentSnapshot } from 'firebase/firestore';
 import { useCallback, useEffect, useState } from 'react';
 import { MethodItemProps } from '../classes/models/method';
 import { TransactionType } from '../classes/models/transaction';
@@ -40,5 +40,22 @@ export const useMethods = (filterType: TransactionType = 'income') => {
     fetchMethods();
   }, [fetchMethods]);
 
-  return { methods, isLoading, error, refetch: fetchMethods };
+  const getMethodById = useCallback(async (id: string) => {
+      try {
+        if (id) {
+          const ref = doc(firestore, 'methods', id);
+          const snap = await getDoc(ref);
+          if (snap.exists()) {
+            return mapDoc(snap as any);
+          } else {
+            return null;
+          }
+        }
+      } catch (e: unknown) {
+        console.error('Erro ao buscar método por ID', e);
+        setError((e as Error).message ?? 'Erro desconhecido');
+      }
+    }, []);
+
+  return { methods, isLoading, error, getMethodById, refetch: fetchMethods };
 };

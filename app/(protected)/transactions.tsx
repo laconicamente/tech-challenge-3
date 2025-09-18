@@ -1,111 +1,26 @@
-import React, { useState } from 'react';
-import {
-  StyleSheet,
-  Text,
-  View,
-  FlatList,
-  SafeAreaView,
-  StatusBar,
-} from 'react-native';
-import { Ionicons } from '@expo/vector-icons';
-import { Stack } from 'expo-router';
-import TransactionHeader from '@/shared/components/Transaction/TransactionHeader';
-import { BalanceResume } from '@/shared/components/Balance/BalanceResume';
-import Animated, {
-  useSharedValue,
-  useAnimatedStyle,
-  withTiming,
-} from 'react-native-reanimated';
-import { BytebankButton } from '@/shared/ui/Button';
-import { TransactionItem } from '@/shared/components/Transaction/TransactionItem';
 import { ColorsPalette } from '@/shared/classes/constants/Pallete';
 import { TransactionItemProps } from '@/shared/classes/models/transaction';
+import { BalanceResume } from '@/shared/components/Balance/BalanceResume';
+import TransactionHeader from '@/shared/components/Transaction/TransactionHeader';
+import { TransactionItem } from '@/shared/components/Transaction/TransactionItem';
 import { TransactionSkeleton } from '@/shared/components/Transaction/TransactionSkeleton';
-
-// Dados de exemplo para as transações
-const INITIAL_TRANSACTIONS: TransactionItemProps[] = [
-  {
-    id: '1',
-   title: 'Pagamento recebido',
-    description: 'Transferência de Maria P.',
-    value: '+ R$ 50,00',
-   createdAt: '10 de Setembro',
-    type: 'income',
-  },
-  {
-    id: '2',
-   title: 'Spotify',
-    description: 'Pagamento de assinatura',
-    value: '- R$ 21,90',
-   createdAt: '08 de Setembro',
-    type: 'expense',
-  },
-  {
-    id: '3',
-   title: 'Supermercado',
-    description: 'Compra no Carrefour',
-    value: '- R$ 150,50',
-   createdAt: '07 de Setembro',
-    type: 'expense',
-  },
-  {
-    id: '4',
-   title: 'Pix recebido',
-    description: 'Transferência de João S.',
-    value: '+ R$ 200,00',
-   createdAt: '05 de Setembro',
-    type: 'income',
-  },
-  {
-    id: '5',
-   title: 'Uber',
-    description: 'Corrida para casa',
-    value: '- R$ 35,00',
-   createdAt: '04 de Setembro',
-    type: 'expense',
-  },
-  {
-    id: '6',
-   title: 'Pagamento recebido',
-    description: 'Transferência de Maria P.',
-    value: '+ R$ 50,00',
-   createdAt: '10 de Setembro',
-    type: 'income',
-  },
-  {
-    id: '7',
-   title: 'Spotify',
-    description: 'Pagamento de assinatura',
-    value: '- R$ 21,90',
-   createdAt: '08 de Setembro',
-    type: 'expense',
-  },
-  {
-    id: '8',
-   title: 'Supermercado',
-    description: 'Compra no Carrefour',
-    value: '- R$ 150,50',
-   createdAt: '07 de Setembro',
-    type: 'expense',
-  },
-  {
-    id: '9',
-   title: 'Pix recebido',
-    description: 'Transferência de João S.',
-    value: '+ R$ 200,00',
-   createdAt: '05 de Setembro',
-    type: 'income',
-  },
-  {
-    id: '10',
-   title: 'Uber',
-    description: 'Corrida para casa',
-    value: '- R$ 35,00',
-   createdAt: '04 de Setembro',
-    type: 'expense',
-  },
-];
-
+import { useFinancial } from '@/shared/contexts/financial/FinancialContext';
+import { BytebankButton } from '@/shared/ui/Button';
+import { Ionicons } from '@expo/vector-icons';
+import { Stack } from 'expo-router';
+import React, { useState } from 'react';
+import {
+  FlatList,
+  SafeAreaView,
+  StyleSheet,
+  Text,
+  View
+} from 'react-native';
+import Animated, {
+  useAnimatedStyle,
+  useSharedValue,
+  withTiming,
+} from 'react-native-reanimated';
 
 export default function TransactionsScreen() {
   const [showHeader, setShowHeader] = useState(true);
@@ -113,8 +28,7 @@ export default function TransactionsScreen() {
   const height = useSharedValue(115);
   const contentTopRadius = useSharedValue(32);
   const contentMarginTop = useSharedValue(0);
-  const [transactions, setTransactions] = useState(INITIAL_TRANSACTIONS);
-  const [loading, setLoading] = useState(false);
+  const { transactions, isLoading , isLoadingMore, loadMore, hasMore } = useFinancial();
 
   const animatedBalanceResumeStyle = useAnimatedStyle(() => {
     return {
@@ -132,9 +46,9 @@ export default function TransactionsScreen() {
     };
   });
 
-  const renderItem = ({ item }: {item : TransactionItemProps}) => (
+  const renderItem = ({ item }: { item: TransactionItemProps }) => (
     <TransactionItem
-     transaction={item}
+      transaction={item}
     />
   );
 
@@ -152,26 +66,7 @@ export default function TransactionsScreen() {
   };
 
   const fetchMoreTransactions = async () => {
-    if (loading) return;
-    setLoading(true);
-  
-    // Simule uma requisição (troque por sua API)
-    setTimeout(() => {
-      const newTransactions: TransactionItemProps[] = [
-        // ...novos dados, mesmo formato do seu array
-        {
-          id: String(transactions.length + 1),
-          title: 'Nova transação',
-          description: 'Descrição extra',
-          value: '+ R$ 10,00',
-          createdAt: 'Hoje',
-          type: 'income',
-        },
-        // Adicione mais se quiser
-      ];
-      setTransactions([...transactions, ...newTransactions]);
-      setLoading(false);
-    }, 1500);
+    loadMore?.();
   }
 
   const ListHeader = () => (
@@ -206,7 +101,7 @@ export default function TransactionsScreen() {
         <FlatList
           data={transactions}
           renderItem={renderItem}
-          keyExtractor={(item) => item.id}
+          keyExtractor={(item) => item.id || ''}
           contentContainerStyle={styles.listContainer}
           ListHeaderComponent={<ListHeader />}
           showsVerticalScrollIndicator={false}
@@ -214,7 +109,7 @@ export default function TransactionsScreen() {
           scrollEventThrottle={0}
           onEndReached={fetchMoreTransactions}
           onEndReachedThreshold={0.6}
-          ListFooterComponent={loading ? <TransactionSkeleton /> : null}
+          ListFooterComponent={hasMore && isLoadingMore ? <TransactionSkeleton /> : null}
         />
       </Animated.View>
     </SafeAreaView>

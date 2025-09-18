@@ -2,11 +2,12 @@ import { useFonts } from 'expo-font';
 import { SplashScreen, Stack } from 'expo-router';
 import 'react-native-reanimated';
 
-import { useColorScheme } from '@/shared/hooks/useColorScheme';
-import { AuthProvider } from '@/shared/contexts/auth/AuthContext';
-import { PaperProvider, useTheme } from 'react-native-paper';
 import { PaperDarkTheme, PaperLightTheme } from '@/shared/classes/constants/Colors';
+import { AuthProvider } from '@/shared/contexts/auth/AuthContext';
+import { FinancialProvider } from '@/shared/contexts/financial/FinancialContext';
+import { useColorScheme } from '@/shared/hooks/useColorScheme';
 import { useEffect } from 'react';
+import { PaperProvider } from 'react-native-paper';
 
 SplashScreen.preventAutoHideAsync();
 
@@ -31,6 +32,7 @@ export default function RootLayout() {
 
   return (
     <AuthProvider>
+      <FinancialProvider>
       <PaperProvider theme={colorScheme === 'dark' ? PaperDarkTheme : PaperLightTheme}>
         <Stack>
           <Stack.Screen name="index" options={{ headerShown: false }} />
@@ -39,6 +41,7 @@ export default function RootLayout() {
           <Stack.Screen name="+not-found" />
         </Stack>
       </PaperProvider>
+      </FinancialProvider>
     </AuthProvider>
   );
 }

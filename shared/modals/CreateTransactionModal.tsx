@@ -21,6 +21,8 @@ import {
 import { Card, Divider, Modal, Portal, ProgressBar } from "react-native-paper";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { TransactionItemProps, TransactionType } from "../classes/models/transaction";
+import { useFinancial } from "../contexts/financial/FinancialContext";
+import { parseCurrencyToNumber } from "../hooks/formatCurrency";
 import { useBottomSheetAnimation } from "../hooks/useBottomSheetAnimation";
 import { useBottomSheetHandler } from "../hooks/useBottomSheetHandler";
 import { useCategories } from "../hooks/useCategories";
@@ -48,6 +50,7 @@ const CreateTransactionModal: React.FC<CreateTransactionModalProps> = ({
     const { showFeedback, FeedbackAnimation } = useFeedbackAnimation();
     const [transactionType, setTransactionType] = useState<TransactionType>("income");
     const { user } = useAuth();
+    const { refetch, refetchBalanceValue } = useFinancial();
     const { categories } = useCategories(transactionType);
     const { methods } = useMethods(transactionType);
     const [uploadProgress, showUploadProgress] = useState(false);
@@ -72,13 +75,6 @@ const CreateTransactionModal: React.FC<CreateTransactionModalProps> = ({
 
     const slideAnim = useRef(new Animated.Value(height)).current;
     useBottomSheetAnimation(visible, slideAnim, pan);
-
-    const transactionCategories = [
-        { label: "Pix", value: "pix" },
-        { label: "Boleto bancário", value: "boleto" },
-        { label: "Transferência bancária", value: "transferencia" },
-        { label: "Dinheiro em espécie", value: "dinheiro" },
-    ];
 
     const resetSettings = (type: TransactionType = 'income') => {
         reset({
@@ -108,7 +104,8 @@ const CreateTransactionModal: React.FC<CreateTransactionModalProps> = ({
 
         setIsLoading(true);
         try {
-            const newTransaction = { ...data };
+            const newTransaction = { ...data, value: parseCurrencyToNumber(data.value), userId: user.uid };
+            
             const docRef = await addDoc(
                 collection(firestore, "transactions"),
                 newTransaction
@@ -117,6 +114,8 @@ const CreateTransactionModal: React.FC<CreateTransactionModalProps> = ({
             showFeedback("success");
             onFinished();
             onDismiss();
+            refetch?.();
+            refetchBalanceValue?.();
         } catch (error) {
             console.error("Erro ao adicionar transação: ", error);
             showFeedback("error");

@@ -1,7 +1,8 @@
 
-import React, { createContext, useState, useContext, useEffect, ReactNode } from 'react';
-import { onAuthStateChanged, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, User, updateProfile } from 'firebase/auth';
-import { auth } from '@/firebaseConfig';
+import { auth, firestore } from '@/firebaseConfig';
+import { createUserWithEmailAndPassword, onAuthStateChanged, signInWithEmailAndPassword, signOut, updateProfile, User } from 'firebase/auth';
+import { doc, serverTimestamp, setDoc } from 'firebase/firestore';
+import React, { createContext, ReactNode, useContext, useEffect, useState } from 'react';
 
 interface AuthContextType {
     user: User | null;
@@ -21,6 +22,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
     useEffect(() => {
         const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
+            console.log("Auth state changed:", currentUser);
             setUser(currentUser);
             setIsLoading(false);
             setIsAuthenticated(!!currentUser);
@@ -40,10 +42,23 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
     const signUp = async (name: string, email: string, password: string): Promise<void> => {
         try {
-            await createUserWithEmailAndPassword(auth, email, password);
+            const createdUser = await createUserWithEmailAndPassword(auth, email, password);
+            
+            if (createdUser.user) {
+                await updateProfile(createdUser.user, { displayName: name });
 
-            if (auth.currentUser) {
-                await updateProfile(auth.currentUser, { displayName: name });
+                await setDoc(
+                    doc(firestore, 'users', createdUser.user.uid),
+                    {
+                        uid: createdUser.user.uid,
+                        name,
+                        email: createdUser.user.email,
+                        createdAt: serverTimestamp(),
+                        updatedAt: serverTimestamp(),
+                    },
+                    { merge: true }
+                );
+    
             }
         } catch (error) {
             console.error("Erro de cadastro:", error);
@@ -55,14 +70,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         await signOut(auth);
     };
 
-    const value = {
-        user,
-        isLoading,
-        login,
-        signUp,
-        logout,
-        isAuthenticated,
-    };
+    const value = { user, isLoading, login, signUp, logout, isAuthenticated };
 
     return (
         <AuthContext.Provider value={value}>

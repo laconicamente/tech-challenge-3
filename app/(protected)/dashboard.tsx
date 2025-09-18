@@ -1,15 +1,17 @@
-import { CardBalance } from '@/shared/components/Balance/CardBalance';
-import FinancialResume from '@/shared/components/Widget/FinancialResume';
-import CardAnalytics from '@/shared/components/Widget/CardAnalysis';
-import React, { useState } from 'react';
-import { Stack } from 'expo-router';
-import { AppHeader } from '@/shared/components/AppHeader';
-import CategoryList from '@/shared/components/Category/CategoryList';
 import { ColorsPalette } from '@/shared/classes/constants/Pallete';
-import { View, Text, ScrollView, StyleSheet, SafeAreaView } from 'react-native';
-import Animated, { useSharedValue, useAnimatedStyle, withTiming } from 'react-native-reanimated';
+import { AppHeader } from '@/shared/components/AppHeader';
+import { CardBalance } from '@/shared/components/Balance/CardBalance';
+import CategoryList from '@/shared/components/Category/CategoryList';
+import CardAnalytics from '@/shared/components/Widget/CardAnalysis';
+import FinancialResume from '@/shared/components/Widget/FinancialResume';
+import { useAuth } from '@/shared/contexts/auth/AuthContext';
+import { Stack } from 'expo-router';
+import React, { useState } from 'react';
+import { SafeAreaView, ScrollView, StyleSheet, Text, View } from 'react-native';
+import Animated, { useAnimatedStyle, useSharedValue, withTiming } from 'react-native-reanimated';
 
 export default function DashboardScreen() {
+  const { user } = useAuth();
   const [showHeader, setShowHeader] = useState(true);
   const opacity = useSharedValue(1);
   const height = useSharedValue(115);
@@ -50,7 +52,7 @@ export default function DashboardScreen() {
         }}
       />
       <Animated.View style={[styles.greetingHeader, animatedGreetingHeaderStyle]}>
-        <Text style={styles.greetingTitle}>{'Olá, Joana!'}</Text>
+        <Text style={styles.greetingTitle}>{`Olá, ${user?.displayName?.split(' ')[0] ?? 'Usuário'}!`}</Text>
         <Text style={styles.greetingSubtitle}>Gerencie suas finanças de forma eficiente.</Text>
       </Animated.View>
       <Animated.View style={[animatedContentStyle]}>
