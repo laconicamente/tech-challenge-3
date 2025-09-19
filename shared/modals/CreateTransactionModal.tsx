@@ -28,7 +28,6 @@ import { useBottomSheetHandler } from "../hooks/useBottomSheetHandler";
 import { useCategories } from "../hooks/useCategories";
 import { useFeedbackAnimation } from "../hooks/useFeedbackAnimation";
 import { useMethods } from "../hooks/useMethods";
-import { useUploadFile } from "../hooks/useUploadFile";
 import { BytebankButton } from "../ui/Button";
 import { FileUploadButton } from "../ui/FileUploadButton";
 import { BytebankInputController } from "../ui/Input/InputController";
@@ -49,13 +48,11 @@ const CreateTransactionModal: React.FC<CreateTransactionModalProps> = ({
     onFinished,
 }) => {
     const { showFeedback, FeedbackAnimation } = useFeedbackAnimation();
-    const { UploadProgressBar} = useUploadFile();
     const [transactionType, setTransactionType] = useState<TransactionType>("income");
     const { user } = useAuth();
     const { refetch, refetchBalanceValue } = useFinancial();
     const { categories } = useCategories(transactionType);
     const { methods } = useMethods(transactionType);
-    const [uploadProgress, showUploadProgress] = useState(false);
     const [isLoading, setIsLoading] = useState(false);
     const [isInteracting, setIsInteracting] = useState(false);
 
@@ -107,7 +104,7 @@ const CreateTransactionModal: React.FC<CreateTransactionModalProps> = ({
         setIsLoading(true);
         try {
             const newTransaction = { ...data, value: parseCurrencyToNumber(data.value), userId: user.uid };
-            
+
             const docRef = await addDoc(
                 collection(firestore, "transactions"),
                 newTransaction
@@ -127,11 +124,8 @@ const CreateTransactionModal: React.FC<CreateTransactionModalProps> = ({
         }
     };
 
-    const handleUploadProgress = (progress: boolean) => showUploadProgress(progress);
-
     return (
         <Portal>
-            <UploadProgressBar />
             <Modal
                 visible={visible}
                 onDismiss={onDismiss}
