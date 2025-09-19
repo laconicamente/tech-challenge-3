@@ -1,5 +1,5 @@
 import { useAuth } from '@/shared/contexts/auth/AuthContext';
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { ActivityIndicator, Alert, StyleSheet, Text, TouchableOpacity } from 'react-native';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 import { ColorsPalette } from '../classes/constants/Pallete';
@@ -14,6 +14,8 @@ export const FileUploadButton: React.FC<FileUploadButtonProps> = ({ label, onFin
   const { user } = useAuth();
   const [isFinished, setIsFinished] = useState(false);
   const { isProgressVisible, uploadFile } = useUploadFile();
+  const [downloadURL, setDownloadURL] = useState<string | null>(null);
+  const [disabled, setDisabled] = useState(false);
 
   const handleDocumentPick = async () => {
     if (!user) {
@@ -23,8 +25,9 @@ export const FileUploadButton: React.FC<FileUploadButtonProps> = ({ label, onFin
 
     try {
       const downloadURL = await uploadFile('file', `users/${user?.uid}`);
-      if(!downloadURL) return;
-      
+      if (!downloadURL) return;
+
+      setDownloadURL(downloadURL);
       onFinished(downloadURL);
       setIsFinished(true);
     } catch (err: any) {
@@ -38,18 +41,22 @@ export const FileUploadButton: React.FC<FileUploadButtonProps> = ({ label, onFin
     }
   };
 
+  useEffect(() => {
+    setDisabled(isProgressVisible || downloadURL !== null);
+  }, [isProgressVisible, downloadURL]);
+
   return (
     <TouchableOpacity
-      style={[styles.button, { backgroundColor: isFinished ? ColorsPalette.light['grey.50'] : ColorsPalette.light['lime.100'], borderColor: isFinished ? ColorsPalette.light['grey.200'] : ColorsPalette.light['lime.300'] }]}
-      onPress={handleDocumentPick}
-      disabled={isProgressVisible}
+      style={[styles.button, { cursor: disabled ? 'not-allowed' as any : 'pointer', backgroundColor: downloadURL ? ColorsPalette.light['grey.50'] : ColorsPalette.light['lime.100'], borderColor: downloadURL ? ColorsPalette.light['grey.200'] : ColorsPalette.light['lime.300'] }]}
+    onPress={handleDocumentPick}
+      disabled={disabled}
     >
       {isProgressVisible ? (
         <ActivityIndicator color={ColorsPalette.light['lime.700']} />
       ) : (
         <>
-          <MaterialIcons name="cloud-upload" size={24} color={ColorsPalette.light['lime.700']} style={styles.icon} />
-          <Text style={styles.buttonText}>
+          <MaterialIcons name="cloud-upload" size={24} color={downloadURL ? ColorsPalette.light['grey.500'] : ColorsPalette.light['lime.700']} style={styles.icon} />
+          <Text style={[styles.buttonText, { color: downloadURL ? ColorsPalette.light['grey.500'] : ColorsPalette.light['lime.700'] }]}>
             {label}
           </Text>
         </>
@@ -70,7 +77,6 @@ const styles = StyleSheet.create({
     marginTop: 10,
   },
   buttonText: {
-    color: ColorsPalette.light['lime.700'],
     fontSize: 16,
     fontWeight: 'bold',
   },

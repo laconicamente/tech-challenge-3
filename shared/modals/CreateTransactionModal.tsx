@@ -207,7 +207,7 @@ const CreateTransactionModal: React.FC<CreateTransactionModalProps> = ({
                                                         name="fileUrl"
                                                         control={control}
                                                         render={({ field }) => (
-                                                            <FileUploadButton label={field.value ? 'Comprovante adicionado' : 'Adicionar comprovante'} onFinished={(v) => { field.onChange(v); showFeedback('success'); }} />
+                                                            <FileUploadButton label={field.value ? 'Comprovante adicionado' : 'Adicionar comprovante'} onFinished={(v) => { field.onChange(v); console.log(v); showFeedback('success'); }} />
                                                         )}
                                                     />
                                                 </View>
