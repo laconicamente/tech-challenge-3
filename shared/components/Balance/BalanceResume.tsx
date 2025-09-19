@@ -1,5 +1,5 @@
 import { useFinancial } from "@/shared/contexts/financial/FinancialContext";
-import { formatCurrency } from "@/shared/hooks/formatCurrency";
+import { formatCurrency } from "@/shared/helpers/formatCurrency";
 import { Feather } from "@expo/vector-icons";
 import { router } from "expo-router";
 import { Text, View } from "react-native";

@@ -18,16 +18,17 @@ import {
     TouchableWithoutFeedback,
     View,
 } from "react-native";
-import { Card, Divider, Modal, Portal, ProgressBar } from "react-native-paper";
+import { Card, Divider, Modal, Portal } from "react-native-paper";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { TransactionItemProps, TransactionType } from "../classes/models/transaction";
 import { useFinancial } from "../contexts/financial/FinancialContext";
-import { parseCurrencyToNumber } from "../hooks/formatCurrency";
+import { parseCurrencyToNumber } from "../helpers/formatCurrency";
 import { useBottomSheetAnimation } from "../hooks/useBottomSheetAnimation";
 import { useBottomSheetHandler } from "../hooks/useBottomSheetHandler";
 import { useCategories } from "../hooks/useCategories";
 import { useFeedbackAnimation } from "../hooks/useFeedbackAnimation";
 import { useMethods } from "../hooks/useMethods";
+import { useUploadFile } from "../hooks/useUploadFile";
 import { BytebankButton } from "../ui/Button";
 import { FileUploadButton } from "../ui/FileUploadButton";
 import { BytebankInputController } from "../ui/Input/InputController";
@@ -48,6 +49,7 @@ const CreateTransactionModal: React.FC<CreateTransactionModalProps> = ({
     onFinished,
 }) => {
     const { showFeedback, FeedbackAnimation } = useFeedbackAnimation();
+    const { UploadProgressBar} = useUploadFile();
     const [transactionType, setTransactionType] = useState<TransactionType>("income");
     const { user } = useAuth();
     const { refetch, refetchBalanceValue } = useFinancial();
@@ -129,7 +131,7 @@ const CreateTransactionModal: React.FC<CreateTransactionModalProps> = ({
 
     return (
         <Portal>
-            <ProgressBar indeterminate visible={uploadProgress} />
+            <UploadProgressBar />
             <Modal
                 visible={visible}
                 onDismiss={onDismiss}
@@ -205,7 +207,7 @@ const CreateTransactionModal: React.FC<CreateTransactionModalProps> = ({
                                                         name="fileUrl"
                                                         control={control}
                                                         render={({ field }) => (
-                                                            <FileUploadButton label={field.value ? 'Comprovante adicionado' : 'Adicionar comprovante'} onProgress={handleUploadProgress} onFinished={(v) => { field.onChange(v); handleUploadProgress(false); showFeedback('success'); }} />
+                                                            <FileUploadButton label={field.value ? 'Comprovante adicionado' : 'Adicionar comprovante'} onFinished={(v) => { field.onChange(v); showFeedback('success'); }} />
                                                         )}
                                                     />
                                                 </View>

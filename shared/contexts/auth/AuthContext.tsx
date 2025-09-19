@@ -10,6 +10,7 @@ interface AuthContextType {
     login: (email: string, password: string) => Promise<boolean>;
     signUp: (name: string, email: string, password: string) => Promise<void>;
     logout: () => Promise<void>;
+    updateUser: (userData: Partial<User>) => Promise<void>;
     isAuthenticated: boolean;
 }
 
@@ -43,7 +44,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     const signUp = async (name: string, email: string, password: string): Promise<void> => {
         try {
             const createdUser = await createUserWithEmailAndPassword(auth, email, password);
-            
+
             if (createdUser.user) {
                 await updateProfile(createdUser.user, { displayName: name });
 
@@ -58,7 +59,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
                     },
                     { merge: true }
                 );
-    
+
             }
         } catch (error) {
             console.error("Erro de cadastro:", error);
@@ -70,7 +71,26 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         await signOut(auth);
     };
 
-    const value = { user, isLoading, login, signUp, logout, isAuthenticated };
+    const updateUser = async (userData: Partial<User>) => {
+        try {
+            const currentUser = auth.currentUser;
+            if (!currentUser) throw new Error("Usuário não autenticado.");
+
+            if (currentUser) {
+                await updateProfile(currentUser, { ...userData });
+                setUser(currentUser);
+            }
+
+            await setDoc(
+                doc(firestore, 'users', currentUser.uid), userData,
+                { merge: true }
+            );
+        } catch (error) {
+            console.error("Erro ao atualizar usuário:", error);
+        }
+    };
+
+    const value = { user, isLoading, login, signUp, logout, updateUser, isAuthenticated };
 
     return (
         <AuthContext.Provider value={value}>

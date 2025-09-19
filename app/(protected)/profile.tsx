@@ -1,79 +1,103 @@
 import { ColorsPalette } from '@/shared/classes/constants/Pallete';
-import { AppHeader } from '@/shared/components/AppHeader';
+import { useAuth } from '@/shared/contexts/auth/AuthContext';
+import { useFeedbackAnimation } from '@/shared/hooks/useFeedbackAnimation';
+import { useUploadFile } from '@/shared/hooks/useUploadFile';
 import { BytebankButton } from '@/shared/ui/Button';
 import { BytebankInput } from '@/shared/ui/Input/Input';
-import { Stack } from 'expo-router';
 import React, { useState } from 'react';
-import { View, Text, StyleSheet, SafeAreaView, Image, TouchableOpacity, ScrollView } from 'react-native';
+import { Image, SafeAreaView, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 
 const ProfileScreen = () => {
-    // Dados iniciais do usuário para o estado
-    const [name, setName] = useState('João da Silva');
-    const [email, setEmail] = useState('joao.silva@bytebank.com');
-    const [phone, setPhone] = useState('(11) 99876-5432');
+    const { user, updateUser } = useAuth();
+    const { showFeedback, FeedbackAnimation } = useFeedbackAnimation();
+    const { UploadProgressBar, uploadFile } = useUploadFile();
+    const [name, setName] = useState(user?.displayName || '');
+    const [email, setEmail] = useState(user?.email || '');
+    const [phone, setPhone] = useState(user?.phoneNumber || '');
     const [isEditing, setIsEditing] = useState(false);
 
-    const handleSaveProfile = () => {
-        // Lógica para salvar as alterações do perfil
-        console.log('Perfil salvo:', { name, email, phone });
-        setIsEditing(false); // Sai do modo de edição
+    const handleEditProfileImage = async () => {
+        try {
+            const downloadURL = await uploadFile('image', `users/${user?.uid}`);
+            if (!downloadURL) return;
+
+            await updateUser({ photoURL: downloadURL });
+            showFeedback("success");
+        } catch (error) {
+            console.error('Erro ao atualizar a foto:', error);
+            showFeedback("error");
+        }
+    };
+
+    const handleSaveProfile = async () => {
+        updateUser({ displayName: name, email, phoneNumber: phone }).then(() => {
+            showFeedback("success");
+        }).catch(_ => {
+            showFeedback("error");
+        });
+
+        setIsEditing(false);
     };
 
     return (
-        <SafeAreaView style={styles.container}>
-            <View style={styles.header}>
-                <Text style={{ fontSize: 18, fontWeight: 'bold', color: '#333', textAlign: 'center' }}>Perfil</Text>
-            </View>
-            <ScrollView
-                keyboardShouldPersistTaps="handled"
-            >
-                <View style={styles.profileSection}>
-                    <TouchableOpacity>
-                        <View style={styles.profileImage}>
-                            <MaterialIcons name="camera-enhance" size={50} color={ColorsPalette.light['lime.200']} />
-                        </View>
-                    </TouchableOpacity>
-                    <Text style={styles.userName}>{name}</Text>
+        <>
+            <SafeAreaView style={styles.container}>
+                <UploadProgressBar />
+                <View style={styles.header}>
+                    <Text style={{ fontSize: 18, fontWeight: 'bold', color: '#333', textAlign: 'center' }}>Perfil</Text>
                 </View>
+                <ScrollView
+                    keyboardShouldPersistTaps="handled"
+                >
+                    <View style={styles.profileSection}>
+                        <TouchableOpacity onPress={handleEditProfileImage}>
+                            <View style={styles.profileImage}>
+                                {user && user.photoURL ? <Image source={{ uri: user.photoURL }} style={{ width: 120, height: 120, borderRadius: 60 }} /> : <MaterialIcons name="camera-enhance" size={50} color={ColorsPalette.light['lime.200']} />}
+                            </View>
+                        </TouchableOpacity>
+                        <Text style={styles.userName}>{name}</Text>
+                    </View>
 
-                <View style={styles.formSection}>
-                    <BytebankInput
-                        label={'Nome completo'}
-                        value={name}
-                        onChangeText={setName}
-                        placeholder="Seu nome"
-                        editable={isEditing}
-                    />
-                    <BytebankInput
-                        label={'E-mail'}
-                        value={email}
-                        onChangeText={setEmail}
-                        placeholder="email@example.com"
-                        editable={isEditing}
-                    />
-                    <BytebankInput
-                        label={'Telefone'}
-                        value={phone}
-                        onChangeText={setPhone}
-                        placeholder="(00) 00000-0000"
-                        editable={isEditing}
-                    />
-                </View>
+                    <View style={styles.formSection}>
+                        <BytebankInput
+                            label={'Nome completo'}
+                            value={name}
+                            onChangeText={setName}
+                            placeholder="Seu nome"
+                            editable={isEditing}
+                        />
+                        <BytebankInput
+                            label={'E-mail'}
+                            value={email}
+                            onChangeText={setEmail}
+                            placeholder="email@example.com"
+                            editable={isEditing}
+                        />
+                        <BytebankInput
+                            label={'Telefone'}
+                            value={phone}
+                            onChangeText={setPhone}
+                            placeholder="(00) 00000-0000"
+                            editable={isEditing}
+                        />
+                    </View>
 
-                <View style={styles.actionsSection}>
-                    {isEditing ? (
-                        <BytebankButton color="primary" variant="contained" onPress={handleSaveProfile}>
-                            Salvar Alterações
-                        </BytebankButton>
-                    ) : (
-                        <BytebankButton color="secondary" variant="outlined" onPress={() => setIsEditing(true)}>
-                            Editar Perfil
-                        </BytebankButton>
-                    )}
-                </View>
-            </ScrollView>
-        </SafeAreaView>
+                    <View style={styles.actionsSection}>
+                        {isEditing ? (
+                            <BytebankButton color="primary" variant="contained" onPress={handleSaveProfile}>
+                                Salvar alterações
+                            </BytebankButton>
+                        ) : (
+                            <BytebankButton color="secondary" variant="outlined" onPress={() => setIsEditing(true)}>
+                                Permitir edição da conta
+                            </BytebankButton>
+                        )}
+                    </View>
+                </ScrollView>
+                <FeedbackAnimation />
+            </SafeAreaView>
+        </>
     );
 };
 

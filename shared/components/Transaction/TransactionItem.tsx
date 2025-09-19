@@ -1,4 +1,4 @@
-import { formatCurrency } from "@/shared/hooks/formatCurrency";
+import { formatCurrency } from "@/shared/helpers/formatCurrency";
 import { Ionicons } from "@expo/vector-icons";
 import { StyleSheet, Text, View } from "react-native";
 import { TransactionItemProps } from "../../classes/models/transaction";

@@ -1,7 +1,7 @@
 import React, { useId } from "react";
-import { View, StyleSheet, Text, KeyboardTypeOptions } from "react-native";
-import { TextInput, TextInputProps, useTheme } from "react-native-paper";
+import { KeyboardTypeOptions, StyleSheet, Text, View } from "react-native";
 import MaskInput, { Masks } from 'react-native-mask-input';
+import { TextInput, TextInputProps, useTheme } from "react-native-paper";
 
 export type InputMask = "currency" | "date";
 
@@ -73,13 +73,11 @@ export function BytebankInput({
                     mask={mask}
                     placeholder={placeholder}
                     keyboardType={keyboardType}
-                    style={maskInputStyle}
+                    style={[maskInputStyle, props?.editable === false ? { backgroundColor: '#e0e0e0', opacity: 0.3 } : {}]}
                 />
             </View>
         );
     }
-
-
 
     return (
         <View className="bytebank-input">
@@ -93,7 +91,7 @@ export function BytebankInput({
                 mode="outlined"
                 theme={{ colors: { primary: theme.colors.primary, onSurfaceVariant: 'gray', onSurface: 'black' } }}
                 aria-describedby={helperId}
-                style={styles.input}
+                style={[styles.input, props?.editable === false ? { backgroundColor: '#eee', opacity: 0.5 } : {}]}
                 outlineStyle={styles.inputOutline}
             />
         </View>

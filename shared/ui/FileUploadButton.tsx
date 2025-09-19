@@ -1,21 +1,19 @@
 import { useAuth } from '@/shared/contexts/auth/AuthContext';
-import * as DocumentPicker from 'expo-document-picker';
-import { getDownloadURL, getStorage, ref, uploadBytesResumable } from 'firebase/storage';
 import React, { useState } from 'react';
 import { ActivityIndicator, Alert, StyleSheet, Text, TouchableOpacity } from 'react-native';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 import { ColorsPalette } from '../classes/constants/Pallete';
+import { useUploadFile } from '../hooks/useUploadFile';
 
 interface FileUploadButtonProps {
   label: string,
   onFinished: (url: string) => void;
-  onProgress: (uploading: boolean) => void;
 }
 
-export const FileUploadButton: React.FC<FileUploadButtonProps> = ({ label, onFinished, onProgress }) => {
+export const FileUploadButton: React.FC<FileUploadButtonProps> = ({ label, onFinished }) => {
   const { user } = useAuth();
-  const [isUploading, setIsUploading] = useState(false);
   const [isFinished, setIsFinished] = useState(false);
+  const { isProgressVisible, uploadFile } = useUploadFile();
 
   const handleDocumentPick = async () => {
     if (!user) {
@@ -24,46 +22,19 @@ export const FileUploadButton: React.FC<FileUploadButtonProps> = ({ label, onFin
     }
 
     try {
-      const file = await DocumentPicker.getDocumentAsync({ type: ['image/*', 'application/pdf'], copyToCacheDirectory: true });
-      if (file.canceled) {
-        return;
-      }
-
-      const selectedFile = file.assets?.[0];
-      if (!selectedFile || !selectedFile.uri) {
-        Alert.alert("Erro", "Não foi possível obter o arquivo selecionado.");
-        return;
-      }
-      const uri = selectedFile.uri;
-      const filename = uri.split('/').pop() || 'unknown';
-      const uploadPath = `files/${user.uid}/${filename}`;
-
-      setIsUploading(true);
-
-      const storage = getStorage();
-      const reference = ref(storage, uploadPath);
-      const response = await fetch(uri);
-      const blob = await response.blob();
-      const task = uploadBytesResumable(reference, blob);
-
-      task.on('state_changed', (snapshot) => {
-        onProgress(true);
-      });
-
-      await task;
-      const downloadURL = await getDownloadURL(reference);
-
-      setIsUploading(false);
+      const downloadURL = await uploadFile('file', `users/${user?.uid}`);
+      if(!downloadURL) return;
+      
       onFinished(downloadURL);
       setIsFinished(true);
     } catch (err: any) {
-      setIsUploading(false);
-      console.log(err)
-      if (err && err?.message?.includes('user canceled')) {
+      if (err && err.message?.includes('user canceled')) {
         console.log('Seleção de arquivo cancelada');
       } else {
         Alert.alert("Erro", "Não foi possível enviar o arquivo. Tente novamente.");
       }
+    } finally {
+      setIsFinished(true);
     }
   };
 
@@ -71,9 +42,9 @@ export const FileUploadButton: React.FC<FileUploadButtonProps> = ({ label, onFin
     <TouchableOpacity
       style={[styles.button, { backgroundColor: isFinished ? ColorsPalette.light['grey.50'] : ColorsPalette.light['lime.100'], borderColor: isFinished ? ColorsPalette.light['grey.200'] : ColorsPalette.light['lime.300'] }]}
       onPress={handleDocumentPick}
-      disabled={isUploading}
+      disabled={isProgressVisible}
     >
-      {isUploading ? (
+      {isProgressVisible ? (
         <ActivityIndicator color={ColorsPalette.light['lime.700']} />
       ) : (
         <>
