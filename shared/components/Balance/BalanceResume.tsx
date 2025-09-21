@@ -1,21 +1,22 @@
 import { useFinancial } from "@/shared/contexts/financial/FinancialContext";
 import { formatCurrency } from "@/shared/helpers/formatCurrency";
+import { SkeletonText } from "@/shared/ui/Skeleton/SkeletonText";
 import { Feather } from "@expo/vector-icons";
 import { router } from "expo-router";
 import { Text, View } from "react-native";
 import { BytebankButton } from "../../ui/Button";
 
 export const BalanceResume = ({ showMinified = false }) => {
-    const { balanceValue, isBalanceVisible, setBalanceVisible } = useFinancial();
+    const { balanceValue, isLoadingBalance, isBalanceVisible, setBalanceVisible } = useFinancial();
 
     return (
         <View style={{ padding: 10, minHeight: 100, display: 'flex', justifyContent: 'flex-start', gap: 15 }}>
             {!showMinified ? <Text style={{ fontSize: 16, fontWeight: '500' }}>Conta</Text> : null}
-            <View style={{ marginBottom: 10, display: 'flex', flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
+            <View style={{ marginBottom: 10, display: 'flex', flexDirection: 'row', alignItems: 'flex-end', justifyContent: 'space-between' }}>
                 <View>
-                    <Text style={{ fontWeight: '500', fontSize: 22 }}>Saldo em conta</Text>
+                    <Text style={{ fontWeight: '500', fontSize: 22, marginBottom: 5 }}>Saldo em conta</Text>
                     <Text style={{ fontWeight: 'bold', fontSize: 30 }}>
-                        {isBalanceVisible ? `${formatCurrency(balanceValue)}` : "••••••"}
+                        {isLoadingBalance ? <SkeletonText style={{ width: '70%', height: 30 }} /> : (isBalanceVisible ? `${formatCurrency(balanceValue)}` : "••••••")}
                     </Text>
                 </View>
                 <View>

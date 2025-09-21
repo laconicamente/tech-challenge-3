@@ -9,18 +9,13 @@ import { BytebankButton } from '@/shared/ui/Button';
 import { Ionicons } from '@expo/vector-icons';
 import { Stack } from 'expo-router';
 import React, { useState } from 'react';
-import {
-  FlatList,
-  SafeAreaView,
-  StyleSheet,
-  Text,
-  View
-} from 'react-native';
+import { FlatList, StyleSheet, Text, View } from 'react-native';
 import Animated, {
   useAnimatedStyle,
   useSharedValue,
   withTiming,
 } from 'react-native-reanimated';
+import { SafeAreaView } from 'react-native-safe-area-context';
 
 export default function TransactionsScreen() {
   const [showHeader, setShowHeader] = useState(true);
@@ -65,9 +60,7 @@ export default function TransactionsScreen() {
     }
   };
 
-  const fetchMoreTransactions = async () => {
-    loadMore?.();
-  }
+  const fetchMoreTransactions = async () => { loadMore?.(); }
 
   const ListHeader = () => (
     <View style={styles.subHeader}>
@@ -86,7 +79,7 @@ export default function TransactionsScreen() {
   );
 
   return (
-    <SafeAreaView style={styles.container}>
+    <>
       <Stack.Screen
         options={{
           header: () => <TransactionHeader showSearch={true} />,
@@ -94,6 +87,7 @@ export default function TransactionsScreen() {
           presentation: 'transparentModal'
         }}
       />
+    <SafeAreaView style={[styles.container, { paddingTop: 0 }]} edges={['left','right','bottom']}>
       <Animated.View style={[styles.balanceResumeHeader, animatedBalanceResumeStyle]}>
         <BalanceResume showMinified={true} />
       </Animated.View>
@@ -104,15 +98,17 @@ export default function TransactionsScreen() {
           keyExtractor={(item) => item.id || ''}
           contentContainerStyle={styles.listContainer}
           ListHeaderComponent={<ListHeader />}
+          ListEmptyComponent={!isLoading ? <TransactionSkeleton numberOfItems={6} /> : null}
           showsVerticalScrollIndicator={false}
           onScroll={handleScroll}
-          scrollEventThrottle={0}
+          scrollEventThrottle={16}
           onEndReached={fetchMoreTransactions}
           onEndReachedThreshold={0.6}
-          ListFooterComponent={hasMore && isLoadingMore ? <TransactionSkeleton /> : null}
+          ListFooterComponent={hasMore && isLoadingMore ? <TransactionSkeleton numberOfItems={2} /> : null}
         />
       </Animated.View>
     </SafeAreaView>
+    </>
   );
 }
 
@@ -130,7 +126,7 @@ const styles = StyleSheet.create({
   contentWrapper: {
     backgroundColor: '#FFF',
     width: '100%',
-    minHeight: 600,
+    minHeight: '100%',
     zIndex: 1,
     paddingBottom: 32,
   },

@@ -1,78 +1,44 @@
-import React, { useEffect } from 'react';
-import { View, StyleSheet } from 'react-native';
-import Animated, { useSharedValue, withRepeat, withTiming, Easing } from 'react-native-reanimated';
+import { SkeletonAvatar } from '@/shared/ui/Skeleton/SkeletonAvatar';
+import { SkeletonCard } from '@/shared/ui/Skeleton/SkeletonCard';
+import { SkeletonText } from '@/shared/ui/Skeleton/SkeletonText';
+import React from 'react';
+import { StyleSheet, View } from 'react-native';
 
-const AnimatedView = Animated.createAnimatedComponent(View);
-
-export const TransactionSkeleton = () => {
-  const opacity = useSharedValue(0.1);
-
-  useEffect(() => {
-    opacity.value = withRepeat(
-      withTiming(1, {
-        duration: 1000,
-        easing: Easing.inOut(Easing.ease),
-      }),
-      -1,
-      true 
-    );
-  }, []);
-
-  const animatedStyle = {
-    opacity: opacity,
-  };
-
+export const TransactionSkeleton = ({ numberOfItems = 1 }) => {
   return (
-    <View style={styles.card}>
-      <AnimatedView style={[styles.shimmer, animatedStyle]} />
-      <View style={styles.content}>
-        <View style={styles.avatar} />
-        <View style={styles.textContainer}>
-          <View style={[styles.text, {width: '80%'}]} />
-          <View style={[styles.text, {width: '60%'}]} />
-        </View>
-      </View>
-    </View>
+    <>
+      {Array.from({ length: numberOfItems }).map((_, index) => (
+        <SkeletonCard key={index} style={styles.card}>
+          <View style={styles.content}>
+            <SkeletonAvatar style={styles.avatar} />
+            <View style={styles.textContainer}>
+                <SkeletonText style={{ width: '80%' }} />
+                <SkeletonText style={{ width: '60%' }} />
+            </View>
+          </View>
+        </SkeletonCard>
+      ))}
+    </>
   );
 };
 
 const styles = StyleSheet.create({
-  card: {
-    overflow: 'hidden',
-    position: 'relative',
+card: {
     padding: 0,
     borderBottomWidth: 1,
     borderBottomColor: '#FDFDFD',
     backgroundColor: '#FFF',
-  },
-  content: {
+},
+content: {
     flexDirection: 'row',
     alignItems: 'center',
     marginVertical: 20
-  },
-  avatar: {
-    width: 50,
-    height: 50,
-    borderRadius: 25,
-    backgroundColor: '#e0e0e0',
+},
+avatar: {
     marginRight: 10,
     marginLeft: 20,
-  },
-  textContainer: {
+},
+textContainer: {
     flex: 1,
-  },
-  text: {
-    height: 12,
-    backgroundColor: '#e0e0e0',
-    borderRadius: 4,
-    marginBottom: 8,
-  },
-  shimmer: {
-    position: 'absolute',
-    top: 0,
-    bottom: 0,
-    width: '100%',
-    backgroundColor: 'rgba(255, 255, 255, 0.73)',
-    zIndex: 1,
-  },
+},
 });

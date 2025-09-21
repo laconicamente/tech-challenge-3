@@ -6,44 +6,32 @@ import CardAnalytics from '@/shared/components/Widget/CardAnalysis';
 import FinancialResume from '@/shared/components/Widget/FinancialResume';
 import { useAuth } from '@/shared/contexts/auth/AuthContext';
 import { Stack } from 'expo-router';
-import React, { useState } from 'react';
-import { SafeAreaView, ScrollView, StyleSheet, Text, View } from 'react-native';
+import React from 'react';
+import { ScrollView, StyleSheet, Text, View } from 'react-native';
 import Animated, { useAnimatedStyle, useSharedValue, withTiming } from 'react-native-reanimated';
+import { SafeAreaView } from 'react-native-safe-area-context';
 
 export default function DashboardScreen() {
   const { user } = useAuth();
-  const [showHeader, setShowHeader] = useState(true);
-  const opacity = useSharedValue(1);
-  const height = useSharedValue(115);
-  const contentTopRadius = useSharedValue(32);
-  const contentMarginTop = useSharedValue(0);
+
+  const headerMax = 115;
+  const headerHeight = useSharedValue(headerMax);
+  const headerOpacity = useSharedValue(1);
+  const contentPaddingTop = useSharedValue(headerMax); // espaço abaixo do header apenas
 
   const animatedGreetingHeaderStyle = useAnimatedStyle(() => ({
-    opacity: withTiming(opacity.value, { duration: 300 }),
-    height: withTiming(height.value, { duration: 300 }),
-    borderBottomLeftRadius: contentTopRadius.value,
-    borderBottomRightRadius: contentTopRadius.value,
-    overflow: 'hidden',
+    height: withTiming(headerHeight.value, { duration: 220 }),
   }));
 
-  const animatedContentStyle = useAnimatedStyle(() => ({
-    marginTop: contentMarginTop.value,
-  }));
-
-  const handleScroll = (e) => {
+  const handleScroll = (e: any) => {
     const y = e.nativeEvent.contentOffset.y;
-    const shouldShowHeader = y < 40;
-
-    if (shouldShowHeader !== showHeader) {
-      setShowHeader(shouldShowHeader);
-      height.value = shouldShowHeader ? 115 : 0;
-      contentTopRadius.value = shouldShowHeader ? 32 : 0;
-      contentMarginTop.value = shouldShowHeader ? 0 : 0;
-    }
+    const collapse = y > 40;
+    headerHeight.value = collapse ? 0 : headerMax;
   };
 
   return (
-    <SafeAreaView style={styles.container}>
+    // Removemos 'bottom' de edges para evitar dupla soma: SafeArea + nosso paddingBottom
+    <SafeAreaView style={styles.container} edges={['left','right']}>
       <Stack.Screen
         options={{
           header: () => <AppHeader />,
@@ -51,15 +39,20 @@ export default function DashboardScreen() {
           statusBarStyle: 'inverted',
         }}
       />
+
       <Animated.View style={[styles.greetingHeader, animatedGreetingHeaderStyle]}>
         <Text style={styles.greetingTitle}>{`Olá, ${user?.displayName?.split(' ')[0] ?? 'Usuário'}!`}</Text>
         <Text style={styles.greetingSubtitle}>Gerencie suas finanças de forma eficiente.</Text>
       </Animated.View>
-      <Animated.View style={[animatedContentStyle]}>
+
+      <Animated.View style={{ flex: 1 }}>
         <ScrollView
           keyboardShouldPersistTaps="handled"
           onScroll={handleScroll}
-          scrollEventThrottle={0}
+          scrollEventThrottle={16}
+          // Diminuímos o paddingBottom para evitar duplicação (antes tinha + insets.bottom e SafeAreaView)
+          contentContainerStyle={{ paddingBottom: 32 }}
+          showsVerticalScrollIndicator={false}
         >
           <View style={styles.content}>
             <CardBalance />
@@ -76,35 +69,22 @@ export default function DashboardScreen() {
 }
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#FFF',
-  },
+  container: { flex: 1, backgroundColor: '#FFF' },
   greetingHeader: {
     backgroundColor: ColorsPalette.light['lime.900'],
     paddingHorizontal: 30,
-    zIndex: 2,
+    zIndex: 10,
     borderBottomLeftRadius: 32,
     borderBottomRightRadius: 32,
-    height: 115,
-    display: 'flex',
     justifyContent: 'center',
+    overflow: 'hidden',
   },
-  greetingTitle: {
-    fontSize: 30,
-    fontWeight: '500',
-    color: '#FFF',
-  },
-  greetingSubtitle: {
-    fontSize: 16,
-    color: ColorsPalette.light['lime.50'],
-  },
+  greetingTitle: { fontSize: 30, fontWeight: '500', color: ColorsPalette.light['lime.50'] },
+  greetingSubtitle: { fontSize: 16, color: ColorsPalette.light['lime.50'] },
   content: {
     backgroundColor: '#FFF',
     flex: 1,
-    marginTop: 20,
-    minHeight: 600,
-    paddingHorizontal: 20,
-    zIndex: 1,
+    gap: 16,
+     padding: 20
   },
 });

@@ -1,16 +1,19 @@
-import React from 'react';
-import { View, StyleSheet, SafeAreaView, TouchableOpacity, Text } from 'react-native';
-import { Ionicons } from '@expo/vector-icons';
 import { ColorsPalette } from '@/shared/classes/constants/Pallete';
+import { useAuth } from '@/shared/contexts/auth/AuthContext';
+import { Ionicons } from '@expo/vector-icons';
+import React from 'react';
+import { Image, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import MaterialIcons from "react-native-vector-icons/AntDesign";
 
 const TransactionHeader = ({ title = '', showSearch = false }) => {
+  const { user } = useAuth();
   return (
-    <SafeAreaView style={styles.headerContainer}>
+    <SafeAreaView style={styles.headerContainer} edges={['top']}>
       <View style={styles.headerContent}>
         <TouchableOpacity style={styles.leftIcon}>
           <View style={styles.avatarCircle}>
-            <MaterialIcons name="user" size={25} color={ColorsPalette.light['lime.800']} />
+            {user && user.photoURL ? <Image source={{ uri: user.photoURL }} style={{ width: 50, height: 50, borderRadius: 25 }} /> : <MaterialIcons name="user" size={25} color={ColorsPalette.light['lime.800']} />}
           </View>
         </TouchableOpacity>
         <View style={styles.titleContainer}>
@@ -37,7 +40,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'space-between',
     paddingHorizontal: 16,
-    paddingVertical: 12,
+    paddingTop: 16,
   },
   leftIcon: {
     width: 50,

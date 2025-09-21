@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, StyleSheet, Text, TouchableOpacity } from 'react-native';
+import { StyleSheet, Text, View } from 'react-native';
 import RNPickerSelect, { PickerSelectProps } from 'react-native-picker-select';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 

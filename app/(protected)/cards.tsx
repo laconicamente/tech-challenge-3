@@ -1,10 +1,11 @@
-import BankCardItem from '@/shared/components/BankCard/BankCardItem';
+import { ColorsPalette } from '@/shared/classes/constants/Pallete';
 import BankCardDetails from '@/shared/components/BankCard/BankCardDetails';
+import BankCardItem from '@/shared/components/BankCard/BankCardItem';
 import TransactionHeader from '@/shared/components/Transaction/TransactionHeader';
 import { Stack } from 'expo-router';
-import React, { useState, useCallback } from 'react';
-import { View, Text, StyleSheet, FlatList, Dimensions, SafeAreaView } from 'react-native';
-import { ColorsPalette } from '@/shared/classes/constants/Pallete';
+import React, { useCallback, useState } from 'react';
+import { Dimensions, FlatList, StyleSheet, View } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 
 const { width } = Dimensions.get('window');
 
@@ -56,7 +57,7 @@ const CardsScreen = () => {
   );
 
   return (
-    <SafeAreaView style={styles.container}>
+    <SafeAreaView style={styles.container} edges={['left','right','bottom']}>
       <Stack.Screen
         options={{
           header: () => <TransactionHeader title='Meus cartões' />,

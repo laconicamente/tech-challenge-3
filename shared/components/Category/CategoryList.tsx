@@ -1,9 +1,10 @@
+import { CategoryWidgetItem } from '@/shared/classes/models/category';
 import React, { useRef } from 'react';
-import { StyleSheet, FlatList, Text, View, ViewToken } from 'react-native';
-import Animated, { useSharedValue, useAnimatedStyle, withTiming } from 'react-native-reanimated';
-import CategoryItem, { CategoryItemProps } from './CategoryItem';
+import { FlatList, Text, View, ViewToken } from 'react-native';
+import Animated, { useAnimatedStyle, useSharedValue, withTiming } from 'react-native-reanimated';
+import CategoryItem from './CategoryItem';
 
-const categories: CategoryItemProps[] = [
+const categories: CategoryWidgetItem[] = [
     { name: 'Travel', value: 785.00, color: '#e6eaf5' },
     { name: 'Shopping', value: 950.00, color: '#d9f1e1' },
     { name: 'Delivery', value: 50.00, color: '#f5e4d9' },
@@ -11,7 +12,7 @@ const categories: CategoryItemProps[] = [
 
 const AnimatedCategoryItem = Animated.createAnimatedComponent(CategoryItem);
 
-const AnimatedCardItem = ({ item, cardScale }: { item: CategoryItemProps; cardScale: { value: number } }) => {
+const AnimatedCardItem = ({ item, cardScale }: { item: CategoryWidgetItem; cardScale: { value: number } }) => {
     const animatedStyle = useAnimatedStyle(() => ({
         transform: [
             { scale: cardScale.value },
@@ -27,7 +28,7 @@ const CategoryList = () => {
     const animatedValues = useRef(categories.map(() => useSharedValue(0))).current;
 
     const onViewableItemsChanged = useRef(
-        ({ viewableItems }: { viewableItems: Array<ViewToken<CategoryItemProps>> }) => {
+        ({ viewableItems }: { viewableItems: Array<ViewToken<CategoryWidgetItem>> }) => {
             viewableItems.forEach(({ index }) => {
                 if (index !== null && animatedValues[index].value === 0) {
                     setTimeout(() => {
@@ -38,7 +39,7 @@ const CategoryList = () => {
         }
     ).current;
 
-    const renderItem = ({ item, index }: { item: CategoryItemProps; index: number }) => (
+    const renderItem = ({ item, index }: { item: CategoryWidgetItem; index: number }) => (
         <AnimatedCardItem item={item} cardScale={animatedValues[index]} />
     );
 
@@ -52,19 +53,11 @@ const CategoryList = () => {
                 horizontal
                 showsHorizontalScrollIndicator={false}
                 snapToAlignment="start"
-                contentContainerStyle={styles.listContainer}
                 onViewableItemsChanged={onViewableItemsChanged}
                 viewabilityConfig={{ itemVisiblePercentThreshold: 50 }}
             />
         </View>
     );
 };
-
-const styles = StyleSheet.create({
-    listContainer: {
-        paddingLeft: 20,
-        paddingRight: 20,
-    },
-});
 
 export default CategoryList;

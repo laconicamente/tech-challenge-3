@@ -16,7 +16,7 @@ export interface BalanceValueFilters {
 export function useBalanceValue(filters: BalanceValueFilters) {
   const { userId, startDate, endDate, categoryId } = filters || {};
   const [total, setTotal] = useState(0);
-  const [loadingTotal, setLoadingTotal] = useState(false);
+  const [isLoadingBalance, setIsLoadingBalance] = useState(false);
   const [errorTotal, setErrorTotal] = useState<string | null>(null);
   
   const fetchTotal = useCallback(async () => {
@@ -24,7 +24,7 @@ export function useBalanceValue(filters: BalanceValueFilters) {
       setTotal(0);
       return;
     }
-    setLoadingTotal(true);
+    setIsLoadingBalance(true);
     setErrorTotal(null);
     try {
       const constraints: any[] = [
@@ -50,7 +50,7 @@ export function useBalanceValue(filters: BalanceValueFilters) {
       setErrorTotal(e.message ?? 'Erro desconhecido ao calcular o saldo total.');
       setTotal(0);
     } finally {
-      setLoadingTotal(false);
+      setIsLoadingBalance(false);
     }
   }, [userId, startDate, endDate, categoryId]);
 
@@ -58,5 +58,5 @@ export function useBalanceValue(filters: BalanceValueFilters) {
     fetchTotal();
   }, [fetchTotal]);
 
-  return { total, loadingTotal, errorTotal, refetchBalanceValue: fetchTotal };
+  return { total, isLoadingBalance, errorTotal, refetchBalanceValue: fetchTotal };
 }

@@ -22,6 +22,7 @@ interface FinancialContextType extends FinancialContextProps {
     loadMore?: () => Promise<void> | void;
     hasMore?: boolean;
     isBalanceVisible?: boolean;
+    isLoadingBalance?: boolean;
     setBalanceVisible: (visible: boolean) => void;
 }
 
@@ -48,7 +49,7 @@ export const FinancialProvider: React.FC<{ children: React.ReactNode }> = ({ chi
         hasMore
     } = useTransactions({}, 5);
     const { user } = useAuth();
-    const { total: balanceValue, refetchBalanceValue } = useBalanceValue({userId: user?.uid});
+    const { total: balanceValue, isLoadingBalance, refetchBalanceValue } = useBalanceValue({userId: user?.uid});
     const [isBalanceVisible, setBalanceVisible] = useState(false);
 
     const fetchTransactions = (user: User, params?: TransactionFilter) => {
@@ -77,7 +78,8 @@ export const FinancialProvider: React.FC<{ children: React.ReactNode }> = ({ chi
             loadMore,
             hasMore,
             isBalanceVisible, 
-            setBalanceVisible
+            isLoadingBalance,
+            setBalanceVisible,
           }}
         >
           {children}

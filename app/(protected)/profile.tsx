@@ -5,7 +5,8 @@ import { useUploadFile } from '@/shared/hooks/useUploadFile';
 import { BytebankButton } from '@/shared/ui/Button';
 import { BytebankInput } from '@/shared/ui/Input/Input';
 import React, { useState } from 'react';
-import { Image, SafeAreaView, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { Image, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 
 const ProfileScreen = () => {
@@ -42,7 +43,7 @@ const ProfileScreen = () => {
 
     return (
         <>
-            <SafeAreaView style={styles.container}>
+            <SafeAreaView style={styles.container} >
                 <UploadProgressBar />
                 <View style={styles.header}>
                     <Text style={{ fontSize: 18, fontWeight: 'bold', color: '#333', textAlign: 'center' }}>Perfil</Text>

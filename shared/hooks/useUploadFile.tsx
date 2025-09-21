@@ -1,5 +1,5 @@
 import * as DocumentPicker from "expo-document-picker";
-import * as ImagePicker from "expo-image-picker";
+import { launchImageLibraryAsync, requestMediaLibraryPermissionsAsync } from "expo-image-picker";
 import { getDownloadURL, getStorage, ref, uploadBytesResumable } from "firebase/storage";
 import { useState } from "react";
 import { Alert } from "react-native";
@@ -7,15 +7,15 @@ import { ProgressBar } from "react-native-paper";
 
 const handleUploadFile = async (type: 'image' | 'file') => {
     if (type === 'image') {
-        const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
+        const { status } = await requestMediaLibraryPermissionsAsync();
         if (status !== 'granted') {
             Alert.alert('Permissão necessária', 'Conceda acesso à galeria para trocar a foto.');
             return;
         }
     }
 
-    const file = (type === 'image') ? await ImagePicker.launchImageLibraryAsync({
-        mediaTypes: ImagePicker.MediaTypeOptions.Images,
+    const file = (type === 'image') ? await launchImageLibraryAsync({
+        mediaTypes: 'images',
         quality: 0.8,
         allowsEditing: true,
         aspect: [1, 1],
