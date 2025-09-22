@@ -1,8 +1,9 @@
 import { ColorsPalette } from "@/shared/classes/constants/Pallete";
 import { Feather } from "@expo/vector-icons";
+import { Image } from 'expo-image';
 import { router } from "expo-router";
 import React from "react";
-import { Alert, Image, Text, TouchableOpacity, View } from "react-native";
+import { Alert, Text, TouchableOpacity, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import MaterialIcons from "react-native-vector-icons/AntDesign";
 import { useAuth } from "../contexts/auth/AuthContext";
@@ -36,8 +37,10 @@ export const AppHeader = ({ title = '' }: { title?: string }) => {
                 paddingVertical: 16,
             }}>
                 <TouchableOpacity>
-                    <View style={{display: 'flex', alignItems: 'center', justifyContent: 'center', backgroundColor: ColorsPalette.light['lime.200'], borderRadius: 25, width: 50, height: 50}}>
-                        {user && user.photoURL ? <Image source={{ uri: user.photoURL }} style={{ width: 50, height: 50, borderRadius: 25 }} /> : <MaterialIcons name="user" size={25} color={ColorsPalette.light['lime.800']} />}
+                    <View style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', backgroundColor: ColorsPalette.light['lime.200'], borderRadius: 25, width: 50, height: 50 }}>
+                        {user && user.photoURL ? <Image source={{ uri: user.photoURL }} cachePolicy="memory-disk" cachePolicy="memory-disk"
+                            contentFit="cover"
+                            transition={150} style={{ width: 50, height: 50, borderRadius: 25 }} /> : <MaterialIcons name="user" size={25} color={ColorsPalette.light['lime.800']} />}
                     </View>
                 </TouchableOpacity>
                 <Text style={{ fontSize: 18, fontWeight: 'bold', color: ColorsPalette.light['lime.50'] }}>{title}</Text>

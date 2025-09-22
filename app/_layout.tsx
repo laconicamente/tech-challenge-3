@@ -1,13 +1,13 @@
-import { useFonts } from 'expo-font';
-import { SplashScreen, Stack } from 'expo-router';
-import 'react-native-reanimated';
-
 import { PaperDarkTheme, PaperLightTheme } from '@/shared/classes/constants/Colors';
 import { AuthProvider } from '@/shared/contexts/auth/AuthContext';
 import { FinancialProvider } from '@/shared/contexts/financial/FinancialContext';
 import { useColorScheme } from '@/shared/hooks/useColorScheme';
+import '@/shared/i18n/datePickerLocale';
+import { useFonts } from 'expo-font';
+import { SplashScreen, Stack } from 'expo-router';
 import { useEffect } from 'react';
 import { PaperProvider } from 'react-native-paper';
+import 'react-native-reanimated';
 
 SplashScreen.preventAutoHideAsync();
 

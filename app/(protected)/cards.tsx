@@ -60,7 +60,7 @@ const CardsScreen = () => {
     <>
       <Stack.Screen
         options={{
-          header: () => <TransactionHeader title='Meus cartões' />,
+          header: () => <TransactionHeader title='Meus cartões' hasAction={true} iconAction='add-card' onActionPress={() => console.log('Action pressed')} />,
           headerShown: true,
         }}
       />

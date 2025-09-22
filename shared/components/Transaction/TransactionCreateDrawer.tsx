@@ -43,13 +43,11 @@ const height = Dimensions.get("window").height;
 interface TransactionCreateDrawerProps {
     visible: boolean;
     onDismiss: () => void;
-    onFinished?: () => void;
 }
 
 const TransactionCreateDrawer: React.FC<TransactionCreateDrawerProps> = ({
     visible,
     onDismiss,
-    onFinished,
 }) => {
     const { showFeedback, FeedbackAnimation } = useFeedbackAnimation();
     const [transactionType, setTransactionType] = useState<TransactionType>("income");
