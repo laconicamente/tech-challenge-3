@@ -34,6 +34,7 @@ const TransactionHeader = ({ title = '', showSearch = false }) => {
 const styles = StyleSheet.create({
   headerContainer: {
     backgroundColor: '#d4eb61',
+    minHeight: 'auto',
   },
   headerContent: {
     flexDirection: 'row',
@@ -41,6 +42,7 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     paddingHorizontal: 16,
     paddingTop: 16,
+    paddingBottom: 14,
   },
   leftIcon: {
     width: 50,

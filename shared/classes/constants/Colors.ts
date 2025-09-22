@@ -1,3 +1,4 @@
+import { MD3LightTheme } from 'react-native-paper';
 import { ColorsPalette } from './Pallete';
 
 /**
@@ -66,5 +67,18 @@ export const PaperDarkTheme = {
     placeholder: Colors.dark.placeholder,
     onSurface: Colors.dark.onSurface,
     notification: Colors.dark.notification,
+  },
+};
+
+export const datePickerTheme = {
+    ...MD3LightTheme,
+  colors: {
+    ...MD3LightTheme.colors,
+    primary: ColorsPalette.light['lime.800'],  
+    onPrimary: '#FFFFFF',
+    primaryContainer: ColorsPalette.light['lime.200'],
+    onPrimaryContainer: ColorsPalette.light['lime.900'],    
+    surface: '#FFFFFF',
+    surfaceVariant: '#FFFFFF',
   },
 };

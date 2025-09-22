@@ -32,16 +32,40 @@ interface TransactionsResponse {
   refetch: () => Promise<void>;
 }
 
-function parseDateString(input?: string): Date | undefined {
-  if (!input) return undefined;
-  if (/^\d{2}\/\d{2}\/\d{4}$/.test(input)) {
-    const [d, m, y] = input.split("/").map(Number);
-    const dt = new Date(y, (m ?? 1) - 1, d);
+const toDateFromFirestore = (raw: any): Date | null => {
+    if (!raw) return null;
+    // Firestore Timestamp instance
+    if (raw instanceof Timestamp) return raw.toDate();
+    // Serialized plain object { seconds, nanoseconds }
+    if (
+      typeof raw === 'object' &&
+      typeof raw.seconds === 'number' &&
+      typeof raw.nanoseconds === 'number'
+    ) {
+      return new Date(raw.seconds * 1000 + Math.floor(raw.nanoseconds / 1_000_000));
+    }
+    // ISO/string fallback
+    if (typeof raw === 'string') {
+      const d = new Date(raw);
+      return isNaN(d.getTime()) ? null : d;
+    }
+    return null;
+  };
+  
+  const formatDateISO = (d: Date | null) => (d ? d.toISOString() : '');
+  const formatDate = (d: Date | null) =>
+    d ? new Date(d).toLocaleDateString('pt-BR') : '';
+  
+  function parseDateString(input?: string): Date | undefined {
+    if (!input) return undefined;
+    if (/^\d{2}\/\d{2}\/\d{4}$/.test(input)) {
+      const [d, m, y] = input.split("/").map(Number);
+      const dt = new Date(y, (m ?? 1) - 1, d);
+      return isNaN(dt.getTime()) ? undefined : dt;
+    }
+    const dt = new Date(input);
     return isNaN(dt.getTime()) ? undefined : dt;
   }
-  const dt = new Date(input);
-  return isNaN(dt.getTime()) ? undefined : dt;
-}
 
 export function useTransactions(
   initial: TransactionFilter = {},
@@ -64,15 +88,11 @@ export function useTransactions(
     doc: QueryDocumentSnapshot<DocumentData>
   ): Promise<TransactionItemProps> => {
     const data = doc.data();
-    let createdAt: Date | null = null;
-    if (data.createdAt instanceof Timestamp) {
-      createdAt = data.createdAt.toDate();
-    } else if (typeof data.createdAt === "string") {
-      createdAt = parseDateString(data.createdAt) ?? null;
-    }
+    const formattedCreatedAt = toDateFromFirestore(data.createdAt);
 
     const category = await getCategoryById(data.categoryId);
     const method = await getMethodById(data.methodId);
+
     return {
       id: doc.id,
       userId: data.userId,
@@ -82,7 +102,8 @@ export function useTransactions(
       methodName: method?.name,
       type: data.type,
       value: typeof data.value === "number" ? data.value : Number(data.value),
-      createdAt: createdAt ? createdAt.toISOString() : "",
+      createdAt: formatDateISO(formattedCreatedAt),
+      createdAtDisplay: formatDate(formattedCreatedAt),
       ...data,
     };
   };
@@ -90,13 +111,14 @@ export function useTransactions(
   const buildBaseQuery = useCallback(
     (forMore: boolean = false) => {
       const base = collection(firestore, "transactions");
-      const constraints: any[] = [];
+      const constraints = [];
 
       if (userId) constraints.push(where("userId", "==", userId));
       if (categoryId) constraints.push(where("categoryId", "==", categoryId));
 
       const start = parseDateString(startDate);
       const end = parseDateString(endDate);
+
       const endWithTime = end
         ? new Date(
             end.getFullYear(),
@@ -150,6 +172,7 @@ export function useTransactions(
 
   const loadMore = useCallback(async () => {
     if (!hasMore || isLoadingMore || isLoading) return;
+
     setIsLoadingMore(true);
     try {
       const qRef = buildBaseQuery(true);
@@ -168,8 +191,10 @@ export function useTransactions(
       }
     } catch (e) {
       const err = e as FirestoreError;
-      console.error("Erro ao paginar transações", err);
-      setError(err.message ?? "Erro desconhecido");
+      setError(
+        err.message ??
+          "Não foi possível carregar mais dados, tente novamente mais tarde."
+      );
     } finally {
       setIsLoadingMore(false);
     }

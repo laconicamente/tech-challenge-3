@@ -27,7 +27,7 @@ export const BytebankSelect = ({
 }: BytebankSelectProps) => {
 
     return (
-        <View style={styles.container}>
+        <View>
             <Text style={styles.label}>{label}</Text>
             <RNPickerSelect
             onOpen={onOpen}
@@ -64,9 +64,6 @@ export const BytebankSelect = ({
 };
 
 const styles = StyleSheet.create({
-    container: {
-        marginBottom: 20,
-    },
     label: {
         fontSize: 14,
         color: '#333',

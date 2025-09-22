@@ -16,8 +16,6 @@ export default function DashboardScreen() {
 
   const headerMax = 115;
   const headerHeight = useSharedValue(headerMax);
-  const headerOpacity = useSharedValue(1);
-  const contentPaddingTop = useSharedValue(headerMax); // espaço abaixo do header apenas
 
   const animatedGreetingHeaderStyle = useAnimatedStyle(() => ({
     height: withTiming(headerHeight.value, { duration: 220 }),
@@ -30,8 +28,7 @@ export default function DashboardScreen() {
   };
 
   return (
-    // Removemos 'bottom' de edges para evitar dupla soma: SafeArea + nosso paddingBottom
-    <SafeAreaView style={styles.container} edges={['left','right']}>
+    <SafeAreaView style={styles.container} edges={['left', 'right']}>
       <Stack.Screen
         options={{
           header: () => <AppHeader />,
@@ -50,7 +47,6 @@ export default function DashboardScreen() {
           keyboardShouldPersistTaps="handled"
           onScroll={handleScroll}
           scrollEventThrottle={16}
-          // Diminuímos o paddingBottom para evitar duplicação (antes tinha + insets.bottom e SafeAreaView)
           contentContainerStyle={{ paddingBottom: 32 }}
           showsVerticalScrollIndicator={false}
         >
@@ -85,6 +81,6 @@ const styles = StyleSheet.create({
     backgroundColor: '#FFF',
     flex: 1,
     gap: 16,
-     padding: 20
+    padding: 20
   },
 });

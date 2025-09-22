@@ -20,7 +20,7 @@ export const TransactionItem = ({transaction}: {transaction: TransactionItemProp
             <Text style={[styles.itemValue]}>
                 {formatCurrency(Number(transaction.value))}
             </Text>
-            <Text style={styles.itemData}>{transaction.createdAt}</Text>
+            <Text style={styles.itemData}>{transaction.createdAtDisplay}</Text>
         </View>
     </View>
 );

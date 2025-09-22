@@ -1,6 +1,8 @@
+import NoDataSvg from '@/assets/images/no-data.svg';
 import { ColorsPalette } from '@/shared/classes/constants/Pallete';
 import { TransactionItemProps } from '@/shared/classes/models/transaction';
 import { BalanceResume } from '@/shared/components/Balance/BalanceResume';
+import { TransactionFilterDrawer } from '@/shared/components/Transaction/TransactionFilterDrawer';
 import TransactionHeader from '@/shared/components/Transaction/TransactionHeader';
 import { TransactionItem } from '@/shared/components/Transaction/TransactionItem';
 import { TransactionSkeleton } from '@/shared/components/Transaction/TransactionSkeleton';
@@ -9,7 +11,7 @@ import { BytebankButton } from '@/shared/ui/Button';
 import { Ionicons } from '@expo/vector-icons';
 import { Stack } from 'expo-router';
 import React, { useState } from 'react';
-import { FlatList, StyleSheet, Text, View } from 'react-native';
+import { FlatList, NativeScrollEvent, NativeSyntheticEvent, StyleSheet, Text, View } from 'react-native';
 import Animated, {
   useAnimatedStyle,
   useSharedValue,
@@ -23,7 +25,9 @@ export default function TransactionsScreen() {
   const height = useSharedValue(115);
   const contentTopRadius = useSharedValue(32);
   const contentMarginTop = useSharedValue(0);
-  const { transactions, isLoading , isLoadingMore, loadMore, hasMore } = useFinancial();
+
+  const { transactions, isLoading, isLoadingMore, loadMore, setFilters, hasMore } = useFinancial();
+  const [isFiltersVisible, setIsFiltersVisible] = useState(false);
 
   const animatedBalanceResumeStyle = useAnimatedStyle(() => {
     return {
@@ -42,12 +46,10 @@ export default function TransactionsScreen() {
   });
 
   const renderItem = ({ item }: { item: TransactionItemProps }) => (
-    <TransactionItem
-      transaction={item}
-    />
+    <TransactionItem transaction={item} />
   );
 
-  const handleScroll = (e) => {
+  const handleScroll = (e: NativeSyntheticEvent<NativeScrollEvent>) => {
     const y = e.nativeEvent.contentOffset.y;
     const shouldShowHeader = y < 40;
 
@@ -62,11 +64,19 @@ export default function TransactionsScreen() {
 
   const fetchMoreTransactions = async () => { loadMore?.(); }
 
+  const renderEmptyFeedback = () => (<View style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 20 }}>
+    <NoDataSvg width={220} height={220} />
+    <Text style={{ textAlign: 'center', fontSize: 16, color: '#666', marginTop: 10 }}>
+      Não encontramos nenhuma transação, que tal criar uma nova?
+    </Text>
+  </View>
+  );
+
   const ListHeader = () => (
     <View style={styles.subHeader}>
       <Text style={styles.subHeaderTitle}>Movimentações</Text>
       <View>
-        <BytebankButton color={'primary'} styles={styles.filterButton}>
+        <BytebankButton color={'primary'} styles={styles.filterButton} onPress={() => setIsFiltersVisible(!isFiltersVisible)}>
           <View>
             <Text style={styles.filterText}>Filtros</Text>
           </View>
@@ -75,6 +85,7 @@ export default function TransactionsScreen() {
           </View>
         </BytebankButton>
       </View>
+      {isFiltersVisible && <TransactionFilterDrawer visible={isFiltersVisible} onDismiss={() => setIsFiltersVisible(false)} onApplyFilter={(filters) => setFilters?.(filters)} />}
     </View>
   );
 
@@ -82,32 +93,31 @@ export default function TransactionsScreen() {
     <>
       <Stack.Screen
         options={{
-          header: () => <TransactionHeader showSearch={true} />,
+          header: () => <TransactionHeader showSearch={false} />,
           headerShown: true,
-          presentation: 'transparentModal'
         }}
       />
-    <SafeAreaView style={[styles.container, { paddingTop: 0 }]} edges={['left','right','bottom']}>
-      <Animated.View style={[styles.balanceResumeHeader, animatedBalanceResumeStyle]}>
-        <BalanceResume showMinified={true} />
-      </Animated.View>
-      <Animated.View style={[styles.contentWrapper, animatedContentStyle]}>
-        <FlatList
-          data={transactions}
-          renderItem={renderItem}
-          keyExtractor={(item) => item.id || ''}
-          contentContainerStyle={styles.listContainer}
-          ListHeaderComponent={<ListHeader />}
-          ListEmptyComponent={!isLoading ? <TransactionSkeleton numberOfItems={6} /> : null}
-          showsVerticalScrollIndicator={false}
-          onScroll={handleScroll}
-          scrollEventThrottle={16}
-          onEndReached={fetchMoreTransactions}
-          onEndReachedThreshold={0.6}
-          ListFooterComponent={hasMore && isLoadingMore ? <TransactionSkeleton numberOfItems={2} /> : null}
-        />
-      </Animated.View>
-    </SafeAreaView>
+      <SafeAreaView style={[styles.container, { paddingTop: 0 }]} edges={['left', 'right', 'bottom']}>
+        <Animated.View style={[styles.balanceResumeHeader, animatedBalanceResumeStyle]}>
+          <BalanceResume showMinified={true} />
+        </Animated.View>
+        <Animated.View style={[styles.contentWrapper, animatedContentStyle]}>
+          <FlatList
+            data={transactions}
+            renderItem={renderItem}
+            keyExtractor={(item) => item.id || ''}
+            contentContainerStyle={styles.listContainer}
+            ListHeaderComponent={<ListHeader />}
+            ListEmptyComponent={isLoading ? <TransactionSkeleton numberOfItems={6} /> : renderEmptyFeedback()}
+            showsVerticalScrollIndicator={false}
+            onScroll={handleScroll}
+            scrollEventThrottle={16}
+            onEndReached={fetchMoreTransactions}
+            onEndReachedThreshold={0.6}
+            ListFooterComponent={hasMore && isLoadingMore ? <TransactionSkeleton numberOfItems={2} /> : null}
+          />
+        </Animated.View>
+      </SafeAreaView>
     </>
   );
 }
@@ -119,7 +129,7 @@ const styles = StyleSheet.create({
   },
   balanceResumeHeader: {
     backgroundColor: '#d4eb61',
-    padding: 15,
+    paddingHorizontal: 15,
     paddingBottom: 0,
     zIndex: 2,
   },
@@ -128,7 +138,6 @@ const styles = StyleSheet.create({
     width: '100%',
     minHeight: '100%',
     zIndex: 1,
-    paddingBottom: 32,
   },
   subHeader: {
     flexDirection: 'row',

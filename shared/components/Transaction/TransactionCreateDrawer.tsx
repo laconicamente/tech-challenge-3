@@ -1,4 +1,6 @@
 import { firestore } from "@/firebaseConfig";
+import { datePickerTheme } from "@/shared/classes/constants/Colors";
+import { ColorsPalette } from "@/shared/classes/constants/Pallete";
 import { useAuth } from "@/shared/contexts/auth/AuthContext";
 import { router } from "expo-router";
 import { addDoc, collection } from "firebase/firestore";
@@ -18,31 +20,33 @@ import {
     TouchableWithoutFeedback,
     View,
 } from "react-native";
-import { Card, Divider, Modal, Portal } from "react-native-paper";
+import { Card, Divider, Modal, PaperProvider, Portal } from "react-native-paper";
+import { DatePickerModal } from "react-native-paper-dates";
+import { CalendarDate } from "react-native-paper-dates/lib/typescript/Date/Calendar";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { TransactionItemProps, TransactionType } from "../classes/models/transaction";
-import { useFinancial } from "../contexts/financial/FinancialContext";
-import { parseCurrencyToNumber } from "../helpers/formatCurrency";
-import { useBottomSheetAnimation } from "../hooks/useBottomSheetAnimation";
-import { useBottomSheetHandler } from "../hooks/useBottomSheetHandler";
-import { useCategories } from "../hooks/useCategories";
-import { useFeedbackAnimation } from "../hooks/useFeedbackAnimation";
-import { useMethods } from "../hooks/useMethods";
-import { BytebankButton } from "../ui/Button";
-import { FileUploadButton } from "../ui/FileUploadButton";
-import { BytebankInputController } from "../ui/Input/InputController";
-import { BytebankSelectController } from "../ui/Select/SelectController";
-import { BytebankTabSelector } from "../ui/TabSelector";
+import { TransactionItemProps, TransactionType } from "../../classes/models/transaction";
+import { useFinancial } from "../../contexts/financial/FinancialContext";
+import { parseCurrencyToNumber } from "../../helpers/formatCurrency";
+import { useBottomSheetAnimation } from "../../hooks/useBottomSheetAnimation";
+import { useBottomSheetHandler } from "../../hooks/useBottomSheetHandler";
+import { useCategories } from "../../hooks/useCategories";
+import { useFeedbackAnimation } from "../../hooks/useFeedbackAnimation";
+import { useMethods } from "../../hooks/useMethods";
+import { BytebankButton } from "../../ui/Button";
+import { FileUploadButton } from "../../ui/FileUploadButton";
+import { BytebankInputController } from "../../ui/Input/InputController";
+import { BytebankSelectController } from "../../ui/Select/SelectController";
+import { BytebankTabSelector } from "../../ui/TabSelector";
 
 const height = Dimensions.get("window").height;
 
-interface CreateTransactionModalProps {
+interface TransactionCreateDrawerProps {
     visible: boolean;
     onDismiss: () => void;
-    onFinished: () => void;
+    onFinished?: () => void;
 }
 
-const CreateTransactionModal: React.FC<CreateTransactionModalProps> = ({
+const TransactionCreateDrawer: React.FC<TransactionCreateDrawerProps> = ({
     visible,
     onDismiss,
     onFinished,
@@ -67,7 +71,7 @@ const CreateTransactionModal: React.FC<CreateTransactionModalProps> = ({
             fileUrl: null,
         },
     });
-    const { setValue, reset, control, handleSubmit, formState: { errors } } = formMethods;
+    const { setValue, reset, control, handleSubmit, watch, formState: { errors } } = formMethods;
 
     const pan = useRef(new Animated.ValueXY()).current;
     const gestureHandler = useBottomSheetHandler(pan, onDismiss);
@@ -94,7 +98,6 @@ const CreateTransactionModal: React.FC<CreateTransactionModalProps> = ({
     }
 
     const onSubmit = async (data: TransactionItemProps) => {
-        console.log(data);
         if (!user) {
             Alert.alert("Ocorreu um erro", "Usuário não autenticado.");
             router.replace("/(auth)/account-access");
@@ -104,14 +107,11 @@ const CreateTransactionModal: React.FC<CreateTransactionModalProps> = ({
         setIsLoading(true);
         try {
             const newTransaction = { ...data, value: parseCurrencyToNumber(data.value), userId: user.uid };
-
             const docRef = await addDoc(
                 collection(firestore, "transactions"),
                 newTransaction
             );
-            console.log("Transação adicionada com ID: ", docRef.id);
             showFeedback("success");
-            onFinished();
             onDismiss();
             refetch?.();
             refetchBalanceValue?.();
@@ -124,6 +124,17 @@ const CreateTransactionModal: React.FC<CreateTransactionModalProps> = ({
         }
     };
 
+    const [isDatePickerVisible, setIsDatePickerVisible] = useState(false);
+
+    const onDateDismiss = () => setIsDatePickerVisible(false);
+    const onDateConfirm = (params: { date: string }) => {
+        const { date: createdAt } = params;
+        setIsDatePickerVisible(false);
+        if (createdAt) {
+            setValue('createdAt', createdAt, { shouldDirty: true });
+        }
+    };
+    const formatDate = (d?: string) => d ? new Date(d).toLocaleDateString('pt-BR') : '';
     return (
         <Portal>
             <Modal
@@ -169,14 +180,34 @@ const CreateTransactionModal: React.FC<CreateTransactionModalProps> = ({
                                                         onOpen={() => setIsInteracting(true)}
                                                         onClose={() => setIsInteracting(false)} />
                                                     ) : (null)}
-                                                <BytebankInputController
-                                                    type='text'
-                                                    name="createdAt"
-                                                    label="Data da transação"
-                                                    placeholder="DD/MM/AAAA"
-                                                    maskType="date"
-                                                    rules={{ required: "Data obrigatória" }}
-                                                />
+                                                    <View style={{ marginVertical: 15 }}>
+
+                                                <Text style={{ marginLeft: 10, marginBottom: 5 }}>Data da transação</Text>
+                                                <BytebankButton
+                                                    mode="outlined"
+                                                    color="primary"
+                                                    onPress={() => setIsDatePickerVisible(true)}
+                                                    styles={{ backgroundColor: ColorsPalette.light['lime.900'], padding: 5, borderRadius: 10 }}
+                                                    labelStyles={{ color: ColorsPalette.light['lime.50'], fontSize: 16 }}
+                                                >
+                                                    {watch('createdAt')
+                                                        ? `${formatDate(watch('createdAt'))}`
+                                                        : 'Adicionar data'}
+                                                </BytebankButton>
+                                                <PaperProvider theme={datePickerTheme}>
+                                                    <DatePickerModal
+                                                        locale="pt-BR"
+                                                        mode="single"
+                                                        visible={isDatePickerVisible}
+                                                        onDismiss={onDateDismiss}
+                                                        onConfirm={onDateConfirm}
+                                                        startDate={watch('createdAt') as unknown as CalendarDate}
+                                                        label="Selecione o período"
+                                                        startLabel="Data da transação"
+                                                        saveLabel="Selecionar"
+                                                    />
+                                                </PaperProvider>
+                                                    </View>
                                                 <BytebankInputController
                                                     type='text'
                                                     name="value"
@@ -201,7 +232,7 @@ const CreateTransactionModal: React.FC<CreateTransactionModalProps> = ({
                                                         name="fileUrl"
                                                         control={control}
                                                         render={({ field }) => (
-                                                            <FileUploadButton label={field.value ? 'Comprovante adicionado' : 'Adicionar comprovante'} onFinished={(v) => { field.onChange(v); console.log(v); showFeedback('success'); }} />
+                                                            <FileUploadButton label={field.value ? 'Comprovante adicionado' : 'Adicionar comprovante'} onFinished={(v) => { field.onChange(v); showFeedback('success'); }} />
                                                         )}
                                                     />
                                                 </View>
@@ -279,4 +310,4 @@ const styles = StyleSheet.create({
     },
 });
 
-export default CreateTransactionModal;
+export default TransactionCreateDrawer;

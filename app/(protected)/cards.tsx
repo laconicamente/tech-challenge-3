@@ -57,13 +57,14 @@ const CardsScreen = () => {
   );
 
   return (
-    <SafeAreaView style={styles.container} edges={['left','right','bottom']}>
+    <>
       <Stack.Screen
         options={{
           header: () => <TransactionHeader title='Meus cartões' />,
           headerShown: true,
         }}
       />
+    <SafeAreaView style={styles.container} edges={['left','right','bottom']}>
       <FlatList
         data={cardsData}
         renderItem={renderCardItem}
@@ -89,6 +90,7 @@ const CardsScreen = () => {
       </View>
       <BankCardDetails card={cardsData[activeCardIndex]} />
     </SafeAreaView>
+    </>
   );
 };
 

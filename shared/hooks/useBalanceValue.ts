@@ -1,5 +1,5 @@
 import { firestore } from '@/firebaseConfig';
-import { collection, getDocs, query, where } from 'firebase/firestore';
+import { collection, getDocs, query, QueryFieldFilterConstraint, where } from 'firebase/firestore';
 import { useCallback, useEffect, useState } from 'react';
 
 export interface BalanceValueFilters {
@@ -27,7 +27,7 @@ export function useBalanceValue(filters: BalanceValueFilters) {
     setIsLoadingBalance(true);
     setErrorTotal(null);
     try {
-      const constraints: any[] = [
+      const constraints: QueryFieldFilterConstraint[] = [
         where('userId', '==', userId)
       ];
 
@@ -38,7 +38,7 @@ export function useBalanceValue(filters: BalanceValueFilters) {
       let expenseSum = 0;
 
       snap.docs.forEach(d => {
-        const data: any = d.data();
+        const data = d.data();
         const value = Number(data.value) || 0;
         if (data.type === 'income') incomeSum += value;
         else if (data.type === 'expense') expenseSum += value;

@@ -1,11 +1,11 @@
-import { View, TouchableOpacity, StyleSheet, Text } from 'react-native';
-import { Feather } from '@expo/vector-icons';
-import { Href, useRouter, useSegments } from 'expo-router';
-import { LinearGradient } from 'expo-linear-gradient';
-import { useState } from 'react';
-import CreateTransactionModal from '../modals/CreateTransactionModal';
-import { useTheme } from 'react-native-paper';
 import { ColorsPalette } from '@/shared/classes/constants/Pallete';
+import { Feather } from '@expo/vector-icons';
+import { LinearGradient } from 'expo-linear-gradient';
+import { Href, useRouter, useSegments } from 'expo-router';
+import { useState } from 'react';
+import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { useTheme } from 'react-native-paper';
+import TransactionCreateDrawer from '../components/Transaction/TransactionCreateDrawer';
 
 const BytebankTabBar = () => {
     const theme = useTheme();
@@ -15,10 +15,6 @@ const BytebankTabBar = () => {
 
     const showModal = () => setIsModalVisible(true);
     const hideModal = () => setIsModalVisible(false);
-
-    const handleCreateTransaction = () => {
-        console.log('Transação criada!');
-    };
 
     const tabs: { name: `/${string}`; label: string; icon: React.ComponentProps<typeof Feather>['name'] }[] = [
         { name: '/dashboard', label: 'Início', icon: 'home' },
@@ -64,10 +60,9 @@ const BytebankTabBar = () => {
                 );
             })}
 
-            <CreateTransactionModal
+            <TransactionCreateDrawer
                 visible={isModalVisible}
                 onDismiss={hideModal}
-                onFinished={handleCreateTransaction}
             />
         </View>
     );
@@ -86,7 +81,7 @@ const styles = StyleSheet.create({
         shadowOpacity: 0.1,
         shadowRadius: 5,
         justifyContent: 'space-around',
-        height: 80,
+        height: 90,
     },
     tabButton: {
         flex: 1,
@@ -103,10 +98,6 @@ const styles = StyleSheet.create({
         backgroundColor: 'white',
         justifyContent: 'center',
         alignItems: 'center',
-        shadowColor: '#000',
-        shadowOffset: { width: 0, height: 4 },
-        shadowOpacity: 0.3,
-        shadowRadius: 4,
         elevation: 8,
     },
     gradient: {

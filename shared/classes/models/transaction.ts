@@ -5,7 +5,8 @@ export interface TransactionItemProps {
     categoryId?: string;
     methodId?: string;
     value: number | string;
-    createdAt: string;
+    createdAt: Date | string;
+    createdAtDisplay?: string;
     type: TransactionType;
     fileUrl?: string | null;
     methodName?: string | undefined;
