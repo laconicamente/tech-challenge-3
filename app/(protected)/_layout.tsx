@@ -1,5 +1,5 @@
 import { useAuth } from '@/shared/contexts/auth/AuthContext';
-import BytebankTabBar from '@/shared/ui/TabBar';
+import { BytebankTabBar } from '@/shared/ui/TabBar';
 import { Tabs } from 'expo-router';
 import { Platform } from 'react-native';
 

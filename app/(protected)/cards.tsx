@@ -64,7 +64,7 @@ const CardsScreen = () => {
           headerShown: true,
         }}
       />
-    <SafeAreaView style={styles.container} edges={['left','right']}>
+    <SafeAreaView style={styles.container} edges={['left','right', 'bottom']}>
       <FlatList
         data={cardsData}
         renderItem={renderCardItem}
@@ -99,25 +99,9 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: '#FFF',
   },
-  header: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    padding: 20,
-    paddingTop: 50,
-  },
-  headerText: {
-    color: '#fff',
-    fontSize: 24,
-  },
-  headerTitle: {
-    color: '#fff',
-    fontSize: 20,
-    fontWeight: 'bold',
-  },
   cardList: {
     display: 'flex',
-    height: 230,
+    height: 200,
   },
   cardWrapper: {
     width: width,
@@ -127,7 +111,7 @@ const styles = StyleSheet.create({
   pagination: {
     flexDirection: 'row',
     justifyContent: 'center',
-    marginVertical: 10,
+    marginBottom: 10,
   },
   dot: {
     width: 8,
@@ -138,6 +122,7 @@ const styles = StyleSheet.create({
   },
   activeDot: {
     backgroundColor: ColorsPalette.light['lime.200'],
+    width: 14,
   },
 });
 
