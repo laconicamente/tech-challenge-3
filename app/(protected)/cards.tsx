@@ -1,4 +1,5 @@
 import { ColorsPalette } from '@/shared/classes/constants/Pallete';
+import { BankCardCreateDrawer } from '@/shared/components/BankCard/BankCardCreateDrawer';
 import BankCardDetails from '@/shared/components/BankCard/BankCardDetails';
 import BankCardItem from '@/shared/components/BankCard/BankCardItem';
 import TransactionHeader from '@/shared/components/Transaction/TransactionHeader';
@@ -14,7 +15,7 @@ const cardsData = [
     id: '1',
     number: '3098',
     name: 'Simon StClaire',
-    expireDate: '12/26',
+    expiredAt: '12/26',
     type: 'Platinum',
     cvv: '321',
   },
@@ -22,7 +23,7 @@ const cardsData = [
     id: '2',
     number: '4567',
     name: 'Maria Gomes',
-    expireDate: '05/25',
+    expiredAt: '05/25',
     balance: '$50,000.00',
     type: 'Black',
     cvv: '123',
@@ -31,7 +32,7 @@ const cardsData = [
     id: '3',
     number: '3098',
     name: 'Simon StClaire',
-    expireDate: '12/26',
+    expiredAt: '12/26',
     type: 'Gold',
     cvv: '321',
   },
@@ -39,6 +40,7 @@ const cardsData = [
 
 const CardsScreen = () => {
   const [activeCardIndex, setActiveCardIndex] = useState(0);
+  const [visible, setVisible] = useState(false);
 
   const onViewableItemsChanged = useCallback(({ viewableItems }) => {
     if (viewableItems.length > 0) {
@@ -60,7 +62,7 @@ const CardsScreen = () => {
     <>
       <Stack.Screen
         options={{
-          header: () => <TransactionHeader title='Meus cartões' hasAction={true} iconAction='add-card' onActionPress={() => console.log('Action pressed')} />,
+          header: () => <TransactionHeader title='Meus cartões' hasAction={true} iconAction='add-card' onActionPress={() => setVisible(true)} />,
           headerShown: true,
         }}
       />
@@ -89,6 +91,7 @@ const CardsScreen = () => {
         ))}
       </View>
       <BankCardDetails card={cardsData[activeCardIndex]} />
+      <BankCardCreateDrawer visible={visible} onDismiss={() => setVisible(false)} />
     </SafeAreaView>
     </>
   );

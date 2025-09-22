@@ -11,7 +11,7 @@ const BankCardDetails = ({ card }: { card: Partial<BankCardProps> }) => {
     const cardDetailsList = [
         { label: 'Apelido', value: card.name },
         { label: 'Número', value: maskCardNumber(card.number ?? '') },
-        { label: 'Validade', value: card.expireDate },
+        { label: 'Validade', value: card.expiredAt },
         { label: 'CVV', value: card.cvv },
     ];
     return (
