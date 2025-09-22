@@ -9,11 +9,11 @@ const BankCardItem = ({ card }: { card: Partial<BankCardProps> }) => {
   const { number, type = 'Platinum', color } = card as { number?: string; type?: keyof typeof cardColors; color?: string };
   const cardColors = {
     'Platinum': {
-      backgroundColor: [ColorsPalette.light["lime.500"], ColorsPalette.light["lime.400"]],
+      backgroundColor: [ColorsPalette.light["lime.500"], ColorsPalette.light["lime.600"]],
       color: ColorsPalette.light["lime.900"]
     },
     'Gold': {
-      backgroundColor: [ColorsPalette.light["lime.200"], ColorsPalette.light["lime.300"]],
+      backgroundColor: [ColorsPalette.light["lime.200"], ColorsPalette.light["lime.700"]],
       color: ColorsPalette.light["lime.900"]
     },
     'Black': {
@@ -57,7 +57,7 @@ const styles = StyleSheet.create({
     bottom: 0,
     width: 200,
     height: 200,
-    opacity: 0.6,
+    opacity: 0.8,
   },
   cardTitleContainer: {
     marginBottom: 8,
@@ -78,9 +78,6 @@ const styles = StyleSheet.create({
     fontSize: 20,
     fontWeight: 'bold',
     color: '#333',
-  },
-  cardDetails: {
-    color: '#555',
   },
 });
 

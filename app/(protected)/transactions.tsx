@@ -64,7 +64,7 @@ export default function TransactionsScreen() {
 
   const fetchMoreTransactions = async () => { loadMore?.(); }
 
-  const renderEmptyFeedback = () => (<View style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 20 }}>
+  const EmptyFeedback = () => (<View style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 20 }}>
     <NoDataSvg width={220} height={220} />
     <Text style={{ textAlign: 'center', fontSize: 16, color: '#666', marginTop: 10 }}>
       Não encontramos nenhuma transação, que tal criar uma nova?
@@ -108,7 +108,7 @@ export default function TransactionsScreen() {
             keyExtractor={(item) => item.id || ''}
             contentContainerStyle={styles.listContainer}
             ListHeaderComponent={<ListHeader />}
-            ListEmptyComponent={isLoading ? <TransactionSkeleton numberOfItems={6} /> : renderEmptyFeedback()}
+            ListEmptyComponent={isLoading ? <TransactionSkeleton numberOfItems={6} /> : <EmptyFeedback />}
             showsVerticalScrollIndicator={false}
             onScroll={handleScroll}
             scrollEventThrottle={16}

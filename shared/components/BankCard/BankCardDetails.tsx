@@ -1,4 +1,5 @@
 import { ColorsPalette } from '@/shared/classes/constants/Pallete';
+import { MaterialIcons } from '@expo/vector-icons';
 import React from 'react';
 import { ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { BankCardProps } from '../../classes/models/bank-card';
@@ -8,7 +9,7 @@ const BankCardDetails = ({ card }: { card: Partial<BankCardProps> }) => {
     if (!card) return null;
 
     const cardDetailsList = [
-        { label: 'Nome', value: card.name },
+        { label: 'Apelido', value: card.name },
         { label: 'Número', value: maskCardNumber(card.number ?? '') },
         { label: 'Validade', value: card.expireDate },
         { label: 'CVV', value: card.cvv },
@@ -27,18 +28,24 @@ const BankCardDetails = ({ card }: { card: Partial<BankCardProps> }) => {
                     ))}
                 </View>
                 <View style={styles.actionButtonsContainer}>
+                    <View style={styles.actionButtonWrapper}>
                     <TouchableOpacity style={styles.actionButton}>
+                        <MaterialIcons name="lock" size={20} color={ColorsPalette.light['lime.100']} />
+                    </TouchableOpacity>
                         <Text style={styles.actionButtonText}>Bloquear cartão</Text>
-                    </TouchableOpacity>
-
+                    </View>
+                    <View style={styles.actionButtonWrapper}>
                     <TouchableOpacity style={styles.actionButton}>
+                    <MaterialIcons name={"credit-card"} size={20} color={ColorsPalette.light['lime.100']} />
+                    </TouchableOpacity>
                         <Text style={styles.actionButtonText}>Marcar como principal</Text>
+                    </View>
+                    <View style={styles.actionButtonWrapper}>
+                    <TouchableOpacity style={styles.actionDeleteButton}>
+                    <MaterialIcons name={"credit-card"} size={20} color={ColorsPalette.light['lime.800']} />
                     </TouchableOpacity>
-
-                    <TouchableOpacity>
                         <Text style={styles.deleteButtonText}>Excluir cartão</Text>
-                    </TouchableOpacity>
-
+                    </View>
                 </View>
             </View>
         </ScrollView>
@@ -52,7 +59,7 @@ const styles = StyleSheet.create({
         paddingBottom: 40
     },
     cardDetails: {
-        paddingVertical: 10,
+        paddingVertical: 5,
     },
     cardLabel: {
         fontSize: 15,
@@ -66,26 +73,43 @@ const styles = StyleSheet.create({
     actionButtonsContainer: {
         marginTop: 20,
         gap: 15,
+        flexDirection: 'row',
+        alignItems: 'flex-start'
+    },
+    actionButtonWrapper: {
+        flexDirection: 'column',
+        alignItems: 'center',
+        justifyContent: 'center',
+        width: '30%'
     },
     actionButton: {
-        backgroundColor: ColorsPalette.light['lime.900'],
+        backgroundColor: ColorsPalette.light['lime.800'],
         padding: 15,
-        borderRadius: 10,
+        borderRadius: 30,
         alignItems: 'center',
+        width: 60,
+        height: 60,
+        justifyContent: 'center',
+    },
+    actionDeleteButton: {
+        backgroundColor: ColorsPalette.light['lime.200'],
+        padding: 15,
+        borderRadius: 30,
+        alignItems: 'center',
+        width: 60,
+        height: 60,
+        display: 'flex',
+        justifyContent: 'center',
     },
     actionButtonText: {
-        color: '#fff',
-        fontSize: 16,
-        fontWeight: 'bold',
+        color: ColorsPalette.light['lime.800'],
+        fontSize: 14,
+        textAlign: 'center'
     },
     deleteButtonText: {
-        color: ColorsPalette.light['lime.900'],
+        color: ColorsPalette.light['lime.700'],
         textAlign: 'center',
-        marginTop: 10,
-        fontSize: 16,
-        textDecorationLine: 'underline',
-        fontWeight: 'bold',
-        marginBottom: 20
+        fontSize: 14,
     },
 });
 

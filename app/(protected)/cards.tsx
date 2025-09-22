@@ -64,7 +64,7 @@ const CardsScreen = () => {
           headerShown: true,
         }}
       />
-    <SafeAreaView style={styles.container} edges={['left','right','bottom']}>
+    <SafeAreaView style={styles.container} edges={['left','right']}>
       <FlatList
         data={cardsData}
         renderItem={renderCardItem}
@@ -117,8 +117,7 @@ const styles = StyleSheet.create({
   },
   cardList: {
     display: 'flex',
-    height: 260,
-    marginTop: 15,
+    height: 230,
   },
   cardWrapper: {
     width: width,
