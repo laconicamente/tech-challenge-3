@@ -2,6 +2,7 @@ import NoDataSvg from '@/assets/images/no-data.svg';
 import { ColorsPalette } from '@/shared/classes/constants/Pallete';
 import { TransactionItemProps } from '@/shared/classes/models/transaction';
 import { BalanceResume } from '@/shared/components/Balance/BalanceResume';
+import TransactionCreateDrawer from '@/shared/components/Transaction/TransactionCreateDrawer';
 import { TransactionFilterDrawer } from '@/shared/components/Transaction/TransactionFilterDrawer';
 import TransactionHeader from '@/shared/components/Transaction/TransactionHeader';
 import { TransactionItem } from '@/shared/components/Transaction/TransactionItem';
@@ -11,8 +12,9 @@ import { BytebankButton } from '@/shared/ui/Button';
 import { Ionicons } from '@expo/vector-icons';
 import { Stack } from 'expo-router';
 import React, { useRef, useState } from 'react';
-import { Alert, FlatList, NativeScrollEvent, NativeSyntheticEvent, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { Alert, FlatList, NativeScrollEvent, NativeSyntheticEvent, StyleSheet, Text, View } from 'react-native';
 import { Swipeable } from 'react-native-gesture-handler';
+import { TouchableRipple } from 'react-native-paper';
 import Animated, {
   useAnimatedStyle,
   useSharedValue,
@@ -27,8 +29,10 @@ export default function TransactionsScreen() {
   const contentTopRadius = useSharedValue(32);
   const contentMarginTop = useSharedValue(0);
 
-  const { transactions, isLoading, isLoadingMore, loadMore, setFilters, hasMore } = useFinancial();
+  const { transactions, isLoading, isLoadingMore, loadMore, setFilters, deleteTransaction, hasMore } = useFinancial();
   const [isFiltersVisible, setIsFiltersVisible] = useState(false);
+  const [isEditVisible, setIsEditVisible] = useState(false);
+  const [transaction, setTransaction] = useState<TransactionItemProps | null>(null);
   const openSwipeableRef = useRef<Swipeable | null>(null);
 
   const closeCurrentSwipe = () => {
@@ -71,10 +75,13 @@ export default function TransactionsScreen() {
 
   const fetchMoreTransactions = async () => { loadMore?.(); }
   const handleEdit = (t: TransactionItemProps) => {
-    Alert.alert('Editar', 'Função de edição ainda não implementada.');
-    // setEditingTransaction(t);
-    // setIsEditVisible(true);
+    setTransaction(t);
+    setIsEditVisible(true);
   };
+
+  const renderEditTransaction = () => (
+    <TransactionCreateDrawer visible={isEditVisible} transaction={transaction} onDismiss={() => { setIsEditVisible(false); closeCurrentSwipe(); }} />
+  );
 
   const handleDelete = (t: TransactionItemProps) => {
     Alert.alert('Excluir', 'Deseja excluir esta transação?', [
@@ -82,25 +89,25 @@ export default function TransactionsScreen() {
       {
         text: 'Excluir',
         style: 'destructive',
-        // onPress: () => deleteTransaction?.(t.id)
+        onPress: () => deleteTransaction?.(t.id || ''),
       }
     ]);
   };
 
   const renderRightActions = (item: TransactionItemProps) => (
     <View style={{ flexDirection: 'row', height: '100%' }}>
-      <TouchableOpacity
+      <TouchableRipple
         onPress={() => handleEdit(item)}
-        style={{ backgroundColor: ColorsPalette.light['grey.200'], justifyContent: 'center', paddingHorizontal: 18 }}
+        style={{ backgroundColor: ColorsPalette.light['grey.50'], justifyContent: 'center', paddingHorizontal: 18 }}
       >
         <Text style={{ color: ColorsPalette.light['grey.900'], fontWeight: '600' }}>Editar</Text>
-      </TouchableOpacity>
-      <TouchableOpacity
+      </TouchableRipple>
+      <TouchableRipple
         onPress={() => handleDelete(item)}
         style={{ backgroundColor: ColorsPalette.light['red.700'], justifyContent: 'center', paddingHorizontal: 18 }}
       >
         <Text style={{ color: '#FFF', fontWeight: '600' }}>Excluir</Text>
-      </TouchableOpacity>
+      </TouchableRipple>
     </View>
   );
 
@@ -176,6 +183,7 @@ export default function TransactionsScreen() {
             ListFooterComponent={hasMore && isLoadingMore ? <TransactionSkeleton numberOfItems={2} /> : null}
           />
         </Animated.View>
+        {renderEditTransaction()}
       </SafeAreaView>
     </>
   );

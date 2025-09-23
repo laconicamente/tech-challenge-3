@@ -3,24 +3,32 @@ import {
     DocumentData,
     FirestoreError,
     QueryDocumentSnapshot,
+    addDoc,
     collection,
+    deleteDoc,
+    doc,
     getDocs,
     limit,
     orderBy,
     query,
     startAfter,
-    where
+    updateDoc,
+    where,
 } from "firebase/firestore";
 import { useCallback, useEffect, useRef, useState } from "react";
 import {
     TransactionFilter,
     TransactionItemProps,
 } from "../classes/models/transaction";
-import { formatDate, formatDateISO, toDateFromFirestore } from "../helpers/formatDate";
+import {
+    formatDate,
+    formatDateISO,
+    toDateFromFirestore,
+} from "../helpers/formatDate";
 import { useCategories } from "./useCategories";
 import { useMethods } from "./useMethods";
 
-interface TransactionsResponse {
+export interface TransactionsResponse {
   transactions: TransactionItemProps[];
   isLoading: boolean;
   isLoadingMore: boolean;
@@ -30,18 +38,24 @@ interface TransactionsResponse {
   filters: TransactionFilter;
   setFilters: (f: TransactionFilter) => void;
   refetch: () => Promise<void>;
+  deleteTransaction: (id: string) => Promise<void>;
+  addTransaction?: (data: Partial<TransactionItemProps>) => Promise<void>;
+  editTransaction?: (
+    id: string,
+    data: Partial<TransactionItemProps>
+  ) => Promise<void>;
 }
 
-  function parseDateString(input?: string): Date | undefined {
-    if (!input) return undefined;
-    if (/^\d{2}\/\d{2}\/\d{4}$/.test(input)) {
-      const [d, m, y] = input.split("/").map(Number);
-      const dt = new Date(y, (m ?? 1) - 1, d);
-      return isNaN(dt.getTime()) ? undefined : dt;
-    }
-    const dt = new Date(input);
+function parseDateString(input?: string): Date | undefined {
+  if (!input) return undefined;
+  if (/^\d{2}\/\d{2}\/\d{4}$/.test(input)) {
+    const [d, m, y] = input.split("/").map(Number);
+    const dt = new Date(y, (m ?? 1) - 1, d);
     return isNaN(dt.getTime()) ? undefined : dt;
   }
+  const dt = new Date(input);
+  return isNaN(dt.getTime()) ? undefined : dt;
+}
 
 export function useTransactions(
   initial: TransactionFilter = {},
@@ -180,6 +194,55 @@ export function useTransactions(
     await fetchFirstPage();
   }, [fetchFirstPage]);
 
+  const addTransaction = async (data: Partial<TransactionItemProps>) => {
+    try {
+      setIsLoading(true);
+      await addDoc(collection(firestore, "transactions"), { ...data });
+    } catch (error) {
+      console.error("Erro ao adicionar transação: ", error);
+      throw error;
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const editTransaction = async (
+    id: string,
+    data: Partial<TransactionItemProps>
+  ) => {
+    try {
+      setIsLoading(true);
+      const refCard = doc(firestore, "transactions", id);
+      await updateDoc(refCard, { ...data });
+    } catch (error) {
+      console.error("Erro ao editar transação: ", error);
+      throw error;
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const deleteTransaction = async (id: string) => {
+    if (!id) throw new Error("ID inválido");
+    try {
+      setIsLoading(true);
+      const refCard = doc(firestore, "transactions", id);
+      await deleteDoc(refCard);
+      setTransactions((prev) =>
+        prev.filter((transaction) => transaction.id !== id)
+      );
+    } catch (e: unknown) {
+      console.error("Erro ao excluir transação", e);
+      setError(
+        (e as Error).message ??
+          "Ocorreu um erro ao excluir esta transação, tente novamente por favor."
+      );
+      throw e;
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   useEffect(() => {
     fetchFirstPage();
   }, [fetchFirstPage]);
@@ -193,6 +256,9 @@ export function useTransactions(
     setFilters,
     refetch,
     loadMore,
+    deleteTransaction,
+    addTransaction,
+    editTransaction,
     hasMore,
   };
 }

@@ -5,12 +5,10 @@ import { LinearGradient } from 'expo-linear-gradient';
 import { Href, useRouter, useSegments } from 'expo-router';
 import { useState } from 'react';
 import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
-import { useTheme } from 'react-native-paper';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import TransactionCreateDrawer from '../components/Transaction/TransactionCreateDrawer';
 
 export const BytebankTabBar = () => {
-    const theme = useTheme();
     const router = useRouter();
     const segments = useSegments();
     const insets = useSafeAreaInsets();
@@ -27,7 +25,6 @@ export const BytebankTabBar = () => {
         { name: '/profile', label: 'Perfil', icon: 'user' },
     ];
     const activeTab = '/' + (segments[1] ?? 'dashboard');
-
 
     return (
         <View style={styles.wrapper}>

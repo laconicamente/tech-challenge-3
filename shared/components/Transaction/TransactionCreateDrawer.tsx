@@ -1,11 +1,9 @@
-import { firestore } from "@/firebaseConfig";
 import { datePickerTheme } from "@/shared/classes/constants/Colors";
 import { ColorsPalette } from "@/shared/classes/constants/Pallete";
 import { useAuth } from "@/shared/contexts/auth/AuthContext";
-import { formatDate } from "@/shared/helpers/formatDate";
+import { formatDate, toDateFromFirestore } from "@/shared/helpers/formatDate";
 import { router } from "expo-router";
-import { addDoc, collection } from "firebase/firestore";
-import React, { useRef, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { Controller, FormProvider, useForm } from "react-hook-form";
 import {
     ActivityIndicator,
@@ -13,19 +11,16 @@ import {
     Animated,
     Dimensions,
     Keyboard,
-    KeyboardAvoidingView,
-    Platform,
     ScrollView,
     StyleSheet,
     Text,
-    TouchableOpacity,
     TouchableWithoutFeedback,
-    View,
+    View
 } from "react-native";
-import { Card, Divider, Modal, PaperProvider, Portal } from "react-native-paper";
+import Modal from 'react-native-modal';
+import { Divider, PaperProvider, Portal } from "react-native-paper";
 import { DatePickerModal } from "react-native-paper-dates";
 import { CalendarDate } from "react-native-paper-dates/lib/typescript/Date/Calendar";
-import { SafeAreaView } from "react-native-safe-area-context";
 import { TransactionItemProps, TransactionType } from "../../classes/models/transaction";
 import { useFinancial } from "../../contexts/financial/FinancialContext";
 import { parseCurrencyToNumber } from "../../helpers/formatCurrency";
@@ -44,17 +39,20 @@ const height = Dimensions.get("window").height;
 
 interface TransactionCreateDrawerProps {
     visible: boolean;
+    transaction: TransactionItemProps | null;
     onDismiss: () => void;
 }
 
 const TransactionCreateDrawer: React.FC<TransactionCreateDrawerProps> = ({
     visible,
+    transaction = null,
     onDismiss,
 }) => {
     const { showFeedback, FeedbackAnimation } = useFeedbackAnimation();
-    const [transactionType, setTransactionType] = useState<TransactionType>("income");
+    const [title, setTitle] = useState<string>("");
+    const [transactionType, setTransactionType] = useState<TransactionType>(transaction?.type || "income");
     const { user } = useAuth();
-    const { refetch, refetchBalanceValue } = useFinancial();
+    const { refetch, refetchBalanceValue, editTransaction, addTransaction } = useFinancial();
     const { categories } = useCategories(transactionType);
     const { methods } = useMethods(transactionType);
     const [isLoading, setIsLoading] = useState(false);
@@ -63,15 +61,41 @@ const TransactionCreateDrawer: React.FC<TransactionCreateDrawerProps> = ({
     const formMethods = useForm({
         mode: "onChange",
         defaultValues: {
-            methodId: "",
-            categoryId: "",
-            createdAt: "",
-            value: "",
+            methodId: transaction?.methodId || "",
+            categoryId: transaction?.categoryId || "",
+            createdAt: transaction?.createdAt || "",
+            value: transaction?.value || "",
             type: transactionType,
-            fileUrl: null,
+            fileUrl: "",
         },
     });
     const { setValue, reset, control, handleSubmit, watch, formState: { errors } } = formMethods;
+
+    useEffect(() => {
+        if (transaction) {
+            setTransactionType(transaction.type);
+            setTitle("Editar transação");
+            reset({
+                methodId: transaction.methodId || "",
+                categoryId: transaction.categoryId || "",
+                createdAt: transaction.createdAt ? toDateFromFirestore(transaction.createdAt) : "",
+                value: transaction.value ? String(Number(transaction.value)) : "",
+                type: transaction.type,
+                fileUrl: transaction.fileUrl || "",
+            });
+        } else {
+            reset({
+                methodId: "",
+                categoryId: "",
+                createdAt: "",
+                value: "",
+                type: "income",
+                fileUrl: "",
+            });
+            setTransactionType("income");
+            setTitle("Nova transação");
+        }
+    }, [transaction, reset]);
 
     const pan = useRef(new Animated.ValueXY()).current;
     const gestureHandler = useBottomSheetHandler(pan, onDismiss);
@@ -86,7 +110,7 @@ const TransactionCreateDrawer: React.FC<TransactionCreateDrawerProps> = ({
             createdAt: "",
             value: "",
             type,
-            fileUrl: null
+            fileUrl: ""
         })
     }
 
@@ -106,11 +130,13 @@ const TransactionCreateDrawer: React.FC<TransactionCreateDrawerProps> = ({
 
         setIsLoading(true);
         try {
-            const newTransaction = { ...data, value: parseCurrencyToNumber(data.value), userId: user.uid };
-            await addDoc(
-                collection(firestore, "transactions"),
-                newTransaction
-            );
+            const newTransaction = { ...data, value: parseCurrencyToNumber(data.value) * 100, userId: user.uid };
+            if (transaction?.id) {
+                editTransaction?.(transaction?.id, newTransaction);
+            } else {
+                addTransaction?.(newTransaction);
+            }
+
             showFeedback("success");
             onDismiss();
             refetch?.();
@@ -137,132 +163,124 @@ const TransactionCreateDrawer: React.FC<TransactionCreateDrawerProps> = ({
 
     return (
         <Portal>
-            <TouchableOpacity
-                activeOpacity={1}
-                style={[styles.backdrop, { opacity: visible ? 1 : 0 }]}
-                onPress={onDismiss}
-            />
             <Modal
-                visible={visible}
+                isVisible={visible}
                 onDismiss={onDismiss}
-                contentContainerStyle={styles.modalContainer}
+                style={styles.modal}
+                onBackdropPress={onDismiss}
+                onBackButtonPress={onDismiss}
+                backdropTransitionOutTiming={0}
+                animationIn="slideInUp"
+                animationOut="slideOutDown"
+                animationInTiming={300}
+                animationOutTiming={300}
+                avoidKeyboard={true}
             >
-                <Animated.View
-                    style={[
-                        styles.animatedView,
-                        { transform: [{ translateY: slideAnim }, { translateY: pan.y }] },
-                    ]}
-                    {...(!isInteracting ? gestureHandler.panHandlers : {})}
-                >
-                    <KeyboardAvoidingView
-                        behavior={Platform.OS === "ios" ? "padding" : "height"}
-                    >
-                        <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
-                            <SafeAreaView edges={["bottom"]}>
+                <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
+                    <View style={styles.card}>
+                        <View style={styles.dragHandle} />
+                        <View style={styles.header}>
+                            <Text style={styles.title}>{title}</Text>
+                        </View>
+                        <Divider />
+                        <ScrollView
+                            keyboardShouldPersistTaps="handled"
+                        >
+                            <View style={{ display: 'flex', gap: 0 }}>
                                 <FormProvider {...formMethods}>
-                                    <Card style={styles.card}>
-                                        <View style={styles.dragHandle} />
-                                        <View style={styles.header}>
-                                            <Text style={styles.title}>Nova transação</Text>
-                                        </View>
-                                        <Divider />
-                                        <ScrollView keyboardShouldPersistTaps="handled">
-                                            <View style={{ display: "flex", gap: 0 }}>
-                                                <BytebankTabSelector
-                                                    tabs={[
-                                                        { label: "Entrada", name: "income" },
-                                                        { label: "Saída", name: "expense" },
-                                                    ]}
-                                                    activeTab={transactionType}
-                                                    onTabChange={handleTabChange}
-                                                />
-                                                {methods && methods.length > 0 ?
-                                                    (<BytebankSelectController
-                                                        name={"methodId"}
-                                                        label="Selecione o tipo da transação"
-                                                        items={methods.map(c => ({ label: c.name, value: c.id }))}
-                                                        placeholder="Selecione o tipo da transação"
-                                                        onOpen={() => setIsInteracting(true)}
-                                                        onClose={() => setIsInteracting(false)} />
-                                                    ) : (null)}
-                                                <View style={{ marginVertical: 15 }}>
+                                    <BytebankTabSelector
+                                        tabs={[
+                                            { label: "Entrada", name: "income" },
+                                            { label: "Saída", name: "expense" },
+                                        ]}
+                                        activeTab={transactionType}
+                                        onTabChange={handleTabChange}
+                                    />
+                                    {methods && methods.length > 0 ?
+                                        (<BytebankSelectController
+                                            name={"methodId"}
+                                            label="Selecione o tipo da transação"
+                                            items={methods.map(c => ({ label: c.name, value: c.id }))}
+                                            placeholder="Selecione o tipo da transação"
+                                            onOpen={() => setIsInteracting(true)}
+                                            onClose={() => setIsInteracting(false)} />
+                                        ) : (null)}
+                                    <View style={{ marginVertical: 15 }}>
 
-                                                    <Text style={{ marginLeft: 10, marginBottom: 5 }}>Data da transação</Text>
-                                                    <BytebankButton
-                                                        mode="outlined"
-                                                        color="primary"
-                                                        onPress={() => setIsDatePickerVisible(true)}
-                                                        styles={{ backgroundColor: ColorsPalette.light['lime.900'], padding: 5, borderRadius: 10 }}
-                                                        labelStyles={{ color: ColorsPalette.light['lime.50'], fontSize: 16 }}
-                                                    >
-                                                        {watch('createdAt')
-                                                            ? `${formatDate(watch('createdAt'))}`
-                                                            : 'Adicionar data'}
-                                                    </BytebankButton>
-                                                    <PaperProvider theme={datePickerTheme}>
-                                                        <DatePickerModal
-                                                            locale="pt-BR"
-                                                            mode="single"
-                                                            visible={isDatePickerVisible}
-                                                            onDismiss={onDateDismiss}
-                                                            onConfirm={onDateConfirm}
-                                                            startDate={watch('createdAt') as unknown as CalendarDate}
-                                                            label="Selecione uma data"
-                                                            startLabel="Data da transação"
-                                                            saveLabel="Selecionar"
-                                                        />
-                                                    </PaperProvider>
-                                                </View>
-                                                <BytebankInputController
-                                                    type='text'
-                                                    name="value"
-                                                    label="Valor"
-                                                    placeholder="R$ 0,00"
-                                                    maskType="currency"
-                                                    rules={{ required: "Valor obrigatório" }}
-                                                    keyboardType="numeric"
-                                                />
-                                                {categories && categories.length > 0 && (
-                                                    <BytebankSelectController
-                                                        name="categoryId"
-                                                        label="Selecione uma categoria"
-                                                        items={categories.map(c => ({ label: c.name, value: c.id }))}
-                                                        placeholder="Selecione uma categoria"
-                                                        onOpen={() => setIsInteracting(true)}
-                                                        onClose={() => setIsInteracting(false)}
-                                                    />
-                                                )}
-                                                <View style={{ marginBottom: 10 }}>
-                                                    <Controller
-                                                        name="fileUrl"
-                                                        control={control}
-                                                        render={({ field }) => (
-                                                            <FileUploadButton label={field.value ? 'Comprovante adicionado' : 'Adicionar comprovante'} onFinished={(v) => { field.onChange(v); showFeedback('success'); }} />
-                                                        )}
-                                                    />
-                                                </View>
-                                            </View>
-                                        </ScrollView>
-                                        <View style={{ paddingVertical: 15 }}>
-                                            <BytebankButton
-                                                color="primary"
-                                                variant="contained"
-                                                onPress={handleSubmit(onSubmit)}
-                                                disabled={isLoading}
-                                            >
-                                                {isLoading ? (
-                                                    <ActivityIndicator color="#999" />
-                                                ) : (
-                                                    "Concluir"
-                                                )}
-                                            </BytebankButton>
-                                        </View>
-                                    </Card>
+                                        <Text style={{ marginLeft: 10, marginBottom: 5 }}>Data da transação</Text>
+                                        <BytebankButton
+                                            mode="outlined"
+                                            color="primary"
+                                            onPress={() => setIsDatePickerVisible(true)}
+                                            styles={{ backgroundColor: ColorsPalette.light['lime.900'], padding: 5, borderRadius: 10 }}
+                                            labelStyles={{ color: ColorsPalette.light['lime.50'], fontSize: 16 }}
+                                        >
+                                            {watch('createdAt')
+                                                ? `${formatDate(watch('createdAt'))}`
+                                                : 'Adicionar data'}
+                                        </BytebankButton>
+                                        <PaperProvider theme={datePickerTheme}>
+                                            <DatePickerModal
+                                                locale="pt-BR"
+                                                mode="single"
+                                                visible={isDatePickerVisible}
+                                                onDismiss={onDateDismiss}
+                                                onConfirm={onDateConfirm}
+                                                startDate={watch('createdAt') as unknown as CalendarDate}
+                                                label="Selecione uma data"
+                                                startLabel="Data da transação"
+                                                saveLabel="Selecionar"
+                                            />
+                                        </PaperProvider>
+                                    </View>
+                                    <BytebankInputController
+                                        type='text'
+                                        name="value"
+                                        label="Valor"
+                                        placeholder="R$ 0,00"
+                                        maskType="currency"
+                                        rules={{ required: "Valor obrigatório" }}
+                                        keyboardType="number-pad"
+                                        onPress={() => setIsInteracting(true)}
+                                    />
+                                    {categories && categories.length > 0 && (
+                                        <BytebankSelectController
+                                            name="categoryId"
+                                            label="Selecione uma categoria"
+                                            items={categories.map(c => ({ label: c.name, value: c.id }))}
+                                            placeholder="Selecione uma categoria"
+                                            onOpen={() => setIsInteracting(true)}
+                                            onClose={() => setIsInteracting(false)}
+                                        />
+                                    )}
+                                    <View style={{ marginBottom: 10 }}>
+                                        <Controller
+                                            name="fileUrl"
+                                            control={control}
+                                            render={({ field }) => (
+                                                <FileUploadButton label={field.value ? 'Comprovante adicionado' : 'Adicionar comprovante'} onFinished={(v) => { field.onChange(v); showFeedback('success'); }} />
+                                            )}
+                                        />
+                                    </View>
                                 </FormProvider>
-                            </SafeAreaView>
-                        </TouchableWithoutFeedback>
-                    </KeyboardAvoidingView>
-                </Animated.View>
+                            </View>
+                        </ScrollView>
+                        <View style={{ paddingVertical: 15 }}>
+                            <BytebankButton
+                                color="primary"
+                                variant="contained"
+                                onPress={handleSubmit(onSubmit)}
+                                disabled={isLoading}
+                            >
+                                {isLoading ? (
+                                    <ActivityIndicator color="#fff" />
+                                ) : (
+                                    "Concluir"
+                                )}
+                            </BytebankButton>
+                        </View>
+                    </View>
+                </TouchableWithoutFeedback>
             </Modal>
             <FeedbackAnimation />
         </Portal>
@@ -270,18 +288,16 @@ const TransactionCreateDrawer: React.FC<TransactionCreateDrawerProps> = ({
 };
 
 const styles = StyleSheet.create({
-    backdrop: {
-        ...StyleSheet.absoluteFillObject,
-        backgroundColor: 'rgba(0,0,0,0.35)',
+    modal: {
+        justifyContent: 'flex-end',
+        margin: 0,
     },
     modalContainer: {
-        justifyContent: "flex-end",
-        position: "absolute",
-        top: 0,
-        left: 0,
-        right: 0,
-        bottom: 0,
-        zIndex: 3,
+        position: 'absolute',
+        inset: 0,
+        width: '100%',
+        height: 'auto',
+        zIndex: 999,
     },
     animatedView: {
         width: "100%",

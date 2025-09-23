@@ -18,7 +18,7 @@ export const TransactionItem = ({transaction}: {transaction: TransactionItemProp
         </View>
         <View style={styles.itemValueContainer}>
             <Text style={[styles.itemValue]}>
-                {formatCurrency(Number(transaction.value))}
+                {formatCurrency(Number(transaction.value) / 100)}
             </Text>
             <Text style={styles.itemData}>{transaction.createdAtDisplay}</Text>
         </View>

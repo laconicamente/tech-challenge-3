@@ -9,11 +9,11 @@ export const parseCurrencyToNumber = (
   if (value === null || value === undefined) return 0;
   if (typeof value === "number") return value;
   return (
-    Number(
+    parseFloat(
       value
         .replace(/[R$\s]/g, "")
         .replace(/\./g, "")
         .replace(",", ".")
-    ) || 0
+     ) || 0
   );
 };

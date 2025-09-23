@@ -116,24 +116,21 @@ export const useBankCards = () => {
     [user]
   );
 
-  const deleteBankCard = useCallback(
-    async (id: string) => {
-      if (!id) throw new Error("ID inválido");
-      try {
-        setIsLoading(true);
-        const refCard = doc(firestore, "cards", id);
-        await deleteDoc(refCard);
-        setBankCards((prev) => prev.filter((card) => card.id !== id));
-      } catch (e: unknown) {
-        console.error("Erro ao excluir cartão", e);
-        setError((e as Error).message ?? "Erro ao excluir cartão.");
-        throw e;
-      } finally {
-        setIsLoading(false);
-      }
-    },
-    [user]
-  );
+  const deleteBankCard = async (id: string) => {
+    if (!id) throw new Error("ID inválido");
+    try {
+      setIsLoading(true);
+      const refCard = doc(firestore, "cards", id);
+      await deleteDoc(refCard);
+      setBankCards((prev) => prev.filter((card) => card.id !== id));
+    } catch (e: unknown) {
+      console.error("Erro ao excluir cartão", e);
+      setError((e as Error).message ?? "Erro ao excluir cartão.");
+      throw e;
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   return {
     bankCards,

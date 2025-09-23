@@ -52,6 +52,7 @@
     "react-native-gifted-charts": "^1.4.64",
     "react-native-linear-gradient": "^2.8.3",
     "react-native-mask-input": "^1.2.3",
+    "react-native-modal": "^14.0.0-rc.1",
     "react-native-paper": "^5.14.5",
     "react-native-paper-dates": "^0.22.50",
     "react-native-picker-select": "^9.3.1",
