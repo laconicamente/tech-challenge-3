@@ -10,8 +10,9 @@ import { useFinancial } from '@/shared/contexts/financial/FinancialContext';
 import { BytebankButton } from '@/shared/ui/Button';
 import { Ionicons } from '@expo/vector-icons';
 import { Stack } from 'expo-router';
-import React, { useState } from 'react';
-import { FlatList, NativeScrollEvent, NativeSyntheticEvent, StyleSheet, Text, View } from 'react-native';
+import React, { useRef, useState } from 'react';
+import { Alert, FlatList, NativeScrollEvent, NativeSyntheticEvent, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { Swipeable } from 'react-native-gesture-handler';
 import Animated, {
   useAnimatedStyle,
   useSharedValue,
@@ -28,6 +29,14 @@ export default function TransactionsScreen() {
 
   const { transactions, isLoading, isLoadingMore, loadMore, setFilters, hasMore } = useFinancial();
   const [isFiltersVisible, setIsFiltersVisible] = useState(false);
+  const openSwipeableRef = useRef<Swipeable | null>(null);
+
+  const closeCurrentSwipe = () => {
+    if (openSwipeableRef.current) {
+      openSwipeableRef.current.close();
+      openSwipeableRef.current = null;
+    }
+  };
 
   const animatedBalanceResumeStyle = useAnimatedStyle(() => {
     return {
@@ -45,11 +54,9 @@ export default function TransactionsScreen() {
     };
   });
 
-  const renderItem = ({ item }: { item: TransactionItemProps }) => (
-    <TransactionItem transaction={item} />
-  );
 
   const handleScroll = (e: NativeSyntheticEvent<NativeScrollEvent>) => {
+    closeCurrentSwipe();
     const y = e.nativeEvent.contentOffset.y;
     const shouldShowHeader = y < 40;
 
@@ -63,6 +70,58 @@ export default function TransactionsScreen() {
   };
 
   const fetchMoreTransactions = async () => { loadMore?.(); }
+  const handleEdit = (t: TransactionItemProps) => {
+    Alert.alert('Editar', 'Função de edição ainda não implementada.');
+    // setEditingTransaction(t);
+    // setIsEditVisible(true);
+  };
+
+  const handleDelete = (t: TransactionItemProps) => {
+    Alert.alert('Excluir', 'Deseja excluir esta transação?', [
+      { text: 'Cancelar', style: 'cancel' },
+      {
+        text: 'Excluir',
+        style: 'destructive',
+        // onPress: () => deleteTransaction?.(t.id)
+      }
+    ]);
+  };
+
+  const renderRightActions = (item: TransactionItemProps) => (
+    <View style={{ flexDirection: 'row', height: '100%' }}>
+      <TouchableOpacity
+        onPress={() => handleEdit(item)}
+        style={{ backgroundColor: ColorsPalette.light['grey.200'], justifyContent: 'center', paddingHorizontal: 18 }}
+      >
+        <Text style={{ color: ColorsPalette.light['grey.900'], fontWeight: '600' }}>Editar</Text>
+      </TouchableOpacity>
+      <TouchableOpacity
+        onPress={() => handleDelete(item)}
+        style={{ backgroundColor: ColorsPalette.light['red.700'], justifyContent: 'center', paddingHorizontal: 18 }}
+      >
+        <Text style={{ color: '#FFF', fontWeight: '600' }}>Excluir</Text>
+      </TouchableOpacity>
+    </View>
+  );
+
+  const renderItem = ({ item }: { item: TransactionItemProps }) => {
+    let localRef: Swipeable | null = null;
+    return (<Swipeable ref={(ref) => { localRef = ref; }}
+      renderRightActions={() => renderRightActions(item)}
+      onSwipeableWillOpen={() => {
+        if (openSwipeableRef.current && openSwipeableRef.current !== localRef) {
+          openSwipeableRef.current.close();
+        }
+        openSwipeableRef.current = localRef;
+      }}
+      onSwipeableClose={() => {
+        if (openSwipeableRef.current === localRef) openSwipeableRef.current = null;
+      }}
+    >
+      <TransactionItem transaction={item} />
+    </Swipeable>
+    );
+  }
 
   const EmptyFeedback = () => (<View style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 20 }}>
     <NoDataSvg width={220} height={220} />
@@ -93,7 +152,7 @@ export default function TransactionsScreen() {
     <>
       <Stack.Screen
         options={{
-          header: () => <TransactionHeader showSearch={false} />,
+          header: () => <TransactionHeader />,
           headerShown: true,
         }}
       />

@@ -34,7 +34,7 @@ const lightPalette = {
     "black.main": "#000000",
     "white.main": "#ffffff",
     "red.200": "#ff5c5c",
-    "red.700": "#B00020",
+    "red.700": "#d02623",
   };
   
   const darkPalette = {

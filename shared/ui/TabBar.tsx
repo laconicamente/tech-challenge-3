@@ -1,5 +1,6 @@
 import { ColorsPalette } from '@/shared/classes/constants/Pallete';
 import { Feather } from '@expo/vector-icons';
+import { BlurView } from 'expo-blur';
 import { LinearGradient } from 'expo-linear-gradient';
 import { Href, useRouter, useSegments } from 'expo-router';
 import { useState } from 'react';
@@ -31,6 +32,7 @@ export const BytebankTabBar = () => {
   return (
     <View style={styles.wrapper}>
       <View style={[styles.tabContainer, { paddingBottom: insets.bottom }]}>
+      <BlurView intensity={30} tint="light" style={{...StyleSheet.flatten(StyleSheet.absoluteFill), borderRadius: 20, overflow: 'hidden'}} />
         {tabs.map((tab, index) => {
           const isFocused = tab.name === activeTab;
           if (tab.icon === 'plus') {
@@ -89,7 +91,8 @@ const styles = StyleSheet.create({
   },
   tabContainer: {
     flexDirection: 'row',
-    backgroundColor: '#FFFFFF',    
+    backgroundColor: 'rgba(255, 255, 255, 0.90)', 
+    backdropFilter: 'blur(20px)',
     borderTopWidth: 0,
     elevation: 12,
     shadowColor: '#000',
@@ -103,6 +106,7 @@ const styles = StyleSheet.create({
     marginHorizontal: 0,
     borderTopLeftRadius: 24,
     borderTopRightRadius: 24,
+    // overflow: 'hidden',
   },
   tabButton: {
     flex: 1,

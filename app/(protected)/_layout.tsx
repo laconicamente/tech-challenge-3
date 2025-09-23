@@ -2,6 +2,8 @@ import { useAuth } from '@/shared/contexts/auth/AuthContext';
 import { BytebankTabBar } from '@/shared/ui/TabBar';
 import { Tabs } from 'expo-router';
 import { Platform } from 'react-native';
+import 'react-native-gesture-handler';
+import { GestureHandlerRootView } from 'react-native-gesture-handler';
 
 export default function ProtectedLayout() {
     const { isAuthenticated } = useAuth();
@@ -9,6 +11,7 @@ export default function ProtectedLayout() {
     if (!isAuthenticated) return null;
 
     return (
+        <GestureHandlerRootView style={{ flex: 1 }}>
         <Tabs
             tabBar={() => <BytebankTabBar />}
             screenOptions={{
@@ -43,5 +46,6 @@ export default function ProtectedLayout() {
                 }}
             />
         </Tabs>
+        </GestureHandlerRootView>
     );
 }
