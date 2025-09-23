@@ -2,6 +2,7 @@ import { firestore } from "@/firebaseConfig";
 import { datePickerTheme } from "@/shared/classes/constants/Colors";
 import { ColorsPalette } from "@/shared/classes/constants/Pallete";
 import { useAuth } from "@/shared/contexts/auth/AuthContext";
+import { formatDate } from "@/shared/helpers/formatDate";
 import { router } from "expo-router";
 import { addDoc, collection } from "firebase/firestore";
 import React, { useRef, useState } from "react";
@@ -17,6 +18,7 @@ import {
     ScrollView,
     StyleSheet,
     Text,
+    TouchableOpacity,
     TouchableWithoutFeedback,
     View,
 } from "react-native";
@@ -105,7 +107,7 @@ const TransactionCreateDrawer: React.FC<TransactionCreateDrawerProps> = ({
         setIsLoading(true);
         try {
             const newTransaction = { ...data, value: parseCurrencyToNumber(data.value), userId: user.uid };
-            const docRef = await addDoc(
+            await addDoc(
                 collection(firestore, "transactions"),
                 newTransaction
             );
@@ -132,9 +134,14 @@ const TransactionCreateDrawer: React.FC<TransactionCreateDrawerProps> = ({
             setValue('createdAt', createdAt, { shouldDirty: true });
         }
     };
-    const formatDate = (d?: string) => d ? new Date(d).toLocaleDateString('pt-BR') : '';
+
     return (
         <Portal>
+            <TouchableOpacity
+                activeOpacity={1}
+                style={[styles.backdrop, { opacity: visible ? 1 : 0 }]}
+                onPress={onDismiss}
+            />
             <Modal
                 visible={visible}
                 onDismiss={onDismiss}
@@ -178,34 +185,34 @@ const TransactionCreateDrawer: React.FC<TransactionCreateDrawerProps> = ({
                                                         onOpen={() => setIsInteracting(true)}
                                                         onClose={() => setIsInteracting(false)} />
                                                     ) : (null)}
-                                                    <View style={{ marginVertical: 15 }}>
+                                                <View style={{ marginVertical: 15 }}>
 
-                                                <Text style={{ marginLeft: 10, marginBottom: 5 }}>Data da transação</Text>
-                                                <BytebankButton
-                                                    mode="outlined"
-                                                    color="primary"
-                                                    onPress={() => setIsDatePickerVisible(true)}
-                                                    styles={{ backgroundColor: ColorsPalette.light['lime.900'], padding: 5, borderRadius: 10 }}
-                                                    labelStyles={{ color: ColorsPalette.light['lime.50'], fontSize: 16 }}
-                                                >
-                                                    {watch('createdAt')
-                                                        ? `${formatDate(watch('createdAt'))}`
-                                                        : 'Adicionar data'}
-                                                </BytebankButton>
-                                                <PaperProvider theme={datePickerTheme}>
-                                                    <DatePickerModal
-                                                        locale="pt-BR"
-                                                        mode="single"
-                                                        visible={isDatePickerVisible}
-                                                        onDismiss={onDateDismiss}
-                                                        onConfirm={onDateConfirm}
-                                                        startDate={watch('createdAt') as unknown as CalendarDate}
-                                                        label="Selecione o período"
-                                                        startLabel="Data da transação"
-                                                        saveLabel="Selecionar"
-                                                    />
-                                                </PaperProvider>
-                                                    </View>
+                                                    <Text style={{ marginLeft: 10, marginBottom: 5 }}>Data da transação</Text>
+                                                    <BytebankButton
+                                                        mode="outlined"
+                                                        color="primary"
+                                                        onPress={() => setIsDatePickerVisible(true)}
+                                                        styles={{ backgroundColor: ColorsPalette.light['lime.900'], padding: 5, borderRadius: 10 }}
+                                                        labelStyles={{ color: ColorsPalette.light['lime.50'], fontSize: 16 }}
+                                                    >
+                                                        {watch('createdAt')
+                                                            ? `${formatDate(watch('createdAt'))}`
+                                                            : 'Adicionar data'}
+                                                    </BytebankButton>
+                                                    <PaperProvider theme={datePickerTheme}>
+                                                        <DatePickerModal
+                                                            locale="pt-BR"
+                                                            mode="single"
+                                                            visible={isDatePickerVisible}
+                                                            onDismiss={onDateDismiss}
+                                                            onConfirm={onDateConfirm}
+                                                            startDate={watch('createdAt') as unknown as CalendarDate}
+                                                            label="Selecione uma data"
+                                                            startLabel="Data da transação"
+                                                            saveLabel="Selecionar"
+                                                        />
+                                                    </PaperProvider>
+                                                </View>
                                                 <BytebankInputController
                                                     type='text'
                                                     name="value"
@@ -263,6 +270,10 @@ const TransactionCreateDrawer: React.FC<TransactionCreateDrawerProps> = ({
 };
 
 const styles = StyleSheet.create({
+    backdrop: {
+        ...StyleSheet.absoluteFillObject,
+        backgroundColor: 'rgba(0,0,0,0.35)',
+    },
     modalContainer: {
         justifyContent: "flex-end",
         position: "absolute",
