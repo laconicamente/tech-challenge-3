@@ -2,6 +2,7 @@ import { ColorsPalette } from '@/shared/classes/constants/Pallete';
 import { SkeletonAvatar } from '@/shared/ui/Skeleton/SkeletonAvatar';
 import { SkeletonText } from '@/shared/ui/Skeleton/SkeletonText';
 import { MaterialIcons } from '@expo/vector-icons';
+import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons';
 import React from 'react';
 import { ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { BankCardProps } from '../../classes/models/bank-card';
@@ -11,7 +12,7 @@ const BankCardDetails = ({ isLoading, card, onActionPress, onDelete }: { isLoadi
     
     if (isLoading) {
         return (
-            <View style={styles.container}>
+            <View style={{...styles.container, minHeight: 280}}>
                 {[...Array(4)].map((_, index) => <SkeletonText key={index} style={{ width: '100%', height: 20, marginBottom: 20 }} />)}
                 <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
                 {[...Array(3)].map((_, index) => <SkeletonAvatar key={index} style={{ width: 50, height: 50, marginBottom: 20 }} />)}
@@ -43,20 +44,20 @@ const BankCardDetails = ({ isLoading, card, onActionPress, onDelete }: { isLoadi
                 </View>
                 <View style={styles.actionButtonsContainer}>
                     <View style={styles.actionButtonWrapper}>
-                    <TouchableOpacity style={styles.actionButton} onPress={() => onActionPress(card.id ?? '', { blocked: true })}>
-                        <MaterialIcons name="lock" size={20} color={ColorsPalette.light['lime.100']} />
+                    <TouchableOpacity style={styles.actionButton} onPress={() => onActionPress(card.id ?? '', { blocked: !card.blocked })}>
+                        <MaterialIcons name={card.blocked ? "lock-open" : "lock"} size={20} color={ColorsPalette.light['lime.100']} />
                     </TouchableOpacity>
-                        <Text style={styles.actionButtonText}>Bloquear cartão</Text>
+                        <Text style={styles.actionButtonText}>{card.blocked ? 'Desbloquear cartão' : 'Bloquear cartão'}</Text>
                     </View>
                     <View style={styles.actionButtonWrapper}>
-                    <TouchableOpacity style={styles.actionButton} onPress={() => onActionPress(card.id ?? '', { principal: true })}>
+                    <TouchableOpacity style={styles.actionButton} onPress={() => onActionPress(card.id ?? '', { principal: !card.principal })}>
                     <MaterialIcons name={"credit-card"} size={20} color={ColorsPalette.light['lime.100']} />
                     </TouchableOpacity>
-                        <Text style={styles.actionButtonText}>Marcar como principal</Text>
+                        <Text style={styles.actionButtonText}>{card.principal ? 'Desmarcar como principal' : 'Marcar como principal'}</Text>
                     </View>
                     <View style={styles.actionButtonWrapper}>
                     <TouchableOpacity style={styles.actionDeleteButton} onPress={() => onDelete(card.id)}>
-                    <MaterialIcons name={"credit-card"} size={20} color={ColorsPalette.light['lime.800']} />
+                    <MaterialCommunityIcons name="card-remove-outline" size={20} color={ColorsPalette.light['lime.800']} />
                     </TouchableOpacity>
                         <Text style={styles.deleteButtonText}>Excluir cartão</Text>
                     </View>
