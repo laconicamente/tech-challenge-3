@@ -1,9 +1,8 @@
+import { cardMask, currencyMask, cvvMask, dateMask, expiryMask, InputMask } from "@/shared/helpers/formatInputMask";
 import React, { useId } from "react";
 import { KeyboardTypeOptions, StyleSheet, Text, View } from "react-native";
-import MaskInput, { Masks } from 'react-native-mask-input';
+import MaskInput from 'react-native-mask-input';
 import { TextInput, TextInputProps, useTheme } from "react-native-paper";
-
-export type InputMask = "currency" | "date";
 
 export type BytebankInputProps = {
     label: string;
@@ -23,10 +22,6 @@ export type BytebankInputProps = {
     maskType?: InputMask;
     onChangeText?: (masked: string, unmasked: string) => void;
 } & TextInputProps;
-
-const currencyMask = Masks.BRL_CURRENCY;
-
-const dateMask = Masks.DATE_DDMMYYYY;
 
 
 export function BytebankInput({
@@ -61,8 +56,16 @@ export function BytebankInput({
     };
 
     if (maskType) {
-        let mask = maskType === 'currency' ? currencyMask : dateMask;
-        let keyboardType: KeyboardTypeOptions = (maskType === 'currency' || maskType === 'date') ? 'numeric' : 'default';
+        let mask: any[] | ((value?: string) => any[]);
+        switch (maskType) {
+            case 'currency': mask = currencyMask; break;
+            case 'date': mask = dateMask; break;
+            case 'card': mask = cardMask; break;
+            case 'expiry': mask = expiryMask; break;
+            case 'cvv': mask = cvvMask; break;
+            default: mask = [];
+        }
+        const keyboardType: KeyboardTypeOptions = 'numeric';
 
         return (
             <View className="bytebank-input">
@@ -73,7 +76,9 @@ export function BytebankInput({
                     mask={mask}
                     placeholder={placeholder}
                     keyboardType={keyboardType}
+                    maxLength={props.maxLength}
                     style={[maskInputStyle, props?.editable === false ? { backgroundColor: '#e0e0e0', opacity: 0.3 } : {}]}
+                    {...props}
                 />
             </View>
         );

@@ -1,5 +1,5 @@
 import { firestore } from '@/firebaseConfig';
-import { BankCardProps, CardFlag } from '@/shared/classes/models/bank-card';
+import { BankCardFlag, BankCardProps } from '@/shared/classes/models/bank-card';
 import { useAuth } from '@/shared/contexts/auth/AuthContext';
 import { useFeedbackAnimation } from '@/shared/hooks/useFeedbackAnimation';
 import { BytebankDrawer } from '@/shared/ui/Drawer';
@@ -34,7 +34,7 @@ export const BankCardCreateDrawer = ({
             type: types[0],
             blocked: false,
             principal: false,
-            flag: CardFlag.Visa
+            flag: BankCardFlag.Visa
         },
     });
     const { showFeedback, FeedbackAnimation } = useFeedbackAnimation();
@@ -52,7 +52,7 @@ export const BankCardCreateDrawer = ({
             type: types[0],
             blocked: false,
             principal: false,
-            flag: CardFlag.Visa
+            flag: BankCardFlag.Visa
         });
         onDismiss();
     };
@@ -100,24 +100,33 @@ export const BankCardCreateDrawer = ({
                     <View>
                         <BytebankInputController
                             label="Número do cartão"
-                            placeholder="XXXX-XXXX-XXXX-XXXX"
+                            placeholder="XXXX XXXX XXXX XXXX"
                             name="number"
+                            keyboardType='number-pad'
+                            maskType='card'
+                            maxLength={19}
                         />
                     </View>
-                    <View style={styles.amountContainer}>
-                        <View style={styles.amount}>
+                    <View style={styles.inputContainer}>
+                        <View style={styles.input}>
                             <BytebankInputController
                                 label="Expira em"
                                 placeholder="MM/AA"
-                                maskType='date'
                                 name="expiredAt"
+                                keyboardType='number-pad'
+                                maxLength={5}
+                                maskType='expiry'
                             />
                         </View>
-                        <View style={styles.amount}>
+                        <View style={styles.input}>
                             <BytebankInputController
                                 label="CVV"
                                 placeholder="Digite o CVV"
                                 name="cvv"
+                                keyboardType='number-pad'
+                                maskType='cvv'
+                                maxLength={4}
+                                secureTextEntry
                             />
                         </View>
                     </View>
@@ -134,11 +143,11 @@ const styles = StyleSheet.create({
     sectionInput: {
         marginTop: 16
     },
-    amountContainer: {
+    inputContainer: {
         flexDirection: 'row',
         gap: 16,
     },
-    amount: {
+    input: {
         flex: 1,
     },
 });

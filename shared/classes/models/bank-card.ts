@@ -4,7 +4,7 @@ export interface BankCardProps {
   color?: string;
   name: string;
   cvv: number;
-  flag: CardFlag;
+  flag: BankCardFlag;
   expiredAt: string;
   userId?: string;
   blocked?: boolean;
@@ -13,7 +13,7 @@ export interface BankCardProps {
 
 export type BankCardType = "Platinum" | "Gold" | "Black" | "Standard";
 
-export enum CardFlag {
+export enum BankCardFlag {
   Visa = "Visa",
   MasterCard = "MasterCard",
   Elo = "Elo",
