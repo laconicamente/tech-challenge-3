@@ -1,62 +1,60 @@
+import NoCardSvg from '@/assets/images/no-cards.svg';
 import { ColorsPalette } from '@/shared/classes/constants/Pallete';
+import { BankCardProps } from '@/shared/classes/models/bank-card';
 import { BankCardCreateDrawer } from '@/shared/components/BankCard/BankCardCreateDrawer';
 import BankCardDetails from '@/shared/components/BankCard/BankCardDetails';
 import BankCardItem from '@/shared/components/BankCard/BankCardItem';
 import TransactionHeader from '@/shared/components/Transaction/TransactionHeader';
+import { useBankCards } from '@/shared/hooks/useBankCards';
+import { SkeletonCard } from '@/shared/ui/Skeleton/SkeletonCard';
 import { Stack } from 'expo-router';
 import React, { useCallback, useState } from 'react';
-import { Dimensions, FlatList, StyleSheet, View } from 'react-native';
+import { Dimensions, FlatList, StyleSheet, Text, View, ViewToken } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 const { width } = Dimensions.get('window');
 
-const cardsData = [
-  {
-    id: '1',
-    number: '3098',
-    name: 'Simon StClaire',
-    expiredAt: '12/26',
-    type: 'Platinum',
-    cvv: '321',
-  },
-  {
-    id: '2',
-    number: '4567',
-    name: 'Maria Gomes',
-    expiredAt: '05/25',
-    balance: '$50,000.00',
-    type: 'Black',
-    cvv: '123',
-  },
-  {
-    id: '3',
-    number: '3098',
-    name: 'Simon StClaire',
-    expiredAt: '12/26',
-    type: 'Gold',
-    cvv: '321',
-  },
-];
-
 const CardsScreen = () => {
   const [activeCardIndex, setActiveCardIndex] = useState(0);
   const [visible, setVisible] = useState(false);
+  const { bankCards, isLoading, updateBankCard, deleteBankCard, refetch } = useBankCards();
 
-  const onViewableItemsChanged = useCallback(({ viewableItems }) => {
+  const onViewableItemsChanged = useCallback(({ viewableItems }: { viewableItems: Array<ViewToken<BankCardProps>> }) => {
     if (viewableItems.length > 0) {
-      setActiveCardIndex(viewableItems[0].index);
+      setActiveCardIndex(viewableItems[0].index ?? 0);
     }
-  }, []);
+  }, [bankCards]);
 
   const viewabilityConfig = {
     itemVisiblePercentThreshold: 50,
   };
 
-  const renderCardItem = ({ item }) => (
+  const renderCardItem = ({ item }: { item: BankCardProps }) => (
     <View style={styles.cardWrapper}>
       <BankCardItem card={item} />
     </View>
   );
+
+  const EmptyFeedback = () => (<View style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 20 }}>
+    <NoCardSvg width={220} height={220} />
+    <Text style={{ textAlign: 'center', fontSize: 16, color: '#666', marginTop: 10 }}>
+      Não encontramos nenhum cartão, que tal criar um novo?
+    </Text>
+  </View>
+  );
+
+  const BankCardSkeleton = () => (
+    <View style={styles.cardWrapper}>
+      <SkeletonCard style={styles.cardSkeleton} />
+    </View>
+  );
+
+  const handleActionCard = (id: string, data: Partial<BankCardProps>) => {
+    updateBankCard(id, data);
+  };
+  const handleDeleteCard = (id: string) => {
+    deleteBankCard(id);
+  }
 
   return (
     <>
@@ -66,33 +64,37 @@ const CardsScreen = () => {
           headerShown: true,
         }}
       />
-    <SafeAreaView style={styles.container} edges={['left','right', 'bottom']}>
-      <FlatList
-        data={cardsData}
-        renderItem={renderCardItem}
-        keyExtractor={(item) => item.id}
-        horizontal
-        showsHorizontalScrollIndicator={false}
-        pagingEnabled
-        onViewableItemsChanged={onViewableItemsChanged}
-        viewabilityConfig={viewabilityConfig}
-        style={styles.cardList}
-      />
-      
-      <View style={styles.pagination}>
-        {cardsData.map((_, index) => (
-          <View
-            key={index}
-            style={[
-              styles.dot,
-              activeCardIndex === index ? styles.activeDot : null,
-            ]}
-          />
-        ))}
-      </View>
-      <BankCardDetails card={cardsData[activeCardIndex]} />
-      <BankCardCreateDrawer visible={visible} onDismiss={() => setVisible(false)} />
-    </SafeAreaView>
+      <SafeAreaView style={styles.container} edges={['left', 'right', 'bottom']}>
+        <FlatList
+          data={bankCards}
+          renderItem={renderCardItem}
+          keyExtractor={(item) => item.id ?? item.name}
+          horizontal
+          showsHorizontalScrollIndicator={false}
+          pagingEnabled
+          onViewableItemsChanged={onViewableItemsChanged}
+          viewabilityConfig={viewabilityConfig}
+          ListEmptyComponent={isLoading ? <BankCardSkeleton /> : <EmptyFeedback />}
+          style={styles.cardList}
+        />
+
+        <View style={styles.pagination}>
+          {bankCards.map((_, index) => (
+            <View
+              key={index}
+              style={[
+                styles.dot,
+                activeCardIndex === index ? styles.activeDot : null,
+              ]}
+            />
+          ))}
+        </View>
+        <BankCardDetails isLoading={isLoading} card={bankCards[activeCardIndex]} onActionPress={handleActionCard} onDelete={handleDeleteCard} />
+        <BankCardCreateDrawer visible={visible} onDismiss={(hasUpdated) => {
+          setVisible(false);
+          if (hasUpdated) refetch();
+        }} />
+      </SafeAreaView>
     </>
   );
 };
@@ -110,6 +112,13 @@ const styles = StyleSheet.create({
     width: width,
     alignItems: 'center',
     justifyContent: 'center',
+  },
+  cardSkeleton: {
+    width: '90%',
+    height: 200,
+    marginVertical: 20,
+    borderRadius: 20,
+    backgroundColor: ColorsPalette.light['grey.400'],
   },
   pagination: {
     flexDirection: 'row',

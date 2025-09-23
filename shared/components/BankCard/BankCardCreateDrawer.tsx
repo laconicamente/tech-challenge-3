@@ -6,7 +6,7 @@ import { BytebankDrawer } from '@/shared/ui/Drawer';
 import { BytebankInputController } from '@/shared/ui/Input/InputController';
 import { BytebankSelectController } from '@/shared/ui/Select/SelectController';
 import { SkeletonText } from '@/shared/ui/Skeleton/SkeletonText';
-import { addDoc, collection } from 'firebase/firestore';
+import { addDoc, collection, serverTimestamp } from 'firebase/firestore';
 import React, { useState } from 'react';
 import { FormProvider, useForm } from 'react-hook-form';
 import { StyleSheet, View } from 'react-native';
@@ -14,7 +14,7 @@ import { Portal } from 'react-native-paper';
 
 interface BankCardCreateDrawerProps {
     visible: boolean;
-    onDismiss: () => void;
+    onDismiss: (value?: boolean) => void;
 }
 
 export const BankCardCreateDrawer = ({
@@ -54,19 +54,17 @@ export const BankCardCreateDrawer = ({
             principal: false,
             flag: BankCardFlag.Visa
         });
-        onDismiss();
+        onDismiss(false);
     };
 
     const handleCreateCard = async (data: BankCardProps) => {
-        const cardData: BankCardProps = { ...data };
+        const cardData: BankCardProps = { ...data, createdAt: serverTimestamp(), };
         setIsLoading(true);
         try {
-            await addDoc(
-                collection(firestore, "cards"),
-                cardData
-            );
+            await addDoc( collection(firestore, "cards"), cardData);
+
             showFeedback("success");
-            onDismiss();
+            onDismiss(true);
         } catch (error) {
             console.error("Erro ao adicionar cartão: ", error);
             showFeedback("error");
@@ -83,10 +81,11 @@ export const BankCardCreateDrawer = ({
                     <View style={styles.sectionInput}>
                         {types.length > 0 ?
                             (<BytebankSelectController
-                                name={"methodId"}
+                                name={"type"}
                                 label="Selecione o tipo do cartão"
                                 items={types.map(type => ({ label: type, value: type }))}
                                 placeholder="Selecione o tipo do cartão"
+                                rules={{ required: "Tipo do cartão é obrigatório" }}
                             />
                             ) : (<SkeletonText style={{ height: 30 }} />)}
                     </View>
@@ -95,6 +94,7 @@ export const BankCardCreateDrawer = ({
                             label="Apelido do cartão"
                             placeholder="Digite o apelido do cartão"
                             name="name"
+                            rules={{ required: "Apelido do cartão é obrigatório" }}
                         />
                     </View>
                     <View>
@@ -105,6 +105,7 @@ export const BankCardCreateDrawer = ({
                             keyboardType='number-pad'
                             maskType='card'
                             maxLength={19}
+                            rules={{ required: "Número do cartão é obrigatório" }}
                         />
                     </View>
                     <View style={styles.inputContainer}>
@@ -116,6 +117,7 @@ export const BankCardCreateDrawer = ({
                                 keyboardType='number-pad'
                                 maxLength={5}
                                 maskType='expiry'
+                                rules={{ required: "Data de expiração é obrigatório" }}
                             />
                         </View>
                         <View style={styles.input}>
@@ -127,6 +129,7 @@ export const BankCardCreateDrawer = ({
                                 maskType='cvv'
                                 maxLength={4}
                                 secureTextEntry
+                                rules={{ required: "CVV é obrigatório" }}
                             />
                         </View>
                     </View>

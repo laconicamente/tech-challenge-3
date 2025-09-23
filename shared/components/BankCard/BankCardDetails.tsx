@@ -1,11 +1,25 @@
 import { ColorsPalette } from '@/shared/classes/constants/Pallete';
+import { SkeletonAvatar } from '@/shared/ui/Skeleton/SkeletonAvatar';
+import { SkeletonText } from '@/shared/ui/Skeleton/SkeletonText';
 import { MaterialIcons } from '@expo/vector-icons';
 import React from 'react';
 import { ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { BankCardProps } from '../../classes/models/bank-card';
 import { maskCardNumber } from '../../helpers/maskCardNumber';
 
-const BankCardDetails = ({ card }: { card: Partial<BankCardProps> }) => {
+const BankCardDetails = ({ isLoading, card, onActionPress, onDelete }: { isLoading: boolean, card: Partial<BankCardProps>, onDelete: (id: string) => void, onActionPress: (id: string, data: Partial<BankCardProps>) => void }) => {
+    
+    if (isLoading) {
+        return (
+            <View style={styles.container}>
+                {[...Array(4)].map((_, index) => <SkeletonText key={index} style={{ width: '100%', height: 20, marginBottom: 20 }} />)}
+                <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
+                {[...Array(3)].map((_, index) => <SkeletonAvatar key={index} style={{ width: 50, height: 50, marginBottom: 20 }} />)}
+                </View>
+            </View>
+        );
+    }
+    
     if (!card) return null;
 
     const cardDetailsList = [
@@ -29,19 +43,19 @@ const BankCardDetails = ({ card }: { card: Partial<BankCardProps> }) => {
                 </View>
                 <View style={styles.actionButtonsContainer}>
                     <View style={styles.actionButtonWrapper}>
-                    <TouchableOpacity style={styles.actionButton}>
+                    <TouchableOpacity style={styles.actionButton} onPress={() => onActionPress(card.id ?? '', { blocked: true })}>
                         <MaterialIcons name="lock" size={20} color={ColorsPalette.light['lime.100']} />
                     </TouchableOpacity>
                         <Text style={styles.actionButtonText}>Bloquear cartão</Text>
                     </View>
                     <View style={styles.actionButtonWrapper}>
-                    <TouchableOpacity style={styles.actionButton}>
+                    <TouchableOpacity style={styles.actionButton} onPress={() => onActionPress(card.id ?? '', { principal: true })}>
                     <MaterialIcons name={"credit-card"} size={20} color={ColorsPalette.light['lime.100']} />
                     </TouchableOpacity>
                         <Text style={styles.actionButtonText}>Marcar como principal</Text>
                     </View>
                     <View style={styles.actionButtonWrapper}>
-                    <TouchableOpacity style={styles.actionDeleteButton}>
+                    <TouchableOpacity style={styles.actionDeleteButton} onPress={() => onDelete(card.id)}>
                     <MaterialIcons name={"credit-card"} size={20} color={ColorsPalette.light['lime.800']} />
                     </TouchableOpacity>
                         <Text style={styles.deleteButtonText}>Excluir cartão</Text>

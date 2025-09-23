@@ -3,20 +3,20 @@ import {
     DocumentData,
     FirestoreError,
     QueryDocumentSnapshot,
-    Timestamp,
     collection,
     getDocs,
     limit,
     orderBy,
     query,
     startAfter,
-    where,
+    where
 } from "firebase/firestore";
 import { useCallback, useEffect, useRef, useState } from "react";
 import {
     TransactionFilter,
     TransactionItemProps,
 } from "../classes/models/transaction";
+import { formatDate, formatDateISO, toDateFromFirestore } from "../helpers/formatDate";
 import { useCategories } from "./useCategories";
 import { useMethods } from "./useMethods";
 
@@ -32,30 +32,6 @@ interface TransactionsResponse {
   refetch: () => Promise<void>;
 }
 
-const toDateFromFirestore = (raw: any): Date | null => {
-    if (!raw) return null;
-    // Firestore Timestamp instance
-    if (raw instanceof Timestamp) return raw.toDate();
-    // Serialized plain object { seconds, nanoseconds }
-    if (
-      typeof raw === 'object' &&
-      typeof raw.seconds === 'number' &&
-      typeof raw.nanoseconds === 'number'
-    ) {
-      return new Date(raw.seconds * 1000 + Math.floor(raw.nanoseconds / 1_000_000));
-    }
-    // ISO/string fallback
-    if (typeof raw === 'string') {
-      const d = new Date(raw);
-      return isNaN(d.getTime()) ? null : d;
-    }
-    return null;
-  };
-  
-  const formatDateISO = (d: Date | null) => (d ? d.toISOString() : '');
-  const formatDate = (d: Date | null) =>
-    d ? new Date(d).toLocaleDateString('pt-BR') : '';
-  
   function parseDateString(input?: string): Date | undefined {
     if (!input) return undefined;
     if (/^\d{2}\/\d{2}\/\d{4}$/.test(input)) {

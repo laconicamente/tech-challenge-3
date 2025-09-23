@@ -1,4 +1,7 @@
+import { FieldValue } from "firebase/firestore";
+
 export interface BankCardProps {
+  id?: string,
   number: string;
   type: BankCardType;
   color?: string;
@@ -9,6 +12,7 @@ export interface BankCardProps {
   userId?: string;
   blocked?: boolean;
   principal?: boolean;
+  createdAt: FieldValue | string;
 }
 
 export type BankCardType = "Platinum" | "Gold" | "Black" | "Standard";
