@@ -5,7 +5,7 @@ import { useColorScheme } from '@/shared/hooks/useColorScheme';
 import '@/shared/i18n/datePickerLocale';
 import { useFonts } from 'expo-font';
 import { SplashScreen, Stack } from 'expo-router';
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { PaperProvider } from 'react-native-paper';
 import 'react-native-reanimated';
 
@@ -16,20 +16,22 @@ export default function RootLayout() {
   const [loaded] = useFonts({
     SpaceMono: require('../assets/fonts/SpaceMono-Regular.ttf'),
   });
+  const [ready, setReady] = useState(false);
 
   useEffect(() => {
     if (loaded) {
-      SplashScreen.hideAsync();
-      // Redireciona para a página de login
-      // router.replace('/login'); // Rota baseada na estrutura de arquivos
+      setReady(true);
     }
   }, [loaded]);
 
-  if (!loaded) {
-    // Async font loading only occurs in development.
-    return null;
-  }
+  useEffect(() => {
+    if (ready) {
+      SplashScreen.hideAsync().catch(()=>{});
+    }
+  }, [ready]);
 
+  if (!ready) return null;
+  
   return (
     <AuthProvider>
       <FinancialProvider>

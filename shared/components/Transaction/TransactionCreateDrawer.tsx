@@ -3,18 +3,15 @@ import { ColorsPalette } from "@/shared/classes/constants/Pallete";
 import { useAuth } from "@/shared/contexts/auth/AuthContext";
 import { formatDate, toDateFromFirestore } from "@/shared/helpers/formatDate";
 import { router } from "expo-router";
-import React, { useEffect, useRef, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Controller, FormProvider, useForm } from "react-hook-form";
 import {
     ActivityIndicator,
     Alert,
-    Animated,
     Dimensions,
-    Keyboard,
     ScrollView,
     StyleSheet,
     Text,
-    TouchableWithoutFeedback,
     View
 } from "react-native";
 import Modal from 'react-native-modal';
@@ -24,8 +21,6 @@ import { CalendarDate } from "react-native-paper-dates/lib/typescript/Date/Calen
 import { TransactionItemProps, TransactionType } from "../../classes/models/transaction";
 import { useFinancial } from "../../contexts/financial/FinancialContext";
 import { parseCurrencyToNumber } from "../../helpers/formatCurrency";
-import { useBottomSheetAnimation } from "../../hooks/useBottomSheetAnimation";
-import { useBottomSheetHandler } from "../../hooks/useBottomSheetHandler";
 import { useCategories } from "../../hooks/useCategories";
 import { useFeedbackAnimation } from "../../hooks/useFeedbackAnimation";
 import { useMethods } from "../../hooks/useMethods";
@@ -56,7 +51,6 @@ const TransactionCreateDrawer: React.FC<TransactionCreateDrawerProps> = ({
     const { categories } = useCategories(transactionType);
     const { methods } = useMethods(transactionType);
     const [isLoading, setIsLoading] = useState(false);
-    const [isInteracting, setIsInteracting] = useState(false);
 
     const formMethods = useForm({
         mode: "onChange",
@@ -64,7 +58,7 @@ const TransactionCreateDrawer: React.FC<TransactionCreateDrawerProps> = ({
             methodId: transaction?.methodId || "",
             categoryId: transaction?.categoryId || "",
             createdAt: transaction?.createdAt || "",
-            value: transaction?.value || "",
+            value: transaction?.value || null,
             type: transactionType,
             fileUrl: "",
         },
@@ -79,7 +73,7 @@ const TransactionCreateDrawer: React.FC<TransactionCreateDrawerProps> = ({
                 methodId: transaction.methodId || "",
                 categoryId: transaction.categoryId || "",
                 createdAt: transaction.createdAt ? toDateFromFirestore(transaction.createdAt) : "",
-                value: transaction.value ? String(Number(transaction.value)) : "",
+                value: transaction.value ? String(Number(transaction.value)) : null,
                 type: transaction.type,
                 fileUrl: transaction.fileUrl || "",
             });
@@ -88,7 +82,7 @@ const TransactionCreateDrawer: React.FC<TransactionCreateDrawerProps> = ({
                 methodId: "",
                 categoryId: "",
                 createdAt: "",
-                value: "",
+                value: null,
                 type: "income",
                 fileUrl: "",
             });
@@ -96,12 +90,6 @@ const TransactionCreateDrawer: React.FC<TransactionCreateDrawerProps> = ({
             setTitle("Nova transação");
         }
     }, [transaction, reset]);
-
-    const pan = useRef(new Animated.ValueXY()).current;
-    const gestureHandler = useBottomSheetHandler(pan, onDismiss);
-
-    const slideAnim = useRef(new Animated.Value(height)).current;
-    useBottomSheetAnimation(visible, slideAnim, pan);
 
     const resetSettings = (type: TransactionType = 'income') => {
         reset({
@@ -175,8 +163,10 @@ const TransactionCreateDrawer: React.FC<TransactionCreateDrawerProps> = ({
                 animationInTiming={300}
                 animationOutTiming={300}
                 avoidKeyboard={true}
+                swipeDirection="down"
+                onSwipeComplete={onDismiss}
+                propagateSwipe={true}
             >
-                <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
                     <View style={styles.card}>
                         <View style={styles.dragHandle} />
                         <View style={styles.header}>
@@ -202,8 +192,7 @@ const TransactionCreateDrawer: React.FC<TransactionCreateDrawerProps> = ({
                                             label="Selecione o tipo da transação"
                                             items={methods.map(c => ({ label: c.name, value: c.id }))}
                                             placeholder="Selecione o tipo da transação"
-                                            onOpen={() => setIsInteracting(true)}
-                                            onClose={() => setIsInteracting(false)} />
+                                            />
                                         ) : (null)}
                                     <View style={{ marginVertical: 15 }}>
 
@@ -241,7 +230,6 @@ const TransactionCreateDrawer: React.FC<TransactionCreateDrawerProps> = ({
                                         maskType="currency"
                                         rules={{ required: "Valor obrigatório" }}
                                         keyboardType="number-pad"
-                                        onPress={() => setIsInteracting(true)}
                                     />
                                     {categories && categories.length > 0 && (
                                         <BytebankSelectController
@@ -249,8 +237,6 @@ const TransactionCreateDrawer: React.FC<TransactionCreateDrawerProps> = ({
                                             label="Selecione uma categoria"
                                             items={categories.map(c => ({ label: c.name, value: c.id }))}
                                             placeholder="Selecione uma categoria"
-                                            onOpen={() => setIsInteracting(true)}
-                                            onClose={() => setIsInteracting(false)}
                                         />
                                     )}
                                     <View style={{ marginBottom: 10 }}>
@@ -280,7 +266,6 @@ const TransactionCreateDrawer: React.FC<TransactionCreateDrawerProps> = ({
                             </BytebankButton>
                         </View>
                     </View>
-                </TouchableWithoutFeedback>
             </Modal>
             <FeedbackAnimation />
         </Portal>
