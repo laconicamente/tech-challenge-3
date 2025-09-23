@@ -1,24 +1,6 @@
-import { firestore } from "@/firebaseConfig";
-import {
-  collection,
-  getDocs,
-  query,
-  QueryFieldFilterConstraint,
-  where,
-} from "firebase/firestore";
 import { useCallback, useEffect, useState } from "react";
+import { BalanceValueFilters, fetchBalanceValue } from "../services/balanceService";
 
-export interface BalanceValueFilters {
-  userId?: string;
-  startDate?: string;
-  endDate?: string;
-  categoryId?: string;
-}
-
-/**
- * Hook para calcular o total de valores de transações do tipo "income" com base em filtros.
- * Reexecuta sempre que filtros mudarem.
- */
 export function useBalanceValue(filters: BalanceValueFilters) {
   const { userId, startDate, endDate, categoryId } = filters || {};
   const [total, setTotal] = useState(0);
@@ -33,28 +15,11 @@ export function useBalanceValue(filters: BalanceValueFilters) {
     setIsLoadingBalance(true);
     setErrorTotal(null);
     try {
-      const constraints: QueryFieldFilterConstraint[] = [
-        where("userId", "==", userId),
-      ];
-
-      const qRef = query(collection(firestore, "transactions"), ...constraints);
-      const snap = await getDocs(qRef);
-
-      let incomeSum = 0;
-      let expenseSum = 0;
-
-      snap.docs.forEach((d) => {
-        const data = d.data();
-        const value = Number(data.value) || 0;
-        if (data.type === "income") incomeSum += value;
-        else if (data.type === "expense") expenseSum += value;
-      });
-
-      const totalValue = incomeSum - expenseSum;
+      const totalValue = await fetchBalanceValue(filters);
       setTotal(totalValue);
     } catch (e: any) {
       setErrorTotal(
-        e.message ?? "Erro desconhecido ao calcular o saldo total."
+        e.message ?? "Ocorreu um erro ao calcular o saldo total, tente novamente por favor."
       );
       setTotal(0);
     } finally {

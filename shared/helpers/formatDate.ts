@@ -1,5 +1,16 @@
 import { Timestamp } from "firebase/firestore";
 
+export const parseDateString = (input?: string): Date | undefined => {
+  if (!input) return undefined;
+  if (/^\d{2}\/\d{2}\/\d{4}$/.test(input)) {
+    const [d, m, y] = input.split("/").map(Number);
+    const dt = new Date(y, (m ?? 1) - 1, d);
+    return isNaN(dt.getTime()) ? undefined : dt;
+  }
+  const dt = new Date(input);
+  return isNaN(dt.getTime()) ? undefined : dt;
+}
+
 export const toDateFromFirestore = (raw: any): Date | null => {
   if (!raw) return null;
   if (raw instanceof Timestamp) return raw.toDate();

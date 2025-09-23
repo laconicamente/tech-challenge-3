@@ -23,10 +23,11 @@ import {
 import {
     formatDate,
     formatDateISO,
+    parseDateString,
     toDateFromFirestore,
 } from "../helpers/formatDate";
-import { useCategories } from "./useCategories";
-import { useMethods } from "./useMethods";
+import { getCategoryById } from "../services/categoryService";
+import { getMethodById } from "../services/methodService";
 
 export interface TransactionsResponse {
   transactions: TransactionItemProps[];
@@ -46,17 +47,6 @@ export interface TransactionsResponse {
   ) => Promise<void>;
 }
 
-function parseDateString(input?: string): Date | undefined {
-  if (!input) return undefined;
-  if (/^\d{2}\/\d{2}\/\d{4}$/.test(input)) {
-    const [d, m, y] = input.split("/").map(Number);
-    const dt = new Date(y, (m ?? 1) - 1, d);
-    return isNaN(dt.getTime()) ? undefined : dt;
-  }
-  const dt = new Date(input);
-  return isNaN(dt.getTime()) ? undefined : dt;
-}
-
 export function useTransactions(
   initial: TransactionFilter = {},
   pageSize: number = 10
@@ -70,8 +60,6 @@ export function useTransactions(
     null
   );
   const [isLoadingMore, setIsLoadingMore] = useState(false);
-  const { getCategoryById } = useCategories();
-  const { getMethodById } = useMethods();
   const { userId, categoryId, startDate, endDate } = filters;
 
   const mapDoc = async (
@@ -79,7 +67,7 @@ export function useTransactions(
   ): Promise<TransactionItemProps> => {
     const data = doc.data();
     const formattedCreatedAt = toDateFromFirestore(data.createdAt);
-
+    
     const category = await getCategoryById(data.categoryId);
     const method = await getMethodById(data.methodId);
 
