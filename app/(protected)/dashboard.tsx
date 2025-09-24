@@ -1,9 +1,10 @@
 import { ColorsPalette } from '@/shared/classes/constants/Pallete';
 import { AppHeader } from '@/shared/components/AppHeader';
 import { CardBalance } from '@/shared/components/Balance/CardBalance';
-import CategoryList from '@/shared/components/Category/CategoryList';
 import CardAnalytics from '@/shared/components/Widget/CardAnalysis';
 import FinancialResume from '@/shared/components/Widget/FinancialResume';
+import WidgetFinancialStatus from '@/shared/components/Widget/WidgetFinancialStatus';
+import WidgetSpendingByCategory from '@/shared/components/Widget/WidgetSpending/WidgetSpendingByCategory';
 import { useAuth } from '@/shared/contexts/auth/AuthContext';
 import { Stack } from 'expo-router';
 import React from 'react';
@@ -52,11 +53,10 @@ export default function DashboardScreen() {
         >
           <View style={styles.content}>
             <CardBalance />
+            <WidgetFinancialStatus />
+            <WidgetSpendingByCategory />
             <FinancialResume />
             <CardAnalytics />
-            <View style={{ minHeight: 220 }}>
-              <CategoryList />
-            </View>
           </View>
         </ScrollView>
       </Animated.View>

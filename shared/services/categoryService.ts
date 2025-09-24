@@ -36,6 +36,7 @@ export const getCategoryById = async (categoryId: string) => {
   if (categoryId) {
     const ref = doc(firestore, "categories", categoryId);
     const snap = await getDoc(ref);
+    
     if (snap.exists()) {
       return adapter(snap);
     } else {

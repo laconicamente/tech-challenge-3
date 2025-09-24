@@ -1,16 +1,17 @@
+import { formatCurrency } from '@/shared/helpers/formatCurrency';
 import React from 'react';
 import { StyleSheet, Text, View } from 'react-native';
 
-interface CategoryProps {
+interface WidgetCategoryProps {
   value: number;
   name: string;
   color?: string;
 }
 
-const CategoryItem = ({ data, style = {}, ref }: { data: CategoryProps; style?: object; ref?: React.Ref<any> }) => {
+const SpendingCategoryItem = ({ data, style = {}, ref }: { data: WidgetCategoryProps; style?: object; ref?: React.Ref<any> }) => {
   return (
     <View ref={ref} style={[styles.card, { backgroundColor: data.color }, style]}>
-      <Text style={styles.value}>{data.value}</Text>
+      <Text style={styles.value}>{formatCurrency(data.value)}</Text>
       <View style={styles.detailsContainer}>
         <Text style={styles.name}>{data.name}</Text>
       </View>
@@ -26,9 +27,10 @@ const styles = StyleSheet.create({
     padding: 20,
     justifyContent: 'space-between',
     marginRight: 10,
+    marginBottom: 20,
   },
   value: {
-    fontSize: 24,
+    fontSize: 20,
     fontWeight: 'bold',
   },
   detailsContainer: {
@@ -45,4 +47,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default CategoryItem;
+export default SpendingCategoryItem;

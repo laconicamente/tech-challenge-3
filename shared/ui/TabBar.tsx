@@ -100,7 +100,7 @@ const styles = StyleSheet.create({
     },
     tabContainer: {
         flexDirection: 'row',
-        backgroundColor: 'rgba(227, 231, 187, 0.85)',
+        backgroundColor: 'rgba(231, 234, 202, 0.85)',
         borderTopWidth: 0,
         elevation: 12,
         justifyContent: 'space-around',
