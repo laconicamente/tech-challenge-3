@@ -1,8 +1,9 @@
 import { ColorsPalette } from '@/shared/classes/constants/Pallete';
 import { AppHeader } from '@/shared/components/AppHeader';
 import { CardBalance } from '@/shared/components/Balance/CardBalance';
-import CardAnalytics from '@/shared/components/Widget/CardAnalysis';
-import FinancialResume from '@/shared/components/Widget/FinancialResume';
+import WidgetAnalysisMonthly from '@/shared/components/Widget/WidgetAnalysisMonthly';
+import WidgetBiggestEntries from '@/shared/components/Widget/WidgetBiggestEntries';
+import WidgetFinancialResume from '@/shared/components/Widget/WidgetFinancialResume';
 import WidgetFinancialStatus from '@/shared/components/Widget/WidgetFinancialStatus';
 import WidgetSpendingByCategory from '@/shared/components/Widget/WidgetSpending/WidgetSpendingByCategory';
 import { useAuth } from '@/shared/contexts/auth/AuthContext';
@@ -54,9 +55,10 @@ export default function DashboardScreen() {
           <View style={styles.content}>
             <CardBalance />
             <WidgetFinancialStatus />
+            <WidgetFinancialResume/>
             <WidgetSpendingByCategory />
-            <FinancialResume />
-            <CardAnalytics />
+            <WidgetBiggestEntries />
+            <WidgetAnalysisMonthly />
           </View>
         </ScrollView>
       </Animated.View>

@@ -16,10 +16,12 @@ const adapter = (
   doc: QueryDocumentSnapshot<DocumentData>
 ): CategoryItemProps => {
   const data = doc.data();
+  
   return {
     id: doc.id,
     name: data.name,
     type: data.type,
+    icon: data.icon
   };
 };
 
@@ -36,7 +38,6 @@ export const getCategoryById = async (categoryId: string) => {
   if (categoryId) {
     const ref = doc(firestore, "categories", categoryId);
     const snap = await getDoc(ref);
-    
     if (snap.exists()) {
       return adapter(snap);
     } else {

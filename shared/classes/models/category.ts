@@ -4,6 +4,7 @@ export interface CategoryItemProps {
   id?: string;
   name: string;
   type?: TransactionType;
+  icon?: string;
 }
 
 export interface CategoryWidgetItem extends CategoryItemProps {

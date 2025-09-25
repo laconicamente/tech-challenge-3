@@ -67,7 +67,7 @@ export function useTransactions(
   ): Promise<TransactionItemProps> => {
     const data = doc.data();
     const formattedCreatedAt = toDateFromFirestore(data.createdAt);
-    
+
     const category = await getCategoryById(data.categoryId);
     const method = await getMethodById(data.methodId);
 
@@ -96,7 +96,7 @@ export function useTransactions(
 
       const start = parseDateString(startDate);
       const end = parseDateString(endDate);
-
+      console.log({start, end});
       const endWithTime = end
         ? new Date(
             end.getFullYear(),

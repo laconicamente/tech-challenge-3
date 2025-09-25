@@ -6,7 +6,6 @@ import {
     QueryFieldFilterConstraint,
     where,
 } from "firebase/firestore";
-import { BalanceValueFilters } from "../hooks/useBalanceValue";
 
 export interface BalanceValueFilters {
   userId?: string;
