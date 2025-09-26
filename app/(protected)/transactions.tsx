@@ -12,22 +12,23 @@ import { BytebankButton } from '@/shared/ui/Button';
 import { Ionicons } from '@expo/vector-icons';
 import { Stack } from 'expo-router';
 import React, { useRef, useState } from 'react';
-import { Alert, FlatList, NativeScrollEvent, NativeSyntheticEvent, StyleSheet, Text, View } from 'react-native';
+import { Alert, StyleSheet, Text, View } from 'react-native';
 import { Swipeable } from 'react-native-gesture-handler';
 import { TouchableRipple } from 'react-native-paper';
 import Animated, {
+  Extrapolation,
+  interpolate,
+  useAnimatedScrollHandler,
   useAnimatedStyle,
-  useSharedValue,
-  withTiming,
+  useSharedValue
 } from 'react-native-reanimated';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
+const HEADER_HEIGHT = 115;
+const CONTENT_RADIUS = 20;
+
 export default function TransactionsScreen() {
-  const [showHeader, setShowHeader] = useState(true);
-  const opacity = useSharedValue(1);
-  const height = useSharedValue(115);
-  const contentTopRadius = useSharedValue(32);
-  const contentMarginTop = useSharedValue(0);
+  const scrollY = useSharedValue(0);
 
   const { transactions, isLoading, isLoadingMore, loadMore, setFilters, deleteTransaction, hasMore } = useFinancial();
   const [isFiltersVisible, setIsFiltersVisible] = useState(false);
@@ -42,36 +43,28 @@ export default function TransactionsScreen() {
     }
   };
 
-  const animatedBalanceResumeStyle = useAnimatedStyle(() => {
-    return {
-      opacity: withTiming(opacity.value, { duration: 300 }),
-      height: withTiming(height.value, { duration: 300 }),
-      overflow: 'hidden',
-    };
-  });
-
-  const animatedContentStyle = useAnimatedStyle(() => {
-    return {
-      borderTopLeftRadius: contentTopRadius.value,
-      borderTopRightRadius: contentTopRadius.value,
-      marginTop: contentMarginTop.value,
-    };
-  });
-
-
-  const handleScroll = (e: NativeSyntheticEvent<NativeScrollEvent>) => {
-    closeCurrentSwipe();
-    const y = e.nativeEvent.contentOffset.y;
-    const shouldShowHeader = y < 40;
-
-    if (shouldShowHeader !== showHeader) {
-      setShowHeader(shouldShowHeader);
-      opacity.value = shouldShowHeader ? 1 : 0;
-      height.value = shouldShowHeader ? 115 : 0;
-      contentTopRadius.value = shouldShowHeader ? 32 : 0;
-      contentMarginTop.value = shouldShowHeader ? 0 : 0;
+  const scrollHandler = useAnimatedScrollHandler({
+    onScroll: (e) => {
+      scrollY.value = e.contentOffset.y;
     }
-  };
+  });
+
+  const animatedBalanceResumeStyle = useAnimatedStyle(() => {
+    const y = Math.min(scrollY.value, HEADER_HEIGHT);
+    return {
+      opacity: interpolate(y, [0, HEADER_HEIGHT * 0.5, HEADER_HEIGHT], [1, 0.4, 0], Extrapolation.CLAMP),
+      transform: [{ translateY: -y }],
+    };
+  });
+
+  const animatedSubHeaderStyle = useAnimatedStyle(() => {
+    const y = Math.min(scrollY.value, HEADER_HEIGHT);
+    const radius = interpolate(y, [0, HEADER_HEIGHT * 0.6], [CONTENT_RADIUS, 0], Extrapolation.CLAMP);
+    return {
+      borderTopLeftRadius: radius,
+      borderTopRightRadius: radius,
+    };
+  });
 
   const fetchMoreTransactions = async () => { loadMore?.(); }
   const handleEdit = (t: TransactionItemProps) => {
@@ -130,7 +123,7 @@ export default function TransactionsScreen() {
     );
   }
 
-  const EmptyFeedback = () => (<View style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 20 }}>
+  const EmptyFeedback = () => (<View style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 20, flex: 1 }}>
     <NoDataSvg width={220} height={220} />
     <Text style={{ textAlign: 'center', fontSize: 16, color: '#666', marginTop: 10 }}>
       Não encontramos nenhuma transação, que tal criar uma nova?
@@ -139,7 +132,7 @@ export default function TransactionsScreen() {
   );
 
   const ListHeader = () => (
-    <View style={styles.subHeader}>
+    <Animated.View style={[styles.subHeader, animatedSubHeaderStyle]}>
       <Text style={styles.subHeaderTitle}>Movimentações</Text>
       <View>
         <BytebankButton color={'primary'} styles={styles.filterButton} onPress={() => setIsFiltersVisible(!isFiltersVisible)}>
@@ -152,7 +145,7 @@ export default function TransactionsScreen() {
         </BytebankButton>
       </View>
       {isFiltersVisible && <TransactionFilterDrawer visible={isFiltersVisible} onDismiss={() => setIsFiltersVisible(false)} onApplyFilter={(filters) => setFilters?.(filters)} />}
-    </View>
+    </Animated.View>
   );
 
   return (
@@ -167,22 +160,23 @@ export default function TransactionsScreen() {
         <Animated.View style={[styles.balanceResumeHeader, animatedBalanceResumeStyle]}>
           <BalanceResume showMinified={true} />
         </Animated.View>
-        <Animated.View style={[styles.contentWrapper, animatedContentStyle]}>
-          <FlatList
+        <Animated.View style={[styles.contentWrapper]}>
+          <Animated.FlatList
             data={transactions}
             renderItem={renderItem}
             keyExtractor={(item) => item.id || ''}
-            contentContainerStyle={styles.listContainer}
+            contentContainerStyle={[styles.listContainer, { paddingTop: HEADER_HEIGHT }]}
             ListHeaderComponent={<ListHeader />}
             ListEmptyComponent={isLoading ? <TransactionSkeleton numberOfItems={6} /> : <EmptyFeedback />}
             showsVerticalScrollIndicator={false}
-            onScroll={handleScroll}
+            onScroll={scrollHandler}
             scrollEventThrottle={16}
             onEndReached={fetchMoreTransactions}
             onEndReachedThreshold={0.6}
-            ListFooterComponent={hasMore && isLoadingMore ? <TransactionSkeleton numberOfItems={2} /> : null}
+            ListFooterComponent={hasMore && isLoadingMore ? <TransactionSkeleton numberOfItems={2} /> : <View style={{ height: 50 }} />}
           />
         </Animated.View>
+        <View style={{ position: 'absolute', backgroundColor: '#FFF', zIndex: 0, bottom: 0, width: '100%', height: 300 }} pointerEvents="none" />
         {renderEditTransaction()}
       </SafeAreaView>
     </>
@@ -195,22 +189,29 @@ const styles = StyleSheet.create({
     backgroundColor: '#d4eb61',
   },
   balanceResumeHeader: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
     backgroundColor: '#d4eb61',
     paddingHorizontal: 15,
     paddingBottom: 0,
     zIndex: 2,
   },
   contentWrapper: {
-    backgroundColor: '#FFF',
     width: '100%',
-    minHeight: '100%',
+    flex: 1,
+    minHeight: 'auto',
+    marginBottom: 45,
     zIndex: 1,
   },
   subHeader: {
+    backgroundColor: '#fff',
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
     padding: 16,
+    marginTop: 20,
   },
   subHeaderTitle: {
     fontSize: 18,
@@ -233,7 +234,8 @@ const styles = StyleSheet.create({
   },
   listContainer: {
     paddingHorizontal: 0,
-    marginTop: 20
+    marginTop: 0,
+    zIndex:9
   },
   itemContainer: {
     flexDirection: 'row',

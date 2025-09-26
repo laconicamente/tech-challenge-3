@@ -55,7 +55,7 @@ const WidgetSpendingByCategory = () => {
                 renderItem={({ item, index }) => (
                     <AnimatedCardItem item={item} delay={index * 90} />
                 )}
-                ListEmptyComponent={isLoading ? <LoadingSkeleton /> : <Text style={{ textAlign: 'center' }}>Nenhum dado disponível.</Text>}
+                ListEmptyComponent={isLoading ? <LoadingSkeleton /> : null}
                 keyExtractor={(item, i) => i.toString()}
                 horizontal
                 showsHorizontalScrollIndicator={false}

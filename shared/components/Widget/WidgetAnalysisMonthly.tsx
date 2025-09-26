@@ -58,13 +58,13 @@ const WidgetAnalysisMonthly = () => {
               color={COLORS.incomeMain}
               label="Entradas"
               value={formatCurrency(widgetData?.monthIncome || 0)}
-              percent={((widgetData?.monthIncome / widgetData?.totalValue)) || 0}
+              percent={((widgetData?.monthIncome / widgetData?.totalValue) * 100) || 0}
             />
             <LegendItem
               color={COLORS.expenseMain}
               label="Saídas"
               value={formatCurrency(widgetData?.monthExpense || 0)}
-              percent={((widgetData?.monthExpense / widgetData?.totalValue)) || 0}
+              percent={((widgetData?.monthExpense / widgetData?.totalValue) * 100) || 0}
             />
           </View>
         </View>

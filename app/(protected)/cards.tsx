@@ -10,6 +10,7 @@ import { SkeletonCard } from "@/shared/ui/Skeleton/SkeletonCard";
 import { Stack } from "expo-router";
 import React, { useCallback, useState } from "react";
 import {
+  Alert,
   Dimensions,
   FlatList,
   StyleSheet,
@@ -81,7 +82,14 @@ const CardsScreen = () => {
     updateBankCard(id, data);
   };
   const handleDeleteCard = (id: string) => {
-    deleteBankCard(id);
+            Alert.alert("Excluir cartão", "Você tem certeza que deseja excluir este cartão?", [
+                { text: "Cancelar" },
+                {
+                    text: "Confirmar cancelamento", 
+                    style: "destructive",
+                    onPress: () => deleteBankCard(id),
+                }
+            ]);
   };
 
   return (

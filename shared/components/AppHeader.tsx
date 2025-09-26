@@ -15,7 +15,7 @@ export const AppHeader = ({ title = '' }: { title?: string }) => {
         Alert.alert("Sair", "Você tem certeza que deseja sair da aplicação?", [
             { text: "Cancelar" },
             {
-                text: "Sair", onPress: () => {
+                text: "Sair", style: "destructive", onPress: () => {
                     logout().then(() => router.replace('/(auth)/account-access'));
                 }
             }
