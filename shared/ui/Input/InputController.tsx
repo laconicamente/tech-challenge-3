@@ -1,5 +1,5 @@
 import React from "react";
-import { Controller, useFormContext, RegisterOptions, Control } from "react-hook-form";
+import { Control, Controller, RegisterOptions, useFormContext } from "react-hook-form";
 import { BytebankInput, BytebankInputProps } from "./Input";
 
 interface InputControllerProps extends BytebankInputProps{
@@ -33,8 +33,8 @@ export const BytebankInputController: React.FC<InputControllerProps> = ({
       name={name}
       rules={rules}
       control={control}
-      render={({ field, fieldState: { error } }) => (
-        <BytebankInput
+      render={({ field, fieldState: { error } }) => {
+        return <BytebankInput
           {...field}
           label={label}
           type={type}
@@ -50,7 +50,8 @@ export const BytebankInputController: React.FC<InputControllerProps> = ({
               : field.onChange
           }
         />
-      )}
+      }
+      }
     />
   );
 };

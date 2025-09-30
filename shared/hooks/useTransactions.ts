@@ -96,7 +96,6 @@ export function useTransactions(
 
       const start = parseDateString(startDate);
       const end = parseDateString(endDate);
-      console.log({start, end});
       const endWithTime = end
         ? new Date(
             end.getFullYear(),

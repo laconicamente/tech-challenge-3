@@ -41,6 +41,7 @@ export const BankCardCreateDrawer = ({
     const [isLoading, setIsLoading] = useState(false);
 
     const { reset, handleSubmit, formState: { errors } } = formMethods;
+    const { isValid } = formMethods.formState;
 
     const handleClearForm = () => {
         reset({
@@ -76,7 +77,7 @@ export const BankCardCreateDrawer = ({
 
     return (
         <>
-            <BytebankDrawer title='Adicionar cartão' confirmLabel='Salvar' onDismiss={onDismiss} onCancel={handleClearForm} onSubmit={handleSubmit(handleCreateCard)} visible={visible}>
+            <BytebankDrawer title='Adicionar cartão' confirmLabel='Salvar' onDismiss={handleClearForm} onCancel={handleClearForm} onSubmit={handleSubmit(handleCreateCard)} visible={visible} disabled={isLoading || !isValid}>
                 <FormProvider {...formMethods} >
                     <View style={styles.sectionInput}>
                         {types.length > 0 ?

@@ -1,5 +1,5 @@
 import React from "react";
-import { Controller, useFormContext, RegisterOptions, Control } from "react-hook-form";
+import { Control, Controller, RegisterOptions, useFormContext } from "react-hook-form";
 import { BytebankSelect, SelectOption } from "./Select";
 
 interface SelectControllerProps {
@@ -46,6 +46,8 @@ export const BytebankSelectController: React.FC<SelectControllerProps> = ({
           placeholder={placeholder}
           onOpen={onOpen}
           onClose={onClose}
+          error={!!error}
+          helperText={error?.message}
         />
       )}
     />

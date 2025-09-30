@@ -42,18 +42,23 @@ export function BytebankInput({
     const inputId = `input-${reactId}`;
     const helperId = helperText ? `${inputId}-helper` : undefined;
 
-    const baseInputStyle = {
-        ...styles.input,
-        backgroundColor: '#f0f0f0',
-        borderRadius: 10,
-        marginBottom: 20,
-    };
-    const maskInputStyle = {
-        ...baseInputStyle,
-        height: 50,
-        fontSize: 16,
-        paddingHorizontal: 15,
-    };
+    const baseInputStyle = { ...styles.input, backgroundColor: '#f0f0f0', borderRadius: 10, marginBottom: 20 };
+    const maskInputStyle = { ...baseInputStyle, height: 50, fontSize: 16, paddingHorizontal: 15 };
+    
+    const HelperText = () => (helperText ? (
+        <Text
+          style={{
+            color: error ? '#d32f2f' : '#888',
+            fontSize: 12,
+            marginLeft: 10,
+            marginTop: -15,
+            marginBottom: 10,
+          }}
+          nativeID={helperId}
+        >
+          {helperText}
+        </Text>
+    ) : null);
 
     if (maskType) {
         let mask: any[] | ((value?: string) => any[]);
@@ -80,6 +85,7 @@ export function BytebankInput({
                     style={[maskInputStyle, props?.editable === false ? { backgroundColor: '#e0e0e0', opacity: 0.3 } : {}]}
                     {...props}
                 />
+                <HelperText />
             </View>
         );
     }
@@ -99,6 +105,7 @@ export function BytebankInput({
                 style={[styles.input, props?.editable === false ? { backgroundColor: '#eee', opacity: 0.5 } : {}]}
                 outlineStyle={styles.inputOutline}
             />
+            <HelperText />
         </View>
     );
 }

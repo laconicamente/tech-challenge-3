@@ -77,10 +77,10 @@ export default function TransactionsScreen() {
   );
 
   const handleDelete = (t: TransactionItemProps) => {
-    Alert.alert('Excluir', 'Deseja excluir esta transação?', [
-      { text: 'Cancelar', style: 'cancel' },
+    Alert.alert('Excluir transação', 'Você tem certeza que deseja excluir esta transação?', [
+      { text: 'Cancelar' },
       {
-        text: 'Excluir',
+        text: 'Confirmar exclusão',
         style: 'destructive',
         onPress: () => deleteTransaction?.(t.id || ''),
       }
@@ -176,7 +176,7 @@ export default function TransactionsScreen() {
             ListFooterComponent={hasMore && isLoadingMore ? <TransactionSkeleton numberOfItems={2} /> : <View style={{ height: 50 }} />}
           />
         </Animated.View>
-        <View style={{ position: 'absolute', backgroundColor: '#FFF', zIndex: 0, bottom: 0, width: '100%', height: 300 }} pointerEvents="none" />
+        <View style={{ position: 'absolute', backgroundColor: '#FFF', zIndex: 0, bottom: 0, width: '100%', height: 600 }} pointerEvents="none" />
         {renderEditTransaction()}
       </SafeAreaView>
     </>

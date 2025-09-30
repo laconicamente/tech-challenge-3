@@ -85,7 +85,7 @@ const CardsScreen = () => {
             Alert.alert("Excluir cartão", "Você tem certeza que deseja excluir este cartão?", [
                 { text: "Cancelar" },
                 {
-                    text: "Confirmar cancelamento", 
+                    text: "Confirmar exclusão", 
                     style: "destructive",
                     onPress: () => deleteBankCard(id),
                 }

@@ -14,6 +14,8 @@ interface BytebankSelectProps extends Partial<PickerSelectProps> {
     items: SelectOption[];
     onSelect: ((value?: string) => void);
     placeholder?: string;
+    helperText?: string;
+    error?: boolean;
 }
 
 export const BytebankSelect = ({
@@ -24,7 +26,25 @@ export const BytebankSelect = ({
     onOpen,
     onClose,
     placeholder,
+    helperText,
+    error = false,
 }: BytebankSelectProps) => {
+    const helperId = helperText ? `${label}-helper` : undefined;
+
+ const HelperText = () => (helperText ? (
+        <Text
+          style={{
+            color: error ? '#d32f2f' : '#888',
+            fontSize: 12,
+            marginLeft: 10,
+            marginTop: 8,
+            marginBottom: 10,
+          }}
+          nativeID={helperId}
+        >
+          {helperText}
+        </Text>
+    ) : null);
 
     return (
         <View>
@@ -59,6 +79,7 @@ export const BytebankSelect = ({
                     return <MaterialIcons name={'keyboard-arrow-down'} size={30} color="gray" />;
                 }}
             />
+            <HelperText />
         </View>
     );
 };

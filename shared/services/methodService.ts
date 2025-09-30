@@ -27,7 +27,7 @@ export const fetchMethods = async (filterType?: TransactionType) => {
   const methodsRef = collection(firestore, "methods");
   const constraints = filterType ? [where("type", "==", filterType)] : [];
   const q = query(methodsRef, ...constraints);
-console.log(constraints)
+
   const querySnapshot = await getDocs(q);
   return querySnapshot.docs.map(adapter);
 };

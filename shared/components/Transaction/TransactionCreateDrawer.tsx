@@ -12,6 +12,7 @@ import {
     ScrollView,
     StyleSheet,
     Text,
+    TouchableOpacity,
     View
 } from "react-native";
 import Modal from 'react-native-modal';
@@ -63,7 +64,8 @@ const TransactionCreateDrawer: React.FC<TransactionCreateDrawerProps> = ({
             fileUrl: "",
         },
     });
-    const { setValue, reset, control, handleSubmit, watch, formState: { errors } } = formMethods;
+    const { setValue, reset, control, handleSubmit, formState: { errors } } = formMethods;
+    const { isValid } = formMethods.formState;
 
     useEffect(() => {
         if (transaction) {
@@ -141,13 +143,6 @@ const TransactionCreateDrawer: React.FC<TransactionCreateDrawerProps> = ({
     const [isDatePickerVisible, setIsDatePickerVisible] = useState(false);
 
     const onDateDismiss = () => setIsDatePickerVisible(false);
-    const onDateConfirm = (params: { date: string }) => {
-        const { date: createdAt } = params;
-        setIsDatePickerVisible(false);
-        if (createdAt) {
-            setValue('createdAt', createdAt, { shouldDirty: true });
-        }
-    };
 
     return (
         <Portal>
@@ -166,105 +161,129 @@ const TransactionCreateDrawer: React.FC<TransactionCreateDrawerProps> = ({
                 onSwipeComplete={onDismiss}
                 propagateSwipe={true}
             >
-                    <View style={styles.card}>
-                        <View style={styles.dragHandle} />
-                        <View style={styles.header}>
-                            <Text style={styles.title}>{title}</Text>
-                        </View>
-                        <Divider />
-                        <ScrollView
-                            keyboardShouldPersistTaps="handled"
-                        >
-                            <View style={{ display: 'flex', gap: 0 }}>
-                                <FormProvider {...formMethods}>
-                                    <BytebankTabSelector
-                                        tabs={[
-                                            { label: "Entrada", name: "income" },
-                                            { label: "Saída", name: "expense" },
-                                        ]}
-                                        activeTab={transactionType}
-                                        onTabChange={handleTabChange}
-                                    />
-                                    {methods && methods.length > 0 ?
-                                        (<BytebankSelectController
-                                            name={"methodId"}
-                                            label="Selecione o tipo da transação"
-                                            items={methods.map(c => ({ label: c.name, value: c.id }))}
-                                            placeholder="Selecione o tipo da transação"
-                                            />
-                                        ) : (null)}
-                                    <View style={{ marginVertical: 15 }}>
-
-                                        <Text style={{ marginLeft: 10, marginBottom: 5 }}>Data da transação</Text>
-                                        <BytebankButton
-                                            mode="outlined"
-                                            color="primary"
-                                            onPress={() => setIsDatePickerVisible(true)}
-                                            styles={{ backgroundColor: ColorsPalette.light['lime.900'], padding: 5, borderRadius: 10 }}
-                                            labelStyles={{ color: ColorsPalette.light['lime.50'], fontSize: 16 }}
-                                        >
-                                            {watch('createdAt')
-                                                ? `${formatDate(watch('createdAt'))}`
-                                                : 'Adicionar data'}
-                                        </BytebankButton>
-                                        <PaperProvider theme={datePickerTheme}>
-                                            <DatePickerModal
-                                                locale="pt-BR"
-                                                mode="single"
-                                                visible={isDatePickerVisible}
-                                                onDismiss={onDateDismiss}
-                                                onConfirm={onDateConfirm}
-                                                startDate={watch('createdAt') as unknown as CalendarDate}
-                                                label="Selecione uma data"
-                                                startLabel="Data da transação"
-                                                saveLabel="Selecionar"
-                                            />
-                                        </PaperProvider>
-                                    </View>
-                                    <BytebankInputController
-                                        type='text'
-                                        name="value"
-                                        label="Valor"
-                                        placeholder="R$ 0,00"
-                                        maskType="currency"
-                                        rules={{ required: "Valor obrigatório" }}
-                                        keyboardType="number-pad"
-                                    />
-                                    {categories && categories.length > 0 && (
-                                        <BytebankSelectController
-                                            name="categoryId"
-                                            label="Selecione uma categoria"
-                                            items={categories.map(c => ({ label: c.name, value: c.id }))}
-                                            placeholder="Selecione uma categoria"
-                                        />
-                                    )}
-                                    <View style={{ marginBottom: 10 }}>
-                                        <Controller
-                                            name="fileUrl"
-                                            control={control}
-                                            render={({ field }) => (
-                                                <FileUploadButton label={field.value ? 'Comprovante adicionado' : 'Adicionar comprovante'} onFinished={(v) => { field.onChange(v); showFeedback('success'); }} />
-                                            )}
-                                        />
-                                    </View>
-                                </FormProvider>
-                            </View>
-                        </ScrollView>
-                        <View style={{ paddingVertical: 15 }}>
-                            <BytebankButton
-                                color="primary"
-                                variant="contained"
-                                onPress={handleSubmit(onSubmit)}
-                                disabled={isLoading}
-                            >
-                                {isLoading ? (
-                                    <ActivityIndicator color="#fff" />
-                                ) : (
-                                    "Concluir"
-                                )}
-                            </BytebankButton>
-                        </View>
+                <View style={styles.card}>
+                    <View style={styles.dragHandle} />
+                    <View style={styles.header}>
+                        <Text style={styles.title}>{title}</Text>
                     </View>
+                    <Divider />
+                    <ScrollView
+                        keyboardShouldPersistTaps="handled"
+                    >
+                        <View style={{ display: 'flex', gap: 0 }}>
+                            <FormProvider {...formMethods}>
+                                <BytebankTabSelector
+                                    tabs={[
+                                        { label: "Entrada", name: "income" },
+                                        { label: "Saída", name: "expense" },
+                                    ]}
+                                    activeTab={transactionType}
+                                    onTabChange={handleTabChange}
+                                />
+                                {methods && methods.length > 0 ?
+                                    (<BytebankSelectController
+                                        name={"methodId"}
+                                        label="Tipo da transação"
+                                        items={methods.map(c => ({ label: c.name, value: c.id }))}
+                                        placeholder="Selecione o tipo da transação"
+                                        rules={{ required: "Tipo da transação é obrigatório" }}
+                                    />
+                                    ) : (null)}
+                                <View style={{ marginVertical: 20 }}>
+                                    <Controller
+                                        name="createdAt"
+                                        control={control}
+                                        rules={{ required: "Data obrigatória" }}
+                                        render={({ field, fieldState: { error } }) => (
+                                            <View>
+                                                <View style={{ flexDirection: 'row', flexWrap: 'wrap', alignItems: 'center', justifyContent: 'space-between' }}>
+                                                    <Text style={{ marginLeft: 10, fontWeight: 500 }}>Data da transação</Text>
+                                                    <TouchableOpacity onPress={() => setIsDatePickerVisible(true)} >
+                                                        <View style={{ alignItems: 'flex-end', width: '100%' }}>
+                                                            {field.value ? <Text style={{ fontWeight: 400, justifyContent: 'flex-end' }} >
+                                                                {formatDate(field.value)}
+                                                            </Text> : <Text style={{ fontWeight: 'bold', justifyContent: 'flex-end' }} >Adicionar data</Text>}
+                                                        </View>
+                                                    </TouchableOpacity>
+                                                    {field.value && <View style={{ alignItems: 'flex-end', width: '100%' }}>
+                                                        <TouchableOpacity onPress={() => setIsDatePickerVisible(true)} >
+                                                            <Text style={{ fontWeight: 'bold', justifyContent: 'flex-end' }} >
+                                                                Alterar data
+                                                            </Text>
+                                                        </TouchableOpacity>
+                                                    </View>}
+                                                </View>
+                                                {error?.message ? (
+                                                    <Text style={{ color: '#d32f2f', fontSize: 12, marginLeft: 10, marginTop: 2 }}>
+                                                        {error.message}
+                                                    </Text>
+                                                ) : null}
+                                                <PaperProvider theme={datePickerTheme}>
+                                                    <DatePickerModal
+                                                        locale="pt-BR"
+                                                        mode="single"
+                                                        visible={isDatePickerVisible}
+                                                        onDismiss={onDateDismiss}
+                                                        onConfirm={({ date }) => {
+                                                            setIsDatePickerVisible(false);
+                                                            if (date) field.onChange(date);
+                                                        }}
+                                                        startDate={field.value as unknown as CalendarDate}
+                                                        label="Selecione uma data"
+                                                        startLabel="Data da transação"
+                                                        saveLabel="Selecionar"
+                                                    />
+                                                </PaperProvider>
+                                            </View>
+                                        )}
+                                    />
+                                </View>
+                                <BytebankInputController
+                                    type='text'
+                                    name="value"
+                                    label="Valor"
+                                    placeholder="R$ 0,00"
+                                    maskType="currency"
+                                    rules={{ required: "Valor obrigatório" }}
+                                    keyboardType="number-pad"
+                                />
+                                {categories && categories.length > 0 && (
+                                    <BytebankSelectController
+                                        name="categoryId"
+                                        label="Categoria"
+                                        items={categories.map(c => ({ label: c.name, value: c.id }))}
+                                        placeholder="Selecione uma categoria"
+                                        rules={{ required: "Categoria obrigatória" }}
+                                    />
+                                )}
+                                <View style={{ marginVertical: 20 }}>
+                                    <Text style={{ fontWeight: 500, marginLeft: 10 }}>Se preferir, inclua o comprovante da transação: </Text>
+                                    <Controller
+                                        name="fileUrl"
+                                        control={control}
+                                        render={({ field }) => (
+                                            <FileUploadButton label={field.value ? 'Comprovante adicionado' : 'Adicionar comprovante'} onFinished={(v) => { field.onChange(v); showFeedback('success'); }} />
+                                        )}
+                                    />
+                                </View>
+                            </FormProvider>
+                        </View>
+                    </ScrollView>
+                    <View style={{ paddingVertical: 15 }}>
+                        <BytebankButton
+                            color="primary"
+                            variant="contained"
+                            onPress={handleSubmit(onSubmit)}
+                            disabled={isLoading || !isValid}
+                        >
+                            {isLoading ? (
+                                <ActivityIndicator color={ColorsPalette.light['lime.800']} />
+                            ) : (
+                                "Concluir"
+                            )}
+                        </BytebankButton>
+                    </View>
+                </View>
             </Modal>
             <FeedbackAnimation />
         </Portal>

@@ -1,17 +1,15 @@
 import { datePickerTheme } from '@/shared/classes/constants/Colors';
-import { ColorsPalette } from '@/shared/classes/constants/Pallete';
 import { TransactionFilter } from '@/shared/classes/models/transaction';
 import { parseCurrencyToNumber } from '@/shared/helpers/formatCurrency';
 import { useCategories } from '@/shared/hooks/useCategories';
 import { useMethods } from '@/shared/hooks/useMethods';
-import { BytebankButton } from '@/shared/ui/Button';
 import { BytebankDrawer } from '@/shared/ui/Drawer';
 import { BytebankInputController } from '@/shared/ui/Input/InputController';
 import { BytebankSelectController } from '@/shared/ui/Select/SelectController';
 import { SkeletonText } from '@/shared/ui/Skeleton/SkeletonText';
 import React, { useState } from 'react';
 import { FormProvider, useForm } from 'react-hook-form';
-import { StyleSheet, Text, View } from 'react-native';
+import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { PaperProvider } from 'react-native-paper';
 import { DatePickerModal } from 'react-native-paper-dates';
 import { CalendarDate } from 'react-native-paper-dates/lib/typescript/Date/Calendar';
@@ -77,74 +75,79 @@ export const TransactionFilterDrawer = ({
 
     return (
         <BytebankDrawer title='Filtros' confirmLabel='Filtrar' cancelLabel='Limpar' onDismiss={onDismiss} onCancel={handleClearFilters} onSubmit={handleSubmit(handleApplyFilter)} visible={visible}>
-                <FormProvider {...formMethods}>
+            <FormProvider {...formMethods}>
+                <View style={{ flexDirection: 'row', flexWrap: 'wrap', alignItems: 'center', justifyContent: 'space-between' }}>
                     <Text style={styles.sectionLabel}>Período</Text>
-                    <BytebankButton
-                        mode="outlined"
-                        color="primary"
-                        onPress={() => setIsDatePickerVisible(true)}
-                        style={{ marginBottom: 12 }}
-                        styles={{ backgroundColor: ColorsPalette.light['lime.900'], padding: 5, borderRadius: 10 }}
-                        labelStyles={{ color: ColorsPalette.light['lime.50'], fontSize: 16 }}
-                    >
-                        {watch('startDate')
-                            ? `${formatDate(watch('startDate'))} - ${formatDate(watch('endDate'))}`
-                            : 'Adicionar datas'}
-                    </BytebankButton>
-                    <PaperProvider theme={datePickerTheme}>
-                        <DatePickerModal
-                            locale="pt-BR"
-                            mode="range"
-                            visible={isDatePickerVisible}
-                            onDismiss={onDateDismiss}
-                            onConfirm={onDateConfirm}
-                            startDate={watch('startDate') as unknown as CalendarDate}
-                            endDate={watch('endDate') as unknown as CalendarDate}
-                            label="Selecione o período"
-                            startLabel="Data inicial"
-                            endLabel="Data final"
-                            saveLabel="Aplicar"
-                        />
-                    </PaperProvider>
-                    <Text style={styles.sectionLabel}>Tipo de transação</Text>
-                    {methods && methods.length > 0 ?
-                        (<BytebankSelectController
-                            name={"methodId"}
-                            label="Selecione o tipo da transação"
-                            items={methods.map(c => ({ label: c.name, value: c.id }))}
-                            placeholder="Selecione o tipo da transação"
-                        />
-                        ) : (<SkeletonText style={{ height: 30 }} />)}
-                    <Text style={styles.sectionLabel}>Categoria</Text>
+                    <TouchableOpacity onPress={() => setIsDatePickerVisible(true)} >
+                        <View style={{ alignItems: 'flex-end', width: '100%' }}>
+                            {watch('startDate') ? <Text style={{ fontWeight: 400, justifyContent: 'flex-end' }} >
+                                {`${formatDate(watch('startDate'))} - ${formatDate(watch('endDate'))}`}
+                            </Text> : <Text style={{ fontWeight: 'bold', justifyContent: 'flex-end' }} >Adicionar período</Text>}
+                        </View>
+                    </TouchableOpacity>
+                    {watch('startDate') && <View style={{ alignItems: 'flex-end', width: '100%' }}>
+                        <TouchableOpacity onPress={() => setIsDatePickerVisible(true)} >
+                            <Text style={{ fontWeight: 'bold', justifyContent: 'flex-end' }} >
+                                Alterar período
+                            </Text>
+                        </TouchableOpacity>
+                    </View>}
+                </View>
+                <PaperProvider theme={datePickerTheme}>
+                    <DatePickerModal
+                        locale="pt-BR"
+                        mode="range"
+                        visible={isDatePickerVisible}
+                        onDismiss={onDateDismiss}
+                        onConfirm={onDateConfirm}
+                        startDate={watch('startDate') as unknown as CalendarDate}
+                        endDate={watch('endDate') as unknown as CalendarDate}
+                        label="Selecione o período"
+                        startLabel="Data inicial"
+                        endLabel="Data final"
+                        saveLabel="Aplicar"
+                    />
+                </PaperProvider>
 
-                    {categories && categories.length > 0 ?
-                        (<BytebankSelectController
-                            name={"categoryId"}
-                            label="Selecione a categoria"
-                            items={categories.filter(c => c.id).map(c => ({ label: c.name, value: c.id! }))}
-                            placeholder="Selecione a categoria"
+                <Text style={styles.sectionLabel}>Tipo de transação</Text>
+                {methods && methods.length > 0 ?
+                    (<BytebankSelectController
+                        name={"methodId"}
+                        label="Selecione o tipo da transação"
+                        items={methods.map(c => ({ label: c.name, value: c.id }))}
+                        placeholder="Selecione o tipo da transação"
+                    />
+                    ) : (<SkeletonText style={{ height: 30 }} />)}
+                <Text style={styles.sectionLabel}>Categoria</Text>
+
+                {categories && categories.length > 0 ?
+                    (<BytebankSelectController
+                        name={"categoryId"}
+                        label="Selecione a categoria"
+                        items={categories.filter(c => c.id).map(c => ({ label: c.name, value: c.id! }))}
+                        placeholder="Selecione a categoria"
+                    />
+                    ) : (<SkeletonText style={{ height: 30 }} />)}
+                <Text style={styles.sectionLabel}>Valores</Text>
+                <View style={styles.amountContainer}>
+                    <View style={styles.amount}>
+                        <BytebankInputController
+                            label="Valor Mínimo"
+                            placeholder="R$ 0,00"
+                            maskType="currency"
+                            name="minValue"
                         />
-                        ) : (<SkeletonText style={{ height: 30 }} />)}
-                    <Text style={styles.sectionLabel}>Valores</Text>
-                    <View style={styles.amountContainer}>
-                        <View style={styles.amount}>
-                            <BytebankInputController
-                                label="Valor Mínimo"
-                                placeholder="R$ 0,00"
-                                maskType="currency"
-                                name="minValue"
-                            />
-                        </View>
-                        <View style={styles.amount}>
-                            <BytebankInputController
-                                label="Valor Máximo"
-                                placeholder="R$ 0,00"
-                                maskType="currency"
-                                name="maxValue"
-                            />
-                        </View>
                     </View>
-                </FormProvider>
+                    <View style={styles.amount}>
+                        <BytebankInputController
+                            label="Valor Máximo"
+                            placeholder="R$ 0,00"
+                            maskType="currency"
+                            name="maxValue"
+                        />
+                    </View>
+                </View>
+            </FormProvider>
         </BytebankDrawer>
     );
 };

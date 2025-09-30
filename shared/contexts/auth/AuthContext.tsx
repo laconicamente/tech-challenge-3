@@ -76,11 +76,11 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
             if (!currentUser) throw new Error("Usuário não autenticado.");
 
             if (currentUser) {
-                await updateProfile(currentUser, { ...userData });
-                setUser(currentUser);
+                await updateProfile(currentUser, userData);
+                setUser({...currentUser, ...userData });
             }
 
-            await setDoc(
+           await setDoc(
                 doc(firestore, 'users', currentUser.uid), userData,
                 { merge: true }
             );

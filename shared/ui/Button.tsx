@@ -1,5 +1,6 @@
 import { Animated, StyleProp, StyleSheet, TextStyle, ViewStyle } from "react-native";
 import { Button, ButtonProps, useTheme } from "react-native-paper";
+import { ColorsPalette } from "../classes/constants/Pallete";
 
 
 export interface BytebankButtonProps extends ButtonProps {
@@ -22,7 +23,8 @@ export function BytebankButton({
     onPress,
     children,
     styles = {},
-    labelStyles = {}
+    labelStyles = {},
+    disabled
 }: BytebankButtonProps) {
     const theme = useTheme();
 
@@ -30,15 +32,18 @@ export function BytebankButton({
         <Button
             mode={variant}
             buttonColor={theme.colors[color]}
-            onPress={onPress}
+            disabled={disabled}
+            onPress={disabled ? undefined : onPress}
             style={{ 
                 ...buttonStyles.button, 
                 ...(styles && typeof styles === 'object' ? styles : {}), 
-                ...(borderRadius ? { borderRadius: Number(borderRadius) } : {}) 
+                ...(borderRadius ? { borderRadius: Number(borderRadius) } : {}),
+                ...(disabled ? { backgroundColor: ColorsPalette.light['grey.200'] } : {})
             }}
             labelStyle={{ 
                 ...buttonStyles.buttonText, 
-                ...(labelStyles && typeof labelStyles === 'object' ? labelStyles : {}) 
+                ...(labelStyles && typeof labelStyles === 'object' ? labelStyles : {}),
+                ...(disabled ? { color: ColorsPalette.light['grey.500'] } : {})
             }}
         >
             {children}
@@ -52,7 +57,7 @@ const buttonStyles = StyleSheet.create({
         padding: 10
     },
     buttonText: {
-        color: 'black',
+        color: ColorsPalette.light['lime.800'],
         fontWeight: 'bold',
         fontSize: 18,
         display: 'flex',

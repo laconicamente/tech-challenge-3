@@ -14,6 +14,7 @@ interface BytebankrDrawerProps {
     children?: React.ReactNode;
     confirmLabel?: string;
     cancelLabel?: string;
+    disabled?: boolean;
 }
 
 const SCREEN_WIDTH = Dimensions.get('window').width;
@@ -27,6 +28,7 @@ export const BytebankDrawer = ({
     confirmLabel = "Salvar",
     cancelLabel = "Cancelar",
     children,
+    disabled,
 }: BytebankrDrawerProps) => {
     const slideAnim = useRef(new Animated.Value(SCREEN_WIDTH)).current;
     const [mounted, setMounted] = useState(visible);
@@ -95,6 +97,7 @@ export const BytebankDrawer = ({
                             mode="contained"
                             color="primary"
                             style={styles.footerBtn}
+                            disabled={disabled}
                         >
                             {confirmLabel}
                         </BytebankButton>

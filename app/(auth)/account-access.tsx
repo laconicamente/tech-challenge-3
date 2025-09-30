@@ -1,36 +1,50 @@
+import { ColorsPalette } from '@/shared/classes/constants/Pallete';
+import { useAuth } from '@/shared/contexts/auth/AuthContext';
+import { BytebankButton } from '@/shared/ui/Button';
+import { BytebankInputController } from '@/shared/ui/Input/InputController';
+import { BytebankTabSelector } from '@/shared/ui/TabSelector';
+import { Feather } from '@expo/vector-icons';
+import { router } from 'expo-router';
 import React, { useEffect, useState } from 'react';
+import { FormProvider, useForm } from 'react-hook-form';
 import {
-    View,
-    Text,
-    StyleSheet,
-    TouchableWithoutFeedback,
+    ActivityIndicator,
+    Alert,
+    Image,
     Keyboard,
     KeyboardAvoidingView,
     Platform,
-    Image,
     ScrollView,
-    ActivityIndicator,
-    Alert
+    StyleSheet,
+    Text,
+    TouchableWithoutFeedback,
+    View
 } from 'react-native';
 import { TextInput } from 'react-native-paper';
-import { Feather } from '@expo/vector-icons';
-import { useAuth } from '@/shared/contexts/auth/AuthContext';
-import { router } from 'expo-router';
-import { BytebankButton } from '@/shared/ui/Button';
-import { BytebankInput } from '@/shared/ui/Input/Input';
-import { BytebankTabSelector } from '@/shared/ui/TabSelector';
 
 const AccountAccessScreen = () => {
     const { login, signUp, user, isLoading: authLoading } = useAuth();
     const [activeTab, setActiveTab] = useState('login');
-    const [email, setEmail] = useState('');
-    const [password, setPassword] = useState('');
     const [showPassword, setShowPassword] = useState(false);
-    const [name, setName] = useState('');
-    const [registerEmail, setRegisterEmail] = useState('');
-    const [registerPassword, setRegisterPassword] = useState('');
     const [showRegisterPassword, setShowRegisterPassword] = useState(false);
     const [isLoading, setIsLoading] = useState(false);
+
+    const loginForm = useForm({
+        mode: "onChange",
+        defaultValues: {
+            email: "",
+            password: "",
+        }
+    });
+
+    const registerForm = useForm({
+        mode: "onChange",
+        defaultValues: {
+            name: "",
+            registerEmail: "",
+            registerPassword: "",
+        }
+    });
 
     useEffect(() => {
         if (user && !authLoading) {
@@ -38,9 +52,9 @@ const AccountAccessScreen = () => {
         }
     }, [user, authLoading]);
 
-    const handleLogin = async () => {
+    const handleLogin = async (data: {email: string; password: string}) => {
         setIsLoading(true);
-        const success = await login(email, password);
+        const success = await login(data.email, data.password);
         setIsLoading(false);
 
         if (!success) {
@@ -48,15 +62,13 @@ const AccountAccessScreen = () => {
         }
     };
 
-    const handleRegister = async () => {
+    const handleRegister = async (data: {name: string; registerEmail: string; registerPassword: string}) => {
         setIsLoading(true);
         try {
-            await signUp(name, registerEmail, registerPassword);
+            await signUp(data.name, data.registerEmail, data.registerPassword);
             setActiveTab('login');
             Alert.alert("Sucesso", "Conta criada com sucesso! Faça login para continuar.");
-            setName('');
-            setRegisterEmail('');
-            setRegisterPassword('');
+            registerForm.reset();
         } catch (_) {
             Alert.alert("Ocorreu um erro", "Verifique os dados e tente novamente.");
         } finally {
@@ -64,14 +76,10 @@ const AccountAccessScreen = () => {
         }
     };
 
-
     const handleTabChange = (name: string) => {
         setActiveTab(name);
-        setEmail('');
-        setPassword('');
-        setName('');
-        setRegisterEmail('');
-        setRegisterPassword('');
+        loginForm.reset();
+        registerForm.reset();
     };
 
     return (
@@ -92,77 +100,89 @@ const AccountAccessScreen = () => {
 
                     <BytebankTabSelector tabs={[{ label: 'Login', name: 'login' }, { label: 'Crie uma conta', name: 'register' }]} activeTab={activeTab} onTabChange={handleTabChange} />
                     {activeTab === 'login' ? (
-                        <View style={styles.formContainer}>
-                            <BytebankInput
-                                label={'Digite o seu e-mail'}
-                                value={email}
-                                onChangeText={setEmail}
-                                type={'email-address'}
-                                placeholder="email@example.com" />
-
-                            <BytebankInput
-                                label={'Digite a sua senha'}
-                                value={password}
-                                onChangeText={setPassword}
-                                type={'visible-password'}
-                                secureTextEntry={!showPassword}
-                                placeholder="********"
-                                right={
-                                    <TextInput.Icon
-                                        icon={() => <Feather name={showPassword ? "eye-off" : "eye"} size={20} color="gray" />}
-                                        onPress={() => setShowPassword(!showPassword)}
-                                    />
-                                }
-                            />
-                            <BytebankButton
-                                color="primary"
-                                variant="contained"
-                                onPress={handleLogin}
-                                disabled={isLoading}>
-                                {isLoading ? <ActivityIndicator color="#fff" /> : "Entrar"}
-                            </BytebankButton>
-                        </View>
+                        <FormProvider {...loginForm}>
+                            <View style={styles.formContainer}>
+                                <BytebankInputController
+                                    name="email"
+                                    label="Digite o seu e-mail"
+                                    placeholder="email@example.com"
+                                    keyboardType="email-address"
+                                    rules={{
+                                        required: "E-mail obrigatório",
+                                        pattern: {
+                                            value: /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
+                                            message: "E-mail inválido"
+                                        }
+                                    }}
+                                />
+                                <BytebankInputController
+                                    name="password"
+                                    label="Digite a sua senha"
+                                    placeholder="********"
+                                    secureTextEntry={!showPassword}
+                                    type="password"
+                                    rules={{ required: "Senha obrigatória" }}
+                                    right={
+                                        <TextInput.Icon
+                                            icon={() => <Feather name={showPassword ? "eye-off" : "eye"} size={20} color="gray" />}
+                                            onPress={() => setShowPassword(!showPassword)}
+                                        />
+                                    }
+                                />
+                                <BytebankButton
+                                    color="primary"
+                                    variant="contained"
+                                    onPress={loginForm.handleSubmit(handleLogin)}
+                                    disabled={isLoading || !loginForm.formState.isValid}>
+                                    {isLoading ? <ActivityIndicator color="#fff" /> : "Entrar"}
+                                </BytebankButton>
+                            </View>
+                        </FormProvider>
                     ) : (
-                        <View style={styles.formContainer}>
-                            <BytebankInput
-                                value={name}
-                                onChangeText={setName}
-                                placeholder="Seu nome"
-                                label={'Nome'} />
-
-
-                            <BytebankInput
-                                label={'Digite o e-mail'}
-                                value={registerEmail}
-                                onChangeText={setRegisterEmail}
-                                keyboardType={'email-address'}
-                                mode="outlined"
-                                placeholder="email@example.com"
-                            />
-
-                            <BytebankInput
-                                label={'Digite a senha'}
-                                value={registerPassword}
-                                onChangeText={setRegisterPassword}
-                                keyboardType={'visible-password'}
-                                mode="outlined"
-                                secureTextEntry={!showRegisterPassword}
-                                placeholder="********"
-                                right={
-                                    <TextInput.Icon
-                                        icon={() => <Feather name={showRegisterPassword ? "eye-off" : "eye"} size={20} color="gray" />}
-                                        onPress={() => setShowRegisterPassword(!showRegisterPassword)}
-                                    />
-                                }
-                            />
-                            <BytebankButton
-                                color="primary"
-                                variant="contained"
-                                onPress={handleRegister}
-                                disabled={isLoading}>
-                                {isLoading ? <ActivityIndicator color="#fff" /> : "Criar conta"}
-                            </BytebankButton>
-                        </View>
+                        <FormProvider {...registerForm}>
+                            <View style={styles.formContainer}>
+                                <BytebankInputController
+                                    name="name"
+                                    label="Nome"
+                                    placeholder="Seu nome"
+                                    rules={{ required: "Nome obrigatório" }}
+                                />
+                                <BytebankInputController
+                                    name="registerEmail"
+                                    label="Digite o e-mail"
+                                    placeholder="email@example.com"
+                                    keyboardType="email-address"
+                                    rules={{
+                                        required: "E-mail obrigatório",
+                                        pattern: {
+                                            value: /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
+                                            message: "E-mail inválido"
+                                        }
+                                    }}
+                                />
+                                <BytebankInputController
+                                    name="registerPassword"
+                                    label="Digite a senha"
+                                    placeholder="********"
+                                    secureTextEntry={!showRegisterPassword}
+                                    type="password"
+                                    rules={{ required: "Senha obrigatória" }}
+                                    right={
+                                        <TextInput.Icon
+                                            icon={() => <Feather name={showRegisterPassword ? "eye-off" : "eye"} size={20} color="gray" />}
+                                            onPress={() => setShowRegisterPassword(!showRegisterPassword)}
+                                        />
+                                    }
+                                />
+                                <BytebankButton
+                                    color="primary"
+                                    variant="contained"
+                                    onPress={registerForm.handleSubmit(handleRegister)}
+                                    disabled={isLoading || !registerForm.formState.isValid}>
+                                    {isLoading ? <ActivityIndicator color={ColorsPalette.light['lime.700']} /> : "Criar conta"}
+                                </BytebankButton>
+                            </View>
+                        </FormProvider>
                     )}
                 </ScrollView>
             </KeyboardAvoidingView>
