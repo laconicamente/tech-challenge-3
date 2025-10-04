@@ -17,7 +17,9 @@ export const BytebankInputController: React.FC<InputControllerProps> = ({
   placeholder,
   maskType,
   rules,
-  keyboardType
+  keyboardType,
+  secureTextEntry,
+  right
 }) => {
   const formContext = useFormContext();
   const control = controlProp ?? formContext?.control;
@@ -44,6 +46,8 @@ export const BytebankInputController: React.FC<InputControllerProps> = ({
           keyboardType={keyboardType || 'default'}
           value={field.value}
           maskType={maskType}
+          secureTextEntry={secureTextEntry}
+          right={right}
           onChangeText={
             maskType
               ? (masked) => field.onChange(masked)

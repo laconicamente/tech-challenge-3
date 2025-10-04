@@ -100,7 +100,7 @@ const AccountAccessScreen = () => {
 
                     <BytebankTabSelector tabs={[{ label: 'Login', name: 'login' }, { label: 'Crie uma conta', name: 'register' }]} activeTab={activeTab} onTabChange={handleTabChange} />
                     {activeTab === 'login' ? (
-                        <FormProvider {...loginForm}>
+                        <FormProvider {...loginForm} key="login-form">
                             <View style={styles.formContainer}>
                                 <BytebankInputController
                                     name="email"
@@ -139,13 +139,13 @@ const AccountAccessScreen = () => {
                             </View>
                         </FormProvider>
                     ) : (
-                        <FormProvider {...registerForm}>
+                        <FormProvider {...registerForm} key="register-form">
                             <View style={styles.formContainer}>
                                 <BytebankInputController
                                     name="name"
                                     label="Nome"
                                     placeholder="Seu nome"
-                                    rules={{ required: "Nome obrigatório" }}
+                                    rules={{ required: "Nome é obrigatório" }}
                                 />
                                 <BytebankInputController
                                     name="registerEmail"
@@ -153,10 +153,10 @@ const AccountAccessScreen = () => {
                                     placeholder="email@example.com"
                                     keyboardType="email-address"
                                     rules={{
-                                        required: "E-mail obrigatório",
+                                        required: "E-mail é obrigatório",
                                         pattern: {
                                             value: /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
-                                            message: "E-mail inválido"
+                                            message: "E-mail é inválido"
                                         }
                                     }}
                                 />
@@ -166,7 +166,7 @@ const AccountAccessScreen = () => {
                                     placeholder="********"
                                     secureTextEntry={!showRegisterPassword}
                                     type="password"
-                                    rules={{ required: "Senha obrigatória" }}
+                                    rules={{ required: "Senha é obrigatória" }}
                                     right={
                                         <TextInput.Icon
                                             icon={() => <Feather name={showRegisterPassword ? "eye-off" : "eye"} size={20} color="gray" />}

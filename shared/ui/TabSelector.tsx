@@ -3,9 +3,10 @@ import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
 interface BytebankTabSelectorProps {
     tabs: Array<{ name: string, label: string }>,
     activeTab: string,
+    disabled?: boolean,
     onTabChange: (name: string) => void,
 }
-export function BytebankTabSelector({ tabs, activeTab, onTabChange }: BytebankTabSelectorProps) {
+export function BytebankTabSelector({ tabs, activeTab, disabled, onTabChange }: BytebankTabSelectorProps) {
     return (
         <View style={styles.tabSelector}>
             {
@@ -13,7 +14,7 @@ export function BytebankTabSelector({ tabs, activeTab, onTabChange }: BytebankTa
                     <TouchableOpacity
                         key={tab.name}
                         style={[styles.tabButton, activeTab === tab.name && styles.tabActive]}
-                        onPress={() => onTabChange(tab.name)}
+                        onPress={() => !disabled && onTabChange(tab.name)}
                     >
                         <Text style={[styles.tabText, activeTab === tab.name && styles.tabTextActive]}>{tab.label}</Text>
                     </TouchableOpacity>

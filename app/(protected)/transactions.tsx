@@ -10,8 +10,8 @@ import { TransactionSkeleton } from '@/shared/components/Transaction/Transaction
 import { useFinancial } from '@/shared/contexts/financial/FinancialContext';
 import { BytebankButton } from '@/shared/ui/Button';
 import { Ionicons } from '@expo/vector-icons';
-import { Stack } from 'expo-router';
-import React, { useRef, useState } from 'react';
+import { Stack, useFocusEffect } from 'expo-router';
+import React, { useCallback, useRef, useState } from 'react';
 import { Alert, StyleSheet, Text, View } from 'react-native';
 import { Swipeable } from 'react-native-gesture-handler';
 import { TouchableRipple } from 'react-native-paper';
@@ -30,11 +30,18 @@ const CONTENT_RADIUS = 20;
 export default function TransactionsScreen() {
   const scrollY = useSharedValue(0);
 
-  const { transactions, isLoading, isLoadingMore, loadMore, setFilters, deleteTransaction, hasMore } = useFinancial();
+  const { transactions, isLoading, isLoadingMore, loadMore, setFilters, deleteTransaction, hasMore, refetch } = useFinancial();
   const [isFiltersVisible, setIsFiltersVisible] = useState(false);
   const [isEditVisible, setIsEditVisible] = useState(false);
   const [transaction, setTransaction] = useState<TransactionItemProps | null>(null);
   const openSwipeableRef = useRef<Swipeable | null>(null);
+
+
+  useFocusEffect(
+    useCallback(() => {
+      refetch?.();
+    }, [refetch])
+  );
 
   const closeCurrentSwipe = () => {
     if (openSwipeableRef.current) {
@@ -66,7 +73,12 @@ export default function TransactionsScreen() {
     };
   });
 
-  const fetchMoreTransactions = async () => { loadMore?.(); }
+  const fetchMoreTransactions = async () => { 
+    if (isLoadingMore || !hasMore) {
+      return;
+    }
+     loadMore?.(); 
+    }
   const handleEdit = (t: TransactionItemProps) => {
     setTransaction(t);
     setIsEditVisible(true);
@@ -117,13 +129,15 @@ export default function TransactionsScreen() {
       onSwipeableClose={() => {
         if (openSwipeableRef.current === localRef) openSwipeableRef.current = null;
       }}
+      containerStyle={styles.bgWhite}
     >
       <TransactionItem transaction={item} />
     </Swipeable>
     );
   }
 
-  const EmptyFeedback = () => (<View style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 20, flex: 1 }}>
+  const EmptyFeedback = () => (
+  <View style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 20, flex: 1, backgroundColor: '#fff' }}>
     <NoDataSvg width={220} height={220} />
     <Text style={{ textAlign: 'center', fontSize: 16, color: '#666', marginTop: 10 }}>
       Não encontramos nenhuma transação, que tal criar uma nova?
@@ -172,11 +186,13 @@ export default function TransactionsScreen() {
             onScroll={scrollHandler}
             scrollEventThrottle={16}
             onEndReached={fetchMoreTransactions}
-            onEndReachedThreshold={0.6}
-            ListFooterComponent={hasMore && isLoadingMore ? <TransactionSkeleton numberOfItems={2} /> : <View style={{ height: 50 }} />}
+            onEndReachedThreshold={0.8}
+            className={'bgWhite'}
+            ListFooterComponent={hasMore && isLoadingMore ? <TransactionSkeleton numberOfItems={2} /> : null}
           />
         </Animated.View>
-        <View style={{ position: 'absolute', backgroundColor: '#FFF', zIndex: 0, bottom: 0, width: '100%', height: 600 }} pointerEvents="none" />
+        <View style={{ position: 'absolute', backgroundColor: '#d4eb61', zIndex: -1, top: 0, width: '100%', height: 220 }} pointerEvents="none" />
+
         {renderEditTransaction()}
       </SafeAreaView>
     </>
@@ -184,9 +200,12 @@ export default function TransactionsScreen() {
 }
 
 const styles = StyleSheet.create({
+  bgWhite: { 
+    backgroundColor: '#FFF',
+  },
   container: {
     flex: 1,
-    backgroundColor: '#d4eb61',
+    backgroundColor: '#FFF',
   },
   balanceResumeHeader: {
     position: 'absolute',
@@ -211,7 +230,6 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     alignItems: 'center',
     padding: 16,
-    marginTop: 20,
   },
   subHeaderTitle: {
     fontSize: 18,

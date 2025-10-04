@@ -26,10 +26,6 @@ export const TransactionItem = ({transaction}: {transaction: TransactionItemProp
 );
 
 const styles = StyleSheet.create({
-    listContainer: {
-        paddingHorizontal: 0,
-        marginTop: 20
-    },
     itemContainer: {
         flexDirection: 'row',
         alignItems: 'center',

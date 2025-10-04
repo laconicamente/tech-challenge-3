@@ -64,8 +64,8 @@ const TransactionCreateDrawer: React.FC<TransactionCreateDrawerProps> = ({
             fileUrl: "",
         },
     });
-    const { setValue, reset, control, handleSubmit, formState: { errors } } = formMethods;
-    const { isValid } = formMethods.formState;
+    const { setValue, reset, control, handleSubmit, formState } = formMethods;
+    const { isValid } = formState;
 
     useEffect(() => {
         if (transaction) {
@@ -80,29 +80,13 @@ const TransactionCreateDrawer: React.FC<TransactionCreateDrawerProps> = ({
                 fileUrl: transaction.fileUrl || "",
             });
         } else {
-            reset({
-                methodId: "",
-                categoryId: "",
-                createdAt: "",
-                value: null,
-                type: "income",
-                fileUrl: "",
-            });
             setTransactionType("income");
+            resetSettings(transactionType);
             setTitle("Nova transação");
         }
     }, [transaction, reset]);
 
-    const resetSettings = (type: TransactionType = 'income') => {
-        reset({
-            methodId: "",
-            categoryId: "",
-            createdAt: "",
-            value: "",
-            type,
-            fileUrl: ""
-        })
-    }
+    const resetSettings = (type: TransactionType = 'income') => reset({ methodId: "", categoryId: "", createdAt: "", value: "", type, fileUrl: "" });
 
     const handleTabChange = (type: string) => {
         const transactionType = type as TransactionType;
@@ -178,6 +162,7 @@ const TransactionCreateDrawer: React.FC<TransactionCreateDrawerProps> = ({
                                         { label: "Saída", name: "expense" },
                                     ]}
                                     activeTab={transactionType}
+                                    disabled={transaction !== null}
                                     onTabChange={handleTabChange}
                                 />
                                 {methods && methods.length > 0 ?
@@ -193,7 +178,7 @@ const TransactionCreateDrawer: React.FC<TransactionCreateDrawerProps> = ({
                                     <Controller
                                         name="createdAt"
                                         control={control}
-                                        rules={{ required: "Data obrigatória" }}
+                                        rules={{ required: "Data da transação é obrigatória" }}
                                         render={({ field, fieldState: { error } }) => (
                                             <View>
                                                 <View style={{ flexDirection: 'row', flexWrap: 'wrap', alignItems: 'center', justifyContent: 'space-between' }}>
@@ -244,7 +229,14 @@ const TransactionCreateDrawer: React.FC<TransactionCreateDrawerProps> = ({
                                     label="Valor"
                                     placeholder="R$ 0,00"
                                     maskType="currency"
-                                    rules={{ required: "Valor obrigatório" }}
+                                    rules={{
+                                        required: "Valor é obrigatório", validate: (v) => {
+                                            const num = parseCurrencyToNumber(v);
+                                            if (!num || num <= 0) return "O valor deve ser maior que zero";
+                                            if (num > 1000000) return "O valor máximo é R$ 1.000.000";
+                                            return true;
+                                        }
+                                    }}
                                     keyboardType="number-pad"
                                 />
                                 {categories && categories.length > 0 && (
@@ -253,7 +245,7 @@ const TransactionCreateDrawer: React.FC<TransactionCreateDrawerProps> = ({
                                         label="Categoria"
                                         items={categories.map(c => ({ label: c.name, value: c.id }))}
                                         placeholder="Selecione uma categoria"
-                                        rules={{ required: "Categoria obrigatória" }}
+                                        rules={{ required: "Categoria é obrigatória" }}
                                     />
                                 )}
                                 <View style={{ marginVertical: 20 }}>
