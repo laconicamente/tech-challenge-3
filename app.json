@@ -10,7 +10,10 @@
     "newArchEnabled": true,
     "ios": {
       "googleServicesFile": "./GoogleService-Info.plist",
-      "bundleIdentifier": "bytebank.laconicamente.com"
+      "bundleIdentifier": "bytebank.laconicamente.com",
+      "infoPlist": {
+        "NSPhotoLibraryUsageDescription": "O aplicativo precisa de acesso à sua galeria para permitir que você escolha uma foto de perfil."
+      }
     },
     "android": {
       "googleServicesFile": "./google-services.json",
@@ -28,7 +31,12 @@
     },
     "plugins": [
       "expo-router",
-      "expo-image-picker",
+      [
+        "expo-image-picker",
+        {
+          "photosPermission": "O aplicativo precisa de acesso à sua galeria para permitir que você escolha uma foto de perfil."
+        }
+      ],
       "@react-native-firebase/app",
       "@react-native-firebase/auth",
       "@react-native-firebase/crashlytics",
