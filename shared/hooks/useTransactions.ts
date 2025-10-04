@@ -120,7 +120,7 @@ export function useTransactions(
 
       return query(base, ...constraints);
     },
-    [userId, categoryId, startDate, endDate, pageSize]
+    [ categoryId, startDate, endDate, pageSize]
   );
 
   const fetchFirstPage = useCallback(async () => {
@@ -128,7 +128,7 @@ export function useTransactions(
     setError(null);
     setHasMore(true);
     lastVisibleRef.current = null;
-    
+
     try {
       const qRef = buildBaseQuery(false);
       const snap = await getDocs(qRef);

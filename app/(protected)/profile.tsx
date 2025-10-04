@@ -1,10 +1,13 @@
 import { ColorsPalette } from '@/shared/classes/constants/Pallete';
 import { useAuth } from '@/shared/contexts/auth/AuthContext';
+import { maskPhone } from '@/shared/helpers/maskPhone';
 import { useFeedbackAnimation } from '@/shared/hooks/useFeedbackAnimation';
 import { useUploadFile } from '@/shared/hooks/useUploadFile';
 import { BytebankButton } from '@/shared/ui/Button';
 import { BytebankInput } from '@/shared/ui/Input/Input';
-import React, { useState } from 'react';
+import { BytebankInputController } from '@/shared/ui/Input/InputController';
+import React, { useEffect, useState } from 'react';
+import { Controller, FormProvider, useForm } from 'react-hook-form';
 import { Image, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
@@ -13,11 +16,26 @@ const ProfileScreen = () => {
     const { user, updateUser } = useAuth();
     const { showFeedback, FeedbackAnimation } = useFeedbackAnimation();
     const { UploadProgressBar, uploadFile } = useUploadFile();
-    const [name, setName] = useState(user?.displayName || '');
-    const [email, setEmail] = useState(user?.email || '');
-    const [phone, setPhone] = useState(user?.phoneNumber || '');
+    
     const [isEditing, setIsEditing] = useState(false);
 
+    const formMethods = useForm({
+        mode: 'onChange',
+        defaultValues: {
+            name: user?.displayName || '',
+            email: user?.email || '',
+            phone: user?.phoneNumber || '',
+        }
+    });
+
+    useEffect(() => { 
+        formMethods.reset({
+            name: user?.displayName || '',
+            email: user?.email || '',
+            phone: user?.phoneNumber ? maskPhone(user.phoneNumber) : '',
+        });
+    }, [user]);
+    
     const handleEditProfileImage = async () => {
         try {
             const downloadURL = await uploadFile('image', `users/${user?.uid}`);
@@ -31,8 +49,9 @@ const ProfileScreen = () => {
         }
     };
 
-    const handleSaveProfile = async () => {
-        updateUser({ displayName: name, email, phoneNumber: phone }).then(() => {
+    const handleSaveProfile = async (data: { name: string, email: string, phone: string }) => {
+        const unmaskedPhone = data.phone.replace(/\D/g, '');
+        updateUser({ displayName: data.name, email: data.email, phoneNumber: unmaskedPhone }).then(() => {
             showFeedback("success");
         }).catch(_ => {
             showFeedback("error");
@@ -57,36 +76,53 @@ const ProfileScreen = () => {
                                 {user && user.photoURL ? <Image source={{ uri: user.photoURL }} style={{ width: 120, height: 120, borderRadius: 60 }} /> : <MaterialIcons name="camera-enhance" size={50} color={ColorsPalette.light['lime.200']} />}
                             </View>
                         </TouchableOpacity>
-                        <Text style={styles.userName}>{name}</Text>
+                        <Text style={styles.userName}>{formMethods.watch('name')}</Text>
                     </View>
 
-                    <View style={styles.formSection}>
-                        <BytebankInput
-                            label={'Nome completo'}
-                            value={name}
-                            onChangeText={setName}
-                            placeholder="Seu nome"
-                            editable={isEditing}
-                        />
-                        <BytebankInput
-                            label={'E-mail'}
-                            value={email}
-                            onChangeText={setEmail}
-                            placeholder="email@example.com"
-                            editable={isEditing}
-                        />
-                        <BytebankInput
-                            label={'Telefone'}
-                            value={phone}
-                            onChangeText={setPhone}
-                            placeholder="(00) 00000-0000"
-                            editable={isEditing}
-                        />
-                    </View>
+                    <FormProvider {...formMethods}>
+                        <View style={styles.formSection}>
+                            <BytebankInputController
+                                name="name"
+                                label={'Nome completo'}
+                                placeholder="Seu nome"
+                                editable={isEditing}
+                                rules={{ required: 'Nome é obrigatório' }}
+                            />
+                            <BytebankInputController
+                                name="email"
+                                label={'E-mail'}
+                                placeholder="email@example.com"
+                                editable={isEditing}
+                                rules={{
+                                    required: "E-mail obrigatório",
+                                    pattern: {
+                                        value: /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
+                                        message: "E-mail é inválido"
+                                    }
+                                }}
+                            />
+                            <Controller
+                                control={formMethods.control}
+                                name="phone"
+                                render={({ field: { onChange, onBlur, value } }) => (
+                                    <BytebankInput
+                                        label={'Telefone'}
+                                        value={value}
+                                        onBlur={onBlur}
+                                        onChangeText={(text) => onChange(maskPhone(text))}
+                                        placeholder="(00) 00000-0000"
+                                        editable={isEditing}
+                                        keyboardType="phone-pad"
+                                        maxLength={15}
+                                    />
+                                )}
+                            />
+                        </View>
+                    </FormProvider>
 
                     <View style={styles.actionsSection}>
                         {isEditing ? (
-                            <BytebankButton color="primary" variant="contained" onPress={handleSaveProfile}>
+                            <BytebankButton color="primary" variant="contained" onPress={formMethods.handleSubmit(handleSaveProfile)}>
                                 Salvar alterações
                             </BytebankButton>
                         ) : (

@@ -91,8 +91,6 @@ const WidgetFinancialResume: React.FC = () => {
     }));
   }, [data]);
 
-  const lastValue = data.length ? data[data.length - 1].value : 0;
-
   const handleRange = (k: RangeKey) => {
     setRange(k);
     Haptics.selectionAsync();
@@ -106,10 +104,8 @@ const handleTransactionTypeChange = () =>  setTransactionType((prev) => (prev ==
       <View style={{ flexDirection: 'row', justifyContent: 'space-between', gap: 10, alignItems: 'center'}}>
       <Text style={styles.title}>Resumo por período</Text>
         <BytebankButton color={'primary'} onPress={() => handleTransactionTypeChange()} styles={styles.button}>
-          <View>
+          <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'center' }}>
             <FontAwesome name="exchange" size={18} color={ColorsPalette.light["lime.100"]} />
-          </View>
-          <View>
             <Text style={styles.buttonText}>Trocar</Text>
           </View>
         </BytebankButton>

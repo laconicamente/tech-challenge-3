@@ -39,6 +39,7 @@ const FinancialContext = createContext<FinancialContextType>({
 });
 
 export const FinancialProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+    const { user } = useAuth();
     const {
         transactions,
         isLoading,
@@ -52,12 +53,12 @@ export const FinancialProvider: React.FC<{ children: React.ReactNode }> = ({ chi
         editTransaction,
         loadMore,
         hasMore
-    } = useTransactions({}, 5);
-    const { user } = useAuth();
+    } = useTransactions({ userId: user?.uid }, 5);
     const { total: balanceValue, isLoadingBalance, refetchBalanceValue } = useBalanceValue({ userId: user?.uid });
     const [isBalanceVisible, setBalanceVisible] = useState(false);
 
     const fetchTransactions = (user: User, params?: TransactionFilter) => {
+        console.log('Fetching transactions for user:', user.uid, 'with params:', params)
         if (!setFilters) return;
         setFilters({
             userId: user.uid,

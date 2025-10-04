@@ -111,7 +111,7 @@ const AccountAccessScreen = () => {
                                         required: "E-mail obrigatório",
                                         pattern: {
                                             value: /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
-                                            message: "E-mail inválido"
+                                            message: "E-mail é inválido"
                                         }
                                     }}
                                 />
@@ -121,7 +121,7 @@ const AccountAccessScreen = () => {
                                     placeholder="********"
                                     secureTextEntry={!showPassword}
                                     type="password"
-                                    rules={{ required: "Senha obrigatória" }}
+                                    rules={{ required: "Senha é obrigatória" }}
                                     right={
                                         <TextInput.Icon
                                             icon={() => <Feather name={showPassword ? "eye-off" : "eye"} size={20} color="gray" />}
