@@ -1,7 +1,6 @@
-
 import { auth, firestore } from '@/firebaseConfig';
 import { createUserWithEmailAndPassword, onAuthStateChanged, signInWithEmailAndPassword, signOut, updateProfile, User } from 'firebase/auth';
-import { doc, serverTimestamp, setDoc } from 'firebase/firestore';
+import { doc, getDoc, serverTimestamp, setDoc } from 'firebase/firestore';
 import React, { createContext, ReactNode, useContext, useEffect, useState } from 'react';
 
 interface AuthContextType {
@@ -12,6 +11,7 @@ interface AuthContextType {
     logout: () => Promise<void>;
     updateUser: (userData: Partial<User>) => Promise<void>;
     isAuthenticated: boolean;
+    reloadUser: () => Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -21,9 +21,24 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     const [isLoading, setIsLoading] = useState(true);
     const [isAuthenticated, setIsAuthenticated] = useState(false);
 
-    useEffect(() => {
-        const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
+    const fetchUserDoc = async (currentUser: User) => {
+        const userDocRef = doc(firestore, 'users', currentUser.uid);
+        const userDoc = await getDoc(userDocRef);
+        if (userDoc.exists()) {
+            const userData = userDoc.data();
+            setUser({ ...currentUser, ...userData });
+        } else {
             setUser(currentUser);
+        }
+    };
+
+    useEffect(() => {
+        const unsubscribe = onAuthStateChanged(auth, async (currentUser) => {
+            if (currentUser) {
+                await fetchUserDoc(currentUser);
+            } else {
+                setUser(null);
+            }
             setIsLoading(false);
             setIsAuthenticated(!!currentUser);
         });
@@ -66,6 +81,17 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         }
     };
 
+    const reloadUser = async () => {
+        const currentUser = auth.currentUser;
+        if (currentUser) {
+            await currentUser.reload();
+            const refreshedUser = auth.currentUser;
+            if (refreshedUser) {
+                await fetchUserDoc(refreshedUser);
+            }
+        }
+    };
+
     const logout = async (): Promise<void> => {
         await signOut(auth);
     };
@@ -77,19 +103,20 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
             if (currentUser) {
                 await updateProfile(currentUser, userData);
-                setUser({...currentUser, ...userData });
             }
 
-           await setDoc(
+            await setDoc(
                 doc(firestore, 'users', currentUser.uid), userData,
                 { merge: true }
             );
+
+            await reloadUser();
         } catch (error) {
             console.error("Erro ao atualizar usuário:", error);
         }
     };
 
-    const value = { user, isLoading, login, signUp, logout, updateUser, isAuthenticated };
+    const value = { user, isLoading, login, signUp, logout, updateUser, isAuthenticated, reloadUser };
 
     return (
         <AuthContext.Provider value={value}>

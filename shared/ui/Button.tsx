@@ -54,12 +54,12 @@ export function BytebankButton({
 const buttonStyles = StyleSheet.create({
     button: {
         borderRadius: 30,
-        padding: 10
     },
     buttonText: {
         color: ColorsPalette.light['lime.800'],
         fontWeight: 'bold',
         fontSize: 18,
         display: 'flex',
+        padding: 8
     },
 });

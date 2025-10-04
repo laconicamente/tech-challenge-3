@@ -149,7 +149,7 @@ export default function TransactionsScreen() {
     <Animated.View style={[styles.subHeader, animatedSubHeaderStyle]}>
       <Text style={styles.subHeaderTitle}>Movimentações</Text>
       <View>
-        <BytebankButton color={'primary'} styles={styles.filterButton} onPress={() => setIsFiltersVisible(!isFiltersVisible)}>
+        <BytebankButton color={'primary'} styles={styles.filterButton} labelStyles={{padding: 0}} onPress={() => setIsFiltersVisible(!isFiltersVisible)}>
           <View>
             <Text style={styles.filterText}>Filtros</Text>
           </View>

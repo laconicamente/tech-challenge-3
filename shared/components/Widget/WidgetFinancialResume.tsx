@@ -103,10 +103,10 @@ const handleTransactionTypeChange = () =>  setTransactionType((prev) => (prev ==
     <>
       <View style={{ flexDirection: 'row', justifyContent: 'space-between', gap: 10, alignItems: 'center'}}>
       <Text style={styles.title}>Resumo por período</Text>
-        <BytebankButton color={'primary'} onPress={() => handleTransactionTypeChange()} styles={styles.button}>
+        <BytebankButton color={'primary'} onPress={() => handleTransactionTypeChange()} styles={styles.button} labelStyles={{padding: 0}} >
           <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'center' }}>
             <FontAwesome name="exchange" size={18} color={ColorsPalette.light["lime.100"]} />
-            <Text style={styles.buttonText}>Trocar</Text>
+            <Text style={styles.buttonText} >Trocar</Text>
           </View>
         </BytebankButton>
       </View>

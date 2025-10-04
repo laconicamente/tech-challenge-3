@@ -2,18 +2,15 @@
   "expo": {
     "name": "Bytebank",
     "slug": "bytebank",
-    "version": "1.0.0",
+    "version": "1.0.2",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
     "scheme": "bytebank",
     "userInterfaceStyle": "automatic",
-    "jsEngine": "hermes",
+    "newArchEnabled": true,
     "ios": {
       "googleServicesFile": "./GoogleService-Info.plist",
-      "bundleIdentifier": "bytebank.laconicamente.com",
-      "infoPlist": {
-        "NSPhotoLibraryUsageDescription": "O aplicativo precisa de acesso à sua galeria para permitir que você escolha uma foto de perfil."
-      }
+      "bundleIdentifier": "bytebank.laconicamente.com"
     },
     "android": {
       "googleServicesFile": "./google-services.json",
@@ -31,12 +28,7 @@
     },
     "plugins": [
       "expo-router",
-      [
-        "expo-image-picker",
-        {
-          "photosPermission": "O aplicativo precisa de acesso à sua galeria para permitir que você escolha uma foto de perfil."
-        }
-      ],
+      "expo-image-picker",
       "@react-native-firebase/app",
       "@react-native-firebase/auth",
       "@react-native-firebase/crashlytics",
@@ -68,6 +60,7 @@
     ],
     "experiments": {
       "typedRoutes": true
-    }
+    },
+    "jsEngine": "hermes"
   }
 }

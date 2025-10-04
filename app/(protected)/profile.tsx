@@ -126,7 +126,7 @@ const ProfileScreen = () => {
                                 Salvar alterações
                             </BytebankButton>
                         ) : (
-                            <BytebankButton color="secondary" variant="outlined" onPress={() => setIsEditing(true)}>
+                            <BytebankButton color="tertiary" variant="outlined" onPress={() => setIsEditing(true)} styles={{ borderColor: ColorsPalette.light['lime.400'], borderWidth: 0 }}>
                                 Permitir edição da conta
                             </BytebankButton>
                         )}
