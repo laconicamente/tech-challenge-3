@@ -7,7 +7,7 @@
     "icon": "./assets/images/icon.png",
     "scheme": "bytebank",
     "userInterfaceStyle": "automatic",
-    "newArchEnabled": true,
+    "jsEngine": "hermes",
     "ios": {
       "googleServicesFile": "./GoogleService-Info.plist",
       "bundleIdentifier": "bytebank.laconicamente.com",
@@ -68,9 +68,6 @@
     ],
     "experiments": {
       "typedRoutes": true
-    },
-    "expo": {
-      "jsEngine": "hermes"
     }
   }
 }
