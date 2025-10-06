@@ -20,6 +20,7 @@ export interface TransactionFilter {
     limit?: number
     userId?: string
     categoryId?: string
+    methodId?: string
     minValue?: number
     maxValue?: number
     startDate?: string

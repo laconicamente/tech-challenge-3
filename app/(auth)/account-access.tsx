@@ -67,7 +67,6 @@ const AccountAccessScreen = () => {
         try {
             await signUp(data.name, data.registerEmail, data.registerPassword);
             setActiveTab('login');
-            Alert.alert("Sucesso", "Conta criada com sucesso! Faça login para continuar.");
             registerForm.reset();
         } catch (_) {
             Alert.alert("Ocorreu um erro", "Verifique os dados e tente novamente.");

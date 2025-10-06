@@ -1,9 +1,10 @@
 import { ColorsPalette } from '@/shared/classes/constants/Pallete';
 import { useAuth } from '@/shared/contexts/auth/AuthContext';
-import MaterialIcons from '@expo/vector-icons/MaterialIcons';
+import { Image } from 'expo-image';
 import React from 'react';
-import { Image, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import MaterialIcons from "react-native-vector-icons/AntDesign";
 
 interface TransactionHeaderProps {
   title?: string;
@@ -14,12 +15,15 @@ interface TransactionHeaderProps {
 
 const TransactionHeader = ({ title = '', hasAction = false, iconAction = '', onActionPress }: TransactionHeaderProps) => {
   const { user } = useAuth();
+
   return (
     <SafeAreaView style={styles.headerContainer} edges={['top']}>
       <View style={styles.headerContent}>
         <TouchableOpacity style={styles.leftIcon}>
           <View style={styles.avatarCircle}>
-            {user && user.photoURL ? <Image source={{ uri: user.photoURL }} style={{ width: 50, height: 50, borderRadius: 25 }} /> : <MaterialIcons name="user" size={25} color={ColorsPalette.light['lime.800']} />}
+            {user && user.photoURL ? <Image source={{ uri: user.photoURL }} cachePolicy="memory-disk" cachePolicy="memory-disk"
+              contentFit="cover"
+              transition={150} style={{ width: 50, height: 50, borderRadius: 25 }} /> : <MaterialIcons name="user" size={25} color={ColorsPalette.light['lime.800']} />}
           </View>
         </TouchableOpacity>
         <View style={styles.titleContainer}>

@@ -73,12 +73,11 @@ export default function TransactionsScreen() {
     };
   });
 
-  const fetchMoreTransactions = async () => { 
-    if (isLoadingMore || !hasMore) {
-      return;
-    }
-     loadMore?.(); 
-    }
+  const fetchMoreTransactions = () => {
+    if (isLoadingMore || isLoading || !hasMore) return;
+    loadMore?.();
+  };
+
   const handleEdit = (t: TransactionItemProps) => {
     setTransaction(t);
     setIsEditVisible(true);
@@ -186,9 +185,9 @@ export default function TransactionsScreen() {
             onScroll={scrollHandler}
             scrollEventThrottle={16}
             onEndReached={fetchMoreTransactions}
-            onEndReachedThreshold={0.8}
+            onEndReachedThreshold={0.2}
             className={'bgWhite'}
-            ListFooterComponent={hasMore && isLoadingMore ? <TransactionSkeleton numberOfItems={2} /> : null}
+            ListFooterComponent={hasMore ? (isLoadingMore ? <TransactionSkeleton numberOfItems={2} /> : <View style={{ padding: 16 }}></View>) : null}
           />
         </Animated.View>
         <View style={{ position: 'absolute', backgroundColor: '#d4eb61', zIndex: -1, top: 0, width: '100%', height: 220 }} pointerEvents="none" />

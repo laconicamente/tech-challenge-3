@@ -1,30 +1,30 @@
 import { firestore } from "@/firebaseConfig";
 import {
-    DocumentData,
-    FirestoreError,
-    QueryDocumentSnapshot,
-    addDoc,
-    collection,
-    deleteDoc,
-    doc,
-    getDocs,
-    limit,
-    orderBy,
-    query,
-    startAfter,
-    updateDoc,
-    where,
+  DocumentData,
+  FirestoreError,
+  QueryDocumentSnapshot,
+  addDoc,
+  collection,
+  deleteDoc,
+  doc,
+  getDocs,
+  limit,
+  orderBy,
+  query,
+  startAfter,
+  updateDoc,
+  where,
 } from "firebase/firestore";
 import { useCallback, useEffect, useRef, useState } from "react";
 import {
-    TransactionFilter,
-    TransactionItemProps,
+  TransactionFilter,
+  TransactionItemProps,
 } from "../classes/models/transaction";
 import {
-    formatDate,
-    formatDateISO,
-    parseDateString,
-    toDateFromFirestore,
+  formatDate,
+  formatDateISO,
+  parseDateString,
+  toDateFromFirestore,
 } from "../helpers/formatDate";
 import { getCategoryById } from "../services/categoryService";
 import { getMethodById } from "../services/methodService";
@@ -60,7 +60,7 @@ export function useTransactions(
     null
   );
   const [isLoadingMore, setIsLoadingMore] = useState(false);
-  const { userId, categoryId, startDate, endDate } = filters;
+  const { userId, categoryId, methodId, startDate, endDate, minValue, maxValue } = filters;
 
   const mapDoc = async (
     doc: QueryDocumentSnapshot<DocumentData>
@@ -93,6 +93,7 @@ export function useTransactions(
 
       if (userId) constraints.push(where("userId", "==", userId));
       if (categoryId) constraints.push(where("categoryId", "==", categoryId));
+      if (methodId) constraints.push(where("methodId", "==", methodId));
 
       const start = parseDateString(startDate);
       const end = parseDateString(endDate);
@@ -111,16 +112,26 @@ export function useTransactions(
       if (start) constraints.push(where("createdAt", ">=", start));
       if (endWithTime) constraints.push(where("createdAt", "<=", endWithTime));
 
-      constraints.push(orderBy("createdAt", "desc"));
-      constraints.push(limit(pageSize));
+      // Valor mínimo e máximo
+      let min = typeof minValue === "number" ? minValue : undefined;
+      let max = typeof maxValue === "number" ? maxValue : undefined;
+      if (typeof min === "number" && typeof max === "number" && min > max) {
+        // Garante ordem correta caso venham invertidos
+        [min, max] = [max, min];
+      }
+      if (typeof min === "number") constraints.push(where("value", ">=", min));
+      if (typeof max === "number") constraints.push(where("value", "<=", max));
 
+      // Ordem correta: orderBy -> startAfter (quando houver) -> limit
+      constraints.push(orderBy("createdAt", "desc"));
       if (forMore && lastVisibleRef.current) {
         constraints.push(startAfter(lastVisibleRef.current));
       }
+      constraints.push(limit(pageSize));
 
       return query(base, ...constraints);
     },
-    [ categoryId, startDate, endDate, pageSize]
+    [userId, categoryId, startDate, endDate, minValue, maxValue, pageSize]
   );
 
   const fetchFirstPage = useCallback(async () => {
@@ -150,7 +161,6 @@ export function useTransactions(
 
   const loadMore = useCallback(async () => {
     if (!hasMore || isLoadingMore || isLoading) return;
-
     setIsLoadingMore(true);
     try {
       const qRef = buildBaseQuery(true);
@@ -201,7 +211,8 @@ export function useTransactions(
     try {
       setIsLoading(true);
       const refCard = doc(firestore, "transactions", id);
-      await updateDoc(refCard, { ...data });
+      const transactionData = { ...data };
+      await updateDoc(refCard, transactionData);
     } catch (error) {
       console.error("Erro ao editar transação: ", error);
       throw error;

@@ -66,8 +66,8 @@ export const TransactionFilterDrawer = ({
     const handleApplyFilter = (data: { methodId: string; categoryId: string; startDate: string; endDate: string; minValue: string; maxValue: string; }) => {
         const filterData: TransactionFilter = {
             ...data,
-            minValue: data.minValue ? parseCurrencyToNumber(data.minValue) : undefined,
-            maxValue: data.maxValue ? parseCurrencyToNumber(data.maxValue) : undefined,
+            minValue: data.minValue ? parseCurrencyToNumber(data.minValue) * 100 : undefined,
+            maxValue: data.maxValue ? parseCurrencyToNumber(data.maxValue) * 100 : undefined,
         };
         onApplyFilter(filterData);
         onDismiss();

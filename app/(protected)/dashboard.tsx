@@ -7,7 +7,7 @@ import WidgetFinancialResume from '@/shared/components/Widget/WidgetFinancialRes
 import WidgetFinancialStatus from '@/shared/components/Widget/WidgetFinancialStatus';
 import WidgetSpendingByCategory from '@/shared/components/Widget/WidgetSpending/WidgetSpendingByCategory';
 import { useAuth } from '@/shared/contexts/auth/AuthContext';
-import { Stack } from 'expo-router';
+import { Stack, useFocusEffect } from 'expo-router';
 import React from 'react';
 import { ScrollView, StyleSheet, Text, View } from 'react-native';
 import Animated, { useAnimatedStyle, useSharedValue, withTiming } from 'react-native-reanimated';
@@ -15,6 +15,15 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 
 export default function DashboardScreen() {
   const { user } = useAuth();
+  const [userName, setUserName] = React.useState<string>('');
+
+  useFocusEffect(
+    React.useCallback(() => {
+      if (user) {
+        setUserName(user.displayName?.split(' ')[0] ?? 'Usuário');
+      }
+    }, [user])
+  );
 
   const headerMax = 115;
   const headerHeight = useSharedValue(headerMax);
@@ -40,7 +49,7 @@ export default function DashboardScreen() {
       />
 
       <Animated.View style={[styles.greetingHeader, animatedGreetingHeaderStyle]}>
-        <Text style={styles.greetingTitle}>{`Olá, ${user?.displayName?.split(' ')[0] ?? 'Usuário'}!`}</Text>
+        <Text style={styles.greetingTitle}>{`Olá, ${userName}!`}</Text>
         <Text style={styles.greetingSubtitle}>Gerencie suas finanças de forma eficiente.</Text>
       </Animated.View>
 

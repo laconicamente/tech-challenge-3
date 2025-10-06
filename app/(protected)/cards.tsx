@@ -82,14 +82,14 @@ const CardsScreen = () => {
     updateBankCard(id, data);
   };
   const handleDeleteCard = (id: string) => {
-            Alert.alert("Excluir cartão", "Você tem certeza que deseja excluir este cartão?", [
-                { text: "Cancelar" },
-                {
-                    text: "Confirmar exclusão", 
-                    style: "destructive",
-                    onPress: () => deleteBankCard(id),
-                }
-            ]);
+    Alert.alert("Excluir cartão", "Você tem certeza que deseja excluir este cartão?", [
+      { text: "Cancelar" },
+      {
+        text: "Confirmar exclusão",
+        style: "destructive",
+        onPress: () => deleteBankCard(id),
+      }
+    ]);
   };
 
   return (
@@ -100,7 +100,7 @@ const CardsScreen = () => {
             <TransactionHeader
               title="Meus cartões"
               hasAction={true}
-              iconAction="add-card"
+              iconAction={'plus-circle'}
               onActionPress={() => setVisible(true)}
             />
           ),
