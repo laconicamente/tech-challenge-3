@@ -10,7 +10,6 @@ Bem-vindo ao projeto de estudo **Bytebank**, uma aplicação mobile moderna dese
 - Criação, edição e exclusão de transações financeiras
 - Filtro e visualização do extrato de transações
 - Visualização do saldo total
-- Customização de widgets
 - Edição de perfil do usuário
 - Visualização e exclusão de cartões vinculados à conta
 
