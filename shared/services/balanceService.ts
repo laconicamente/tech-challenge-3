@@ -1,10 +1,10 @@
 import { firestore } from "@/firebaseConfig";
 import {
-    collection,
-    getDocs,
-    query,
-    QueryFieldFilterConstraint,
-    where,
+  collection,
+  getDocs,
+  query,
+  QueryFieldFilterConstraint,
+  where,
 } from "firebase/firestore";
 
 export interface BalanceValueFilters {
@@ -18,7 +18,7 @@ export const fetchBalanceValue = async (filters: BalanceValueFilters) => {
   const constraints: QueryFieldFilterConstraint[] = [
     where("userId", "==", filters.userId),
   ];
-
+console.log(filters.userId)
   const qRef = query(collection(firestore, "transactions"), ...constraints);
   const snap = await getDocs(qRef);
 
@@ -28,6 +28,7 @@ export const fetchBalanceValue = async (filters: BalanceValueFilters) => {
   snap.docs.forEach((d) => {
     const data = d.data();
     const value = Number(data.value) / 100 || 0;
+    console.log(value)
     if (data.type === "income") incomeSum += value;
     else if (data.type === "expense") expenseSum += value;
   });

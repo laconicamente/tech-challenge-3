@@ -17,6 +17,7 @@ export function useBalanceValue(filters: BalanceValueFilters = {}) {
     setIsLoadingBalance(true);
     setErrorTotal(null);
     try {
+      filters.userId = user.uid;
       const totalValue = await fetchBalanceValue(filters);
       setTotal(totalValue);
     } catch (e: any) {
