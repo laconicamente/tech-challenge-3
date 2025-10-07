@@ -3,7 +3,6 @@ import { useBalanceValue } from "@/shared/hooks/useBalanceValue";
 import { TransactionsResponse, useTransactions } from "@/shared/hooks/useTransactions";
 import { User } from "firebase/auth";
 import React, { createContext, useContext, useState } from "react";
-import { useAuth } from "../auth/AuthContext";
 
 export interface FinancialContextProps extends Partial<TransactionsResponse> {
     transactions: TransactionItemProps[];
@@ -39,7 +38,6 @@ const FinancialContext = createContext<FinancialContextType>({
 });
 
 export const FinancialProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-    const { user } = useAuth();
     const {
         transactions,
         isLoading,
@@ -53,11 +51,13 @@ export const FinancialProvider: React.FC<{ children: React.ReactNode }> = ({ chi
         editTransaction,
         loadMore,
         hasMore
-    } = useTransactions({ userId: user?.uid }, 5);
-    const { total: balanceValue, isLoadingBalance, refetchBalanceValue } = useBalanceValue({ userId: user?.uid });
+    } = useTransactions({}, 5);
+    const { total: balanceValue, isLoadingBalance, refetchBalanceValue } = useBalanceValue();
     const [isBalanceVisible, setBalanceVisible] = useState(false);
 
     const fetchTransactions = (user: User, params?: TransactionFilter) => {
+        console.log('financial',user.uid);
+        
         console.log('Fetching transactions for user:', user.uid, 'with params:', params)
         if (!setFilters) return;
         setFilters({

@@ -20,6 +20,7 @@ import {
   TransactionFilter,
   TransactionItemProps,
 } from "../classes/models/transaction";
+import { useAuth } from "../contexts/auth/AuthContext";
 import {
   formatDate,
   formatDateISO,
@@ -60,7 +61,8 @@ export function useTransactions(
     null
   );
   const [isLoadingMore, setIsLoadingMore] = useState(false);
-  const { userId, categoryId, methodId, startDate, endDate, minValue, maxValue } = filters;
+  const { user} = useAuth();
+  const { categoryId, methodId, startDate, endDate, minValue, maxValue } = filters;
 
   const mapDoc = async (
     doc: QueryDocumentSnapshot<DocumentData>
@@ -73,7 +75,7 @@ export function useTransactions(
 
     return {
       id: doc.id,
-      userId: data.userId,
+      userId: user?.uid,
       categoryId: data.categoryId,
       methodId: data.methodId,
       categoryName: category?.name,
@@ -90,8 +92,8 @@ export function useTransactions(
     (forMore: boolean = false) => {
       const base = collection(firestore, "transactions");
       const constraints = [];
-
-      if (userId) constraints.push(where("userId", "==", userId));
+console.log('userId', user?.uid)
+      if (user?.uid) constraints.push(where("userId", "==", user.uid));
       if (categoryId) constraints.push(where("categoryId", "==", categoryId));
       if (methodId) constraints.push(where("methodId", "==", methodId));
 
@@ -116,13 +118,11 @@ export function useTransactions(
       let min = typeof minValue === "number" ? minValue : undefined;
       let max = typeof maxValue === "number" ? maxValue : undefined;
       if (typeof min === "number" && typeof max === "number" && min > max) {
-        // Garante ordem correta caso venham invertidos
         [min, max] = [max, min];
       }
       if (typeof min === "number") constraints.push(where("value", ">=", min));
       if (typeof max === "number") constraints.push(where("value", "<=", max));
 
-      // Ordem correta: orderBy -> startAfter (quando houver) -> limit
       constraints.push(orderBy("createdAt", "desc"));
       if (forMore && lastVisibleRef.current) {
         constraints.push(startAfter(lastVisibleRef.current));
@@ -131,7 +131,7 @@ export function useTransactions(
 
       return query(base, ...constraints);
     },
-    [userId, categoryId, startDate, endDate, minValue, maxValue, pageSize]
+    [user, categoryId, startDate, endDate, minValue, maxValue, pageSize]
   );
 
   const fetchFirstPage = useCallback(async () => {

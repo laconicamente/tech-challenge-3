@@ -14,7 +14,7 @@ import { Stack, useFocusEffect } from 'expo-router';
 import React, { useCallback, useRef, useState } from 'react';
 import { Alert, StyleSheet, Text, View } from 'react-native';
 import { Swipeable } from 'react-native-gesture-handler';
-import { TouchableRipple } from 'react-native-paper';
+import { ActivityIndicator, TouchableRipple } from 'react-native-paper';
 import Animated, {
   Extrapolation,
   interpolate,
@@ -185,9 +185,9 @@ export default function TransactionsScreen() {
             onScroll={scrollHandler}
             scrollEventThrottle={16}
             onEndReached={fetchMoreTransactions}
-            onEndReachedThreshold={0.2}
+            onEndReachedThreshold={0.16}
             className={'bgWhite'}
-            ListFooterComponent={hasMore ? (isLoadingMore ? <TransactionSkeleton numberOfItems={2} /> : <View style={{ padding: 16 }}></View>) : null}
+            ListFooterComponent={hasMore ? (isLoadingMore ? <TransactionSkeleton numberOfItems={2} /> : <View style={{ padding: 16 }}><ActivityIndicator size={'small'} color={ColorsPalette.light['lime.700']} /></View>) : null}
           />
         </Animated.View>
         <View style={{ position: 'absolute', backgroundColor: '#d4eb61', zIndex: -1, top: 0, width: '100%', height: 220 }} pointerEvents="none" />
