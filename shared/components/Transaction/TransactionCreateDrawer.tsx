@@ -59,12 +59,12 @@ const TransactionCreateDrawer: React.FC<TransactionCreateDrawerProps> = ({
             methodId: transaction?.methodId || "",
             categoryId: transaction?.categoryId || "",
             createdAt: transaction?.createdAt || "",
-            value: transaction?.value || null,
+            value: transaction?.value ? String(Number(transaction.value)) : null,
             type: transactionType,
             fileUrl: "",
         },
     });
-    const { setValue, reset, control, handleSubmit, formState } = formMethods;
+    const { setValue, reset, control, handleSubmit, formState, watch } = formMethods;
     const { isValid } = formState;
 
     useEffect(() => {
@@ -104,11 +104,13 @@ const TransactionCreateDrawer: React.FC<TransactionCreateDrawerProps> = ({
 
         setIsLoading(true);
         try {
-            const newTransaction = { ...data, value: parseCurrencyToNumber(data.value) * 100, userId: user.uid };
+        
+            const isValueNaN = isNaN(parseFloat(String(data.value)));
+            const newTransaction = { ...data, value: !isValueNaN ? transaction?.value ?? data.value : parseCurrencyToNumber(data.value) * 100, userId: user.uid };
             if (transaction?.id) {
-                editTransaction?.(transaction?.id, newTransaction);
+                await editTransaction?.(transaction?.id, newTransaction);
             } else {
-                addTransaction?.(newTransaction);
+                await addTransaction?.(newTransaction);
             }
 
             showFeedback("success");
