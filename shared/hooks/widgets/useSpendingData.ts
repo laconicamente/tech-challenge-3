@@ -26,7 +26,7 @@ export const useWidgetSpendingByCategory = () => {
 
   useEffect(() => {
     getSpendingByCategory();
-  }, [transactions]);
+  }, [user, transactions]);
 
   return { widgetData, isLoading, error };
 };

@@ -92,7 +92,7 @@ export function useTransactions(
     (forMore: boolean = false) => {
       const base = collection(firestore, "transactions");
       const constraints = [];
-console.log('userId', user?.uid)
+
       if (user?.uid) constraints.push(where("userId", "==", user.uid));
       if (categoryId) constraints.push(where("categoryId", "==", categoryId));
       if (methodId) constraints.push(where("methodId", "==", methodId));

@@ -11,15 +11,21 @@ import { TransactionItemProps } from "../classes/models/transaction";
 import { getCategoryById } from "./categoryService";
 
 const generateShades = (index: number, totalItems: number) => {
-  if (totalItems <= 1) return "#0f301a";
+  if (totalItems <= 1) return "#7a60602f";
 
-  const gStart = 50;
-  const gEnd = 180;
+  const rStart = 0x5f;
+  const rEnd = 0x7a;
+  const gStart = 0x6b;
+  const gEnd = 0x1b;
+  const bStart = 0x6b; 
+  const bEnd = 0x1b;  
+
   const ratio = index / (totalItems - 1);
-  const g = Math.round(gStart - (gStart - gEnd) * ratio);
 
-  const r = Math.round(g * 0.28);
-  const b = Math.round(g * 0.2);
+  const lerp = (a: number, b: number, t: number) => Math.round(a + (b - a) * t);
+  const r = lerp(rStart, rEnd, ratio);
+  const g = lerp(gStart, gEnd, ratio);
+  const b = lerp(bStart, bEnd, ratio);
 
   const toHex = (v: number) => v.toString(16).padStart(2, "0");
 

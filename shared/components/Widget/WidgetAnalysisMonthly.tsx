@@ -13,7 +13,7 @@ const COLORS = {
 };
 
 const WidgetAnalysisMonthly = () => {
-  const { widgetData, isLoading } = useAnalysisMonthlyData();
+  const { widgetData } = useAnalysisMonthlyData();
   const chartData = useMemo(
     () => [
       { value: widgetData?.monthIncome || 0, color: COLORS.incomeMain },

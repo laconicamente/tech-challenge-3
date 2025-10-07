@@ -56,9 +56,6 @@ export const FinancialProvider: React.FC<{ children: React.ReactNode }> = ({ chi
     const [isBalanceVisible, setBalanceVisible] = useState(false);
 
     const fetchTransactions = (user: User, params?: TransactionFilter) => {
-        console.log('financial',user.uid);
-        
-        console.log('Fetching transactions for user:', user.uid, 'with params:', params)
         if (!setFilters) return;
         setFilters({
             userId: user.uid,
