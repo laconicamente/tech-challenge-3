@@ -61,7 +61,7 @@ export function useTransactions(
     null
   );
   const [isLoadingMore, setIsLoadingMore] = useState(false);
-  const { user} = useAuth();
+  const { user } = useAuth();
   const { categoryId, methodId, startDate, endDate, minValue, maxValue } = filters;
 
   const mapDoc = async (
@@ -131,10 +131,15 @@ export function useTransactions(
 
       return query(base, ...constraints);
     },
-    [user, categoryId, startDate, endDate, minValue, maxValue, pageSize]
+    [user?.uid, categoryId, startDate, endDate, minValue, maxValue, pageSize]
   );
 
   const fetchFirstPage = useCallback(async () => {
+    if (!user?.uid) {
+      setTransactions([]);
+      setIsLoading(false);
+      return;
+    }
     setIsLoading(true);
     setError(null);
     setHasMore(true);
@@ -157,10 +162,10 @@ export function useTransactions(
     } finally {
       setIsLoading(false);
     }
-  }, [buildBaseQuery, pageSize]);
+  }, [buildBaseQuery, pageSize, user?.uid]);
 
   const loadMore = useCallback(async () => {
-    if (!hasMore || isLoadingMore || isLoading) return;
+    if (!user?.uid || !hasMore || isLoadingMore || isLoading) return;
     setIsLoadingMore(true);
     try {
       const qRef = buildBaseQuery(true);
@@ -186,16 +191,18 @@ export function useTransactions(
     } finally {
       setIsLoadingMore(false);
     }
-  }, [buildBaseQuery, hasMore, isLoadingMore, isLoading, pageSize]);
+  }, [buildBaseQuery, hasMore, isLoadingMore, isLoading, pageSize, user?.uid]);
 
   const refetch = useCallback(async () => {
+    if (!user?.uid) return;
     await fetchFirstPage();
-  }, [fetchFirstPage]);
+  }, [fetchFirstPage, user?.uid]);
 
   const addTransaction = async (data: Partial<TransactionItemProps>) => {
+    if (!user?.uid) throw new Error("Usuário não autenticado para esta operação.");
     try {
       setIsLoading(true);
-      await addDoc(collection(firestore, "transactions"), { ...data });
+      await addDoc(collection(firestore, "transactions"), { ...data, userId: user.uid });
     } catch (error) {
       console.error("Erro ao adicionar transação: ", error);
       throw error;
@@ -208,6 +215,7 @@ export function useTransactions(
     id: string,
     data: Partial<TransactionItemProps>
   ) => {
+    if (!user?.uid) throw new Error("Usuário não autenticado para esta operação.");
     try {
       setIsLoading(true);
       const refCard = doc(firestore, "transactions", id);
@@ -222,6 +230,7 @@ export function useTransactions(
   };
 
   const deleteTransaction = async (id: string) => {
+    if (!user?.uid) throw new Error("Usuário não autenticado para esta operação.");
     if (!id) throw new Error("ID inválido");
     try {
       setIsLoading(true);
